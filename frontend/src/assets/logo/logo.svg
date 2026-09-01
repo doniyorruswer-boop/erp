@@ -1,0 +1,13 @@
+<svg width="293" height="288" viewBox="0 0 293 288" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Purple Rounded Box -->
+  <rect y="5" width="293" height="283" rx="50" fill="#4F46E5"/>
+  
+  <!-- Bold Dynamic E Letter -->
+  <path d="M72 68H215L206 104H116V127H194L185 162H116V188H218L209 224H72V68Z" fill="white"/>
+  
+  <!-- 5-Variant: Zigzag / Lightning Bolt Cut — chaqmoq chiziq -->
+  <polygon points="0,120 140,155 293,120 293,138 140,173 0,138" fill="#4F46E5"/>
+  
+  <!-- Signature Brand Dot -->
+  <ellipse cx="244" cy="219" rx="12" ry="12.5" fill="white"/>
+</svg>

@@ -1,0 +1,24 @@
+.item {
+  .exact-active,
+  .router-link-active {
+    background: var(--color-primary, #2563eb) !important;
+    color: #ffffff !important;
+    &:hover {
+      background: var(--color-primary, #2563eb) !important;
+      color: #ffffff !important;
+    }
+  }
+}
+
+body {
+  ::-moz-selection {
+    /* Code for Firefox */
+    color: white;
+    background: var(--color-primary, #2563eb);
+  }
+
+  ::selection {
+    color: white;
+    background: var(--color-primary, #2563eb);
+  }
+}
