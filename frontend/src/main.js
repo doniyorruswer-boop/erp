@@ -8,12 +8,13 @@ import { createPinia } from "pinia";
 // import "flowbite";
 import "./assets/tailwind.css";
 import "./assets/animate.css";
-import "./assets/sass/css/windzo.css";
+import "./assets/sass/css/eduhub.css";
 import vClickOutside from "click-outside-vue3";
 import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 import FormDatePicker from "@/components/FormDatePicker.vue";
 import FormCurrencyInput from "@/components/FormCurrencyInput.vue";
 import FormTimePicker from "@/components/FormTimePicker.vue";
+import BRAND_CONFIG from "@/config/brand.config";
 import { APP_CONFIG, formatMoney, formatDateUz, formatPhone } from "@/config/app.config";
 import { loadPrimaryColor, loadDarkMode } from "@/helper/theme";
 
@@ -30,7 +31,11 @@ app.component("CurrencyInput", FormCurrencyInput);
 app.component("FormTimePicker", FormTimePicker);
 app.component("TimePicker", FormTimePicker);
 
+import toast from "@/utils/toast";
+
 // Global properties
+app.config.globalProperties.$toast = toast;
+app.config.globalProperties.$brand = BRAND_CONFIG;
 app.config.globalProperties.$appConfig = APP_CONFIG;
 app.config.globalProperties.$formatMoney = formatMoney;
 app.config.globalProperties.$formatDate = formatDateUz;

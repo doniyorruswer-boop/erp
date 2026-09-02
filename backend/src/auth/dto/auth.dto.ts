@@ -42,3 +42,9 @@ export class RegisterDto {
   @IsOptional()
   organizationName?: string;
 }
+
+export class RefreshTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  refreshToken: string;
+}

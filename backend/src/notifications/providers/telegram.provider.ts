@@ -43,6 +43,15 @@ export class TelegramProvider implements NotificationProvider {
       }
     }
 
+    // Production mode without bot token -> Fail explicitly
+    if (process.env.NODE_ENV === 'production') {
+      this.logger.error(`[TELEGRAM ERROR] Productionda Telegram bot tokeni (TELEGRAM_BOT_TOKEN) topilmadi!`);
+      return {
+        success: false,
+        error: 'Telegram bot tokeni (TELEGRAM_BOT_TOKEN) topilmadi',
+      };
+    }
+
     // Simulation / Sandbox mode for development
     this.logger.log(`[TELEGRAM SIMULATION] Chat: ${chatId} | Title: ${payload.title} | Body: ${payload.body}`);
     return {

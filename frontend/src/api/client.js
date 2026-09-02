@@ -4,6 +4,49 @@ function getToken() {
   return localStorage.getItem('token');
 }
 
+let isRefreshing = false;
+let refreshPromise = null;
+
+async function executeTokenRefresh() {
+  if (isRefreshing && refreshPromise) {
+    return refreshPromise;
+  }
+
+  isRefreshing = true;
+  refreshPromise = (async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) return null;
+
+      const refreshRes = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (refreshRes.ok) {
+        const data = await refreshRes.json();
+        if (data.accessToken) {
+          localStorage.setItem('token', data.accessToken);
+          if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+          }
+          return data.accessToken;
+        }
+      }
+      return null;
+    } catch (e) {
+      console.warn('Avtomatik refresh muvaffaqiyatsiz bo\'ldi:', e);
+      return null;
+    } finally {
+      isRefreshing = false;
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
 async function request(endpoint, options = {}) {
   const token = getToken();
 
@@ -42,23 +85,46 @@ async function request(endpoint, options = {}) {
     clearTimeout(timeoutId);
 
     if (response.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      if (!window.location.pathname.startsWith('/auth')) {
-        window.location.href = '/auth/login';
+      if (!options._retry && !endpoint.startsWith('/auth/')) {
+        const newToken = await executeTokenRefresh();
+        if (newToken) {
+          return request(endpoint, { ...options, _retry: true });
+        }
       }
-      throw new Error('Sessiya muddati tugadi. Iltimos, qayta kiring.');
+
+      if (!endpoint.startsWith('/auth/')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        if (!window.location.pathname.startsWith('/auth')) {
+          window.location.href = '/auth/login';
+        }
+        throw new Error('Sessiya muddati tugadi. Iltimos, qayta kiring.');
+      } else {
+        let errorMsg = "Email yoki parol noto'g'ri";
+        let errorData = null;
+        try {
+          errorData = await response.json();
+          errorMsg = errorData.message || errorMsg;
+        } catch {}
+        const error = new Error(errorMsg);
+        error.response = { status: response.status, data: errorData || { message: errorMsg } };
+        throw error;
+      }
     }
 
     if (!response.ok) {
       let errorMessage = 'Xatolik yuz berdi';
+      let errorData = null;
       try {
-        const errorData = await response.json();
+        errorData = await response.json();
         errorMessage = errorData.message || errorMessage;
       } catch {
         errorMessage = response.statusText;
       }
-      throw new Error(errorMessage);
+      const error = new Error(errorMessage);
+      error.response = { status: response.status, data: errorData || { message: errorMessage } };
+      throw error;
     }
 
     if (response.status === 204) return null;

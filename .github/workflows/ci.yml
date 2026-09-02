@@ -1,0 +1,96 @@
+name: EduHub CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  backend-checks:
+    name: Backend Lint, Typecheck & Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: eduhub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: erp/backend/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: erp/backend
+        run: npm ci
+
+      - name: Generate Prisma Client
+        working-directory: erp/backend
+        run: npx prisma generate
+
+      - name: Verify TypeScript Types (Typecheck)
+        working-directory: erp/backend
+        run: npm run typecheck
+
+      - name: Run Unit & Integration Tests (Jest)
+        working-directory: erp/backend
+        env:
+          NODE_ENV: test
+          DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/eduhub_test?schema=public"
+          JWT_SECRET: "ci-testing-jwt-secret-minimum-32-chars-long-secure"
+          REDIS_URL: "redis://localhost:6379"
+        run: npm test
+
+      - name: Verify Production NestJS Build
+        working-directory: erp/backend
+        run: npm run build
+
+  frontend-checks:
+    name: Frontend Build Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          cache-dependency-path: erp/frontend/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: erp/frontend
+        run: npm ci
+
+      - name: Verify Frontend Production Build
+        working-directory: erp/frontend
+        run: npm run build

@@ -12,13 +12,13 @@
             >
               <img
                 src="../../../assets/logo/logo.svg"
-                alt="EduCRM"
+                :alt="$brand.name"
                 class="w-10"
               />
             </div>
             <div class="space-y-3">
               <h2 class="dark:text-white font-semibold text-gray-800 text-4xl">
-                Edu<span class="text-primary">HUB.</span>
+                {{ $brand.prefix }}<span class="text-primary">{{ $brand.suffix }}.</span>
               </h2>
               <p class="dark:text-gray-400 text-gray-700">
                 Parolni tiklash uchun email manzilingizni kiriting.

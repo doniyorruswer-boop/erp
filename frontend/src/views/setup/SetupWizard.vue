@@ -408,7 +408,7 @@
 
     <!-- Footer Copyright -->
     <div class="max-w-4xl mx-auto w-full text-center text-xs text-gray-400 pt-3">
-      EduCRM &copy; 2026. Barcha huquqlar himoyalangan.
+      {{ $brand.copyright }}
     </div>
   </div>
 </template>
@@ -417,6 +417,7 @@
 import { Icon } from "@iconify/vue";
 import { useTenantStore } from "@/store/tenant";
 import { setPrimaryColor, loadPrimaryColor } from "@/helper/theme";
+import BRAND_CONFIG from "@/config/brand.config";
 
 export default {
   name: "SetupWizard",
@@ -453,7 +454,7 @@ export default {
       ],
       form: {
         businessType: "COURSE_CENTER",
-        organizationName: "EduCRM Markazi",
+        organizationName: `${BRAND_CONFIG.name} Markazi`,
         phone: "+998901234567",
         address: "Toshkent shahri",
         currency: "UZS",
@@ -478,7 +479,7 @@ export default {
         adminFirstName: "Bosh",
         adminLastName: "Administrator",
         adminPhone: "+998901234567",
-        adminEmail: "admin@educrm.uz",
+        adminEmail: BRAND_CONFIG.adminEmail,
         adminPassword: "admin123",
         seedDemoData: true,
       },
@@ -536,7 +537,7 @@ export default {
       try {
         await tenantStore.completeSetup(this.form);
         setPrimaryColor(this.form.primaryColor);
-        alert("EduCRM muvaffaqiyatli sozlandi!");
+        alert(`${BRAND_CONFIG.name} muvaffaqiyatli sozlandi!`);
         this.$router.push("/");
       } catch (err) {
         alert(err.message || "O'rnatishda xatolik yuz berdi");

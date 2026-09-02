@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -13,6 +15,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { LeadsModule } from './leads/leads.module';
 import { SetupModule } from './setup/setup.module';
+import { EmployeesModule } from './employees/employees.module';
 import { AuditModule } from './audit/audit.module';
 import { CrmModule } from './crm/crm.module';
 import { CustomFieldsModule } from './custom-fields/custom-fields.module';
@@ -27,6 +30,13 @@ import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60000,
+        limit: 60,
+      },
+    ]),
     PrismaModule,
     AuditModule,
     CustomFieldsModule,
@@ -52,6 +62,13 @@ import { HealthModule } from './health/health.module';
     DashboardModule,
     LeadsModule,
     SetupModule,
+    EmployeesModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

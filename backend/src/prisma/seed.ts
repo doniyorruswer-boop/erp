@@ -6,7 +6,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Boshlang\'ich ma\'lumotlar bazaga kiritilmoqda...');
 
-  const passwordHash = await bcrypt.hash('admin123', 10);
+  const adminPassword = process.env.INITIAL_ADMIN_PASSWORD || 'admin123';
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
 
   // 1. Tashkilotlar (Organizations)
   const orgSchool = await prisma.organization.upsert({
@@ -47,7 +48,7 @@ async function main() {
       firstName: 'Alisher',
       lastName: 'Navoiy',
       phone: '+998901234567',
-      email: 'admin@educrm.uz',
+      email: 'admin@eduhub.uz',
       password: passwordHash,
       role: Role.SUPER_ADMIN,
     },

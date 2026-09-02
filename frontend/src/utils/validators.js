@@ -1,5 +1,5 @@
 /**
- * EduCRM Form Validation Rules (O'zbek tilidagi qoidalar)
+ * EduHub Form Validation Rules (O'zbek tilidagi qoidalar)
  * Vee-Validate va Yup uchun maxsus qoidalar va yordamchi funksiyalar
  */
 

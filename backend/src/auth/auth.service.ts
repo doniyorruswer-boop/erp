@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, ForbiddenException, OnModuleInit } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
@@ -6,34 +6,50 @@ import * as bcrypt from 'bcryptjs';
 import { Role, AuditAction } from '@prisma/client';
 
 @Injectable()
-export class AuthService implements OnModuleInit {
+export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private auditService: AuditService,
   ) {}
 
-  async onModuleInit() {
-    // Seed initial Super Admin if not exists
-    const defaultOrg = await this.prisma.organization.findFirst();
-    const adminExists = await this.prisma.user.findFirst({
-      where: { role: Role.SUPER_ADMIN },
+  private async generateTokens(user: {
+    id: string;
+    phone: string;
+    role: Role;
+    organizationId?: string | null;
+    firstName: string;
+    lastName: string;
+  }) {
+    const payload = {
+      sub: user.id,
+      phone: user.phone,
+      role: user.role,
+      organizationId: user.organizationId || null,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: process.env.JWT_EXPIRES_IN || '15m',
     });
-    if (!adminExists) {
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      await this.prisma.user.create({
-        data: {
-          organizationId: defaultOrg ? defaultOrg.id : null,
-          firstName: 'Bosh',
-          lastName: 'Administrator',
-          phone: '+998901234567',
-          email: 'admin@educrm.uz',
-          password: hashedPassword,
-          role: Role.SUPER_ADMIN,
-        },
-      });
-      console.log('Super Admin yaratildi: Tel: +998901234567, Parol: admin123');
-    }
+
+    const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET;
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: refreshSecret,
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+    });
+
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { hashedRefreshToken },
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   async login(loginDto: { phone?: string; email?: string; password: string }, ip?: string, userAgent?: string) {
@@ -56,8 +72,9 @@ export class AuthService implements OnModuleInit {
       throw new UnauthorizedException('Email yoki parol xato!');
     }
 
-    const isMatch = await bcrypt.compare(loginDto.password, user.password);
-    if (!isMatch) {
+    // Check if account is currently locked out
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      const remainingMinutes = Math.max(1, Math.ceil((user.lockedUntil.getTime() - Date.now()) / (60 * 1000)));
       await this.auditService.log({
         organizationId: user.organizationId || undefined,
         userId: user.id,
@@ -66,19 +83,57 @@ export class AuthService implements OnModuleInit {
         entityId: user.id,
         ip,
         userAgent,
-        after: { identifier: loginDto.email || loginDto.phone, status: 'FAILED_INVALID_PASSWORD' },
+        after: { identifier: loginDto.email || loginDto.phone, status: 'BLOCKED_ACCOUNT_LOCKED', remainingMinutes },
       });
-      throw new UnauthorizedException('Email yoki parol xato!');
+      throw new UnauthorizedException(
+        `Hisobingiz ketma-ket 5 ta muvaffaqiyatsiz urinish sababli vaqtincha bloklangan. Iltimos, ${remainingMinutes} daqiqadan so'ng qayta urinib ko'ring.`
+      );
     }
 
-    const payload = {
-      sub: user.id,
-      phone: user.phone,
-      role: user.role,
-      organizationId: user.organizationId || null,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    };
+    const isMatch = await bcrypt.compare(loginDto.password, user.password);
+    if (!isMatch) {
+      const failedAttempts = (user.failedLoginAttempts || 0) + 1;
+      let updateData: any = { failedLoginAttempts: failedAttempts };
+      let errorMessage = 'Email yoki parol xato!';
+
+      if (failedAttempts >= 5) {
+        const lockoutMinutes = process.env.LOCKOUT_MINUTES ? Number(process.env.LOCKOUT_MINUTES) : (process.env.NODE_ENV === 'development' ? 1 : 15);
+        const lockoutDurationMs = lockoutMinutes * 60 * 1000;
+        updateData = {
+          failedLoginAttempts: 0,
+          lockedUntil: new Date(Date.now() + lockoutDurationMs),
+        };
+        errorMessage = `Parol 5 marta ketma-ket xato kiritildi. Xavfsizlik yuzasidan hisobingiz ${lockoutMinutes} daqiqaga bloklandi!`;
+      }
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: updateData,
+      });
+
+      await this.auditService.log({
+        organizationId: user.organizationId || undefined,
+        userId: user.id,
+        action: AuditAction.LOGIN,
+        entityType: 'User',
+        entityId: user.id,
+        ip,
+        userAgent,
+        after: { identifier: loginDto.email || loginDto.phone, status: failedAttempts >= 5 ? 'ACCOUNT_LOCKED_15M' : 'FAILED_INVALID_PASSWORD', failedAttempts },
+      });
+
+      throw new UnauthorizedException(errorMessage);
+    }
+
+    // Reset failed attempts upon successful authentication
+    if ((user.failedLoginAttempts && user.failedLoginAttempts > 0) || user.lockedUntil) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { failedLoginAttempts: 0, lockedUntil: null },
+      });
+    }
+
+    const tokens = await this.generateTokens(user);
 
     await this.auditService.log({
       organizationId: user.organizationId || undefined,
@@ -92,7 +147,8 @@ export class AuthService implements OnModuleInit {
     });
 
     return {
-      accessToken: this.jwtService.sign(payload),
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
       user: {
         id: user.id,
         organizationId: user.organizationId || null,
@@ -109,6 +165,76 @@ export class AuthService implements OnModuleInit {
         role: user.role,
       },
     };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token taqdim etilmadi');
+    }
+
+    const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET;
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(refreshToken, { secret: refreshSecret });
+    } catch (e) {
+      throw new UnauthorizedException('Refresh token yaroqsiz yoki muddati o\'tgan');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
+
+    if (!user || !user.isActive || user.deletedAt || !user.hashedRefreshToken) {
+      throw new UnauthorizedException('Foydalanuvchi topilmadi yoki sessiya bekor qilingan');
+    }
+
+    const isMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+    if (!isMatch) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { hashedRefreshToken: null },
+      });
+      throw new ForbiddenException('Refresh token xavfsizlik tekshiruvidan o\'tmadi. Iltimos, qayta kiring.');
+    }
+
+    return this.generateTokens(user);
+  }
+
+  decodeToken(token: string) {
+    try {
+      return this.jwtService.decode(token);
+    } catch {
+      return null;
+    }
+  }
+
+  async logout(userId?: string, refreshToken?: string) {
+    if (userId) {
+      try {
+        await this.prisma.user.update({
+          where: { id: userId },
+          data: { hashedRefreshToken: null },
+        });
+      } catch (e) {}
+      return { success: true, message: 'Tizimdan muvaffaqiyatli chiqildi' };
+    }
+
+    if (refreshToken) {
+      try {
+        const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET;
+        const payload: any = this.jwtService.verify(refreshToken, { secret: refreshSecret });
+        if (payload && payload.sub) {
+          await this.prisma.user.update({
+            where: { id: payload.sub },
+            data: { hashedRefreshToken: null },
+          });
+        }
+      } catch (e) {
+        // Token invalid or already revoked
+      }
+    }
+
+    return { success: true, message: 'Tizimdan muvaffaqiyatli chiqildi' };
   }
 
   async register(registerDto: {
@@ -192,18 +318,24 @@ export class AuthService implements OnModuleInit {
       after: { name: result.organization.name, owner: result.user.phone },
     });
 
+    const tokens = await this.generateTokens(result.user);
+
     return {
-      id: result.user.id,
-      organizationId: result.organization.id,
-      organization: {
-        id: result.organization.id,
-        name: result.organization.name,
-        slug: result.organization.slug,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      user: {
+        id: result.user.id,
+        organizationId: result.organization.id,
+        organization: {
+          id: result.organization.id,
+          name: result.organization.name,
+          slug: result.organization.slug,
+        },
+        firstName: result.user.firstName,
+        lastName: result.user.lastName,
+        phone: result.user.phone,
+        role: result.user.role,
       },
-      firstName: result.user.firstName,
-      lastName: result.user.lastName,
-      phone: result.user.phone,
-      role: result.user.role,
     };
   }
 
@@ -230,5 +362,27 @@ export class AuthService implements OnModuleInit {
       },
     });
     return user;
+  }
+
+  async unlockAccount(identifier?: string) {
+    if (!identifier) {
+      const result = await this.prisma.user.updateMany({
+        data: { failedLoginAttempts: 0, lockedUntil: null },
+      });
+      return { success: true, count: result.count, message: 'Barcha hisoblar blokdan chiqarildi.' };
+    }
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: identifier }, { phone: identifier }, { id: identifier }],
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('Foydalanuvchi topilmadi.');
+    }
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { failedLoginAttempts: 0, lockedUntil: null },
+    });
+    return { success: true, message: `${user.email || user.phone} blokdan chiqarildi.` };
   }
 }

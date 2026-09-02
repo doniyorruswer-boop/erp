@@ -1,20 +1,117 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnApplicationBootstrap, OnModuleDestroy } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JobStatus, InvoiceStatus } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CreateJobDto, QueryJobDto } from './dto/job.dto';
+import Redis from 'ioredis';
 
 @Injectable()
-export class JobsService {
+export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
   private readonly logger = new Logger(JobsService.name);
+  private redis: Redis | null = null;
+  private pollerInterval: any = null;
 
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
   ) {}
 
+  async onApplicationBootstrap() {
+    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    try {
+      this.redis = new Redis(redisUrl, {
+        maxRetriesPerRequest: 3,
+        retryStrategy: (times) => Math.min(times * 100, 3000),
+        lazyConnect: true,
+      });
+
+      this.redis.on('connect', () => {
+        this.logger.log(`[REDIS] Background jobs connected to Redis at ${redisUrl}`);
+      });
+
+      this.redis.on('error', (err) => {
+        this.logger.warn(`[REDIS] Connection notice: ${err.message}`);
+      });
+
+      await this.redis.connect().catch((err) => {
+        this.logger.warn(`[REDIS] Initial connect skipped: ${err.message}`);
+      });
+    } catch (e: any) {
+      this.logger.warn(`[REDIS] Redis initialization skipped: ${e.message}`);
+    }
+
+    // Recover any pending or interrupted jobs from previous server run
+    await this.recoverOrphanedJobs();
+
+    // Start checking delayed jobs periodically
+    this.startDelayedJobPoller();
+  }
+
+  async onModuleDestroy() {
+    if (this.pollerInterval) {
+      clearInterval(this.pollerInterval);
+    }
+    if (this.redis) {
+      await this.redis.quit().catch(() => {});
+    }
+  }
+
+  async recoverOrphanedJobs() {
+    try {
+      const orphaned = await this.prisma.job.findMany({
+        where: {
+          status: { in: [JobStatus.PENDING, JobStatus.PROCESSING] },
+        },
+        take: 100,
+        orderBy: { createdAt: 'asc' },
+      });
+
+      if (orphaned.length > 0) {
+        this.logger.log(`[JOB RECOVERY] Found ${orphaned.length} pending/interrupted jobs to re-enqueue.`);
+        for (const job of orphaned) {
+          const delay = Math.max(0, job.runAt.getTime() - Date.now());
+          this.scheduleExecution(job.id, delay);
+        }
+      }
+    } catch (err: any) {
+      this.logger.error(`[JOB RECOVERY ERROR]: ${err.message}`);
+    }
+  }
+
+  private scheduleExecution(jobId: string, delayMs: number) {
+    if (this.redis && this.redis.status === 'ready') {
+      const runTimestamp = Date.now() + delayMs;
+      this.redis.zadd('eduhub:jobs:delayed', runTimestamp, jobId).catch(() => {});
+    }
+
+    if (!delayMs || delayMs <= 0) {
+      setImmediate(() => this.processJob(jobId));
+    } else {
+      setTimeout(() => this.processJob(jobId), Math.min(delayMs, 86400000));
+    }
+  }
+
+  private startDelayedJobPoller() {
+    this.pollerInterval = setInterval(async () => {
+      if (!this.redis || this.redis.status !== 'ready') return;
+      try {
+        const now = Date.now();
+        const dueJobIds = await this.redis.zrangebyscore('eduhub:jobs:delayed', 0, now);
+        if (dueJobIds && dueJobIds.length > 0) {
+          await this.redis.zrem('eduhub:jobs:delayed', ...dueJobIds);
+          for (const jobId of dueJobIds) {
+            this.processJob(jobId);
+          }
+        }
+      } catch (err: any) {
+        // Suppress poller error
+      }
+    }, 3000);
+  }
+
   async addJob(data: CreateJobDto, orgId: string) {
-    const runAt = new Date(Date.now() + (data.delayMs || 0));
+    const delayMs = data.delayMs || 0;
+    const runAt = new Date(Date.now() + delayMs);
 
     const job = await this.prisma.job.create({
       data: {
@@ -27,13 +124,7 @@ export class JobsService {
       },
     });
 
-    // If no delay, trigger execution asynchronously in the background
-    if (!data.delayMs || data.delayMs <= 0) {
-      setImmediate(() => this.processJob(job.id));
-    } else {
-      setTimeout(() => this.processJob(job.id), data.delayMs);
-    }
-
+    this.scheduleExecution(job.id, delayMs);
     return job;
   }
 
@@ -110,7 +201,7 @@ export class JobsService {
           },
         });
 
-        setTimeout(() => this.processJob(jobId), backoffMs);
+        this.scheduleExecution(jobId, backoffMs);
       } else {
         await this.prisma.job.update({
           where: { id: jobId },

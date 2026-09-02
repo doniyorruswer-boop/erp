@@ -291,15 +291,22 @@
               </div>
             </div>
 
-            <div class="space-y-3">
+            <div v-if="examsLoading" class="text-center py-8 text-gray-400">
+              <p class="text-sm">Imtihon natijalari yuklanmoqda...</p>
+            </div>
+            <div v-else-if="!exams || exams.length === 0" class="text-center py-8 text-gray-400">
+              <Icon icon="solar:diploma-verified-linear" class="text-4xl mx-auto mb-2 opacity-50" />
+              <p class="text-sm">Ushbu o'quvchi uchun hali imtihon baholari kiritilmagan</p>
+            </div>
+            <div v-else class="space-y-3">
               <div
-                v-for="exam in mockExams"
+                v-for="exam in exams"
                 :key="exam.id"
                 class="p-4 rounded-lg border dark:border-gray-700 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/30 transition"
               >
                 <div>
                   <h4 class="text-sm font-bold text-gray-800 dark:text-gray-100">{{ exam.title }}</h4>
-                  <p class="text-xs text-gray-400 mt-0.5">Sana: {{ formatDate(exam.date) }} | Mas'ul: {{ exam.examiner }}</p>
+                  <p class="text-xs text-gray-400 mt-0.5">Sana: {{ formatDate(exam.date) }} | Guruh: {{ exam.groupName || 'Asosiy' }}</p>
                 </div>
                 <div class="flex items-center gap-3">
                   <div class="text-right">
@@ -423,7 +430,7 @@
 <script>
 import { Icon } from "@iconify/vue";
 import api from "@/api/client";
-import { studentsApi, paymentsApi } from "@/api/services";
+import { studentsApi, paymentsApi, examsApi } from "@/api/services";
 import { formatUZS, formatPhone, formatDate, formatDateTime } from "@/helper/formatters";
 import Breadcrumb from "@/components/Breadcrumb.vue";
 import Badge from "@/components/Badge.vue";
@@ -476,10 +483,8 @@ export default {
       ],
       studentPayments: [],
       attendanceRecords: [],
-      mockExams: [
-        { id: 1, title: "IELTS Unit 1 Progress Test", date: "2026-08-15", score: 85, maxScore: 100, grade: "A'lo", examiner: "Mr. Jasur" },
-        { id: 2, title: "Vocabulary & Speaking Test", date: "2026-08-01", score: 78, maxScore: 100, grade: "Yaxshi", examiner: "Mr. Jasur" },
-      ],
+      exams: [],
+      examsLoading: false,
     };
   },
   computed: {
@@ -488,7 +493,7 @@ export default {
         { id: "overview", label: "Umumiy Ma'lumot", icon: "solar:user-id-bold" },
         { id: "payments", label: "To'lovlar", icon: "solar:wallet-money-bold", count: this.studentPayments.length },
         { id: "attendance", label: "Davomat", icon: "fluent:calendar-checkmark-24-filled" },
-        { id: "exams", label: "Imtihonlar", icon: "solar:diploma-verified-bold", count: this.mockExams.length },
+        { id: "exams", label: "Imtihonlar", icon: "solar:diploma-verified-bold", count: this.exams.length },
         { id: "notes", label: "Eslatmalar & SMS", icon: "solar:chat-round-dots-linear" },
       ];
     },
@@ -535,6 +540,7 @@ export default {
         this.student = res;
         this.studentPayments = res?.payments || [];
         this.attendanceRecords = res?.attendances || [];
+        this.fetchExams();
       } catch (err) {
         console.error("O'quvchi ma'lumotlarini olishda xatolik:", err);
         this.student = null;
@@ -556,20 +562,34 @@ export default {
     async fetchAttendance() {
       if (!this.student?.id) return;
       try {
-        const res = await api.get(`/attendance?studentId=${this.student.id}`);
-        if (Array.isArray(res)) {
-          this.attendanceRecords = res;
-        }
-      } catch (err) {
-        console.error("Davomatni olishda xatolik:", err);
-      }
-    },
-    async fetchAttendance() {
-      try {
-        const res = await api.get(`/attendance/student/${this.student.id}`);
+        const res = await api.get(`/attendance/students/${this.student.id}`);
         this.attendanceRecords = Array.isArray(res) ? res : [];
       } catch {
-        // Mock fallback
+        this.attendanceRecords = [];
+      }
+    },
+    async fetchExams() {
+      if (!this.student?.id) return;
+      this.examsLoading = true;
+      try {
+        const grades = await examsApi.getStudentGrades(this.student.id);
+        if (Array.isArray(grades)) {
+          this.exams = grades.map((g) => ({
+            id: g.id,
+            title: g.exam?.title || g.lesson?.topic || "Imtihon / Test",
+            date: g.date || g.createdAt,
+            score: Number(g.score),
+            maxScore: Number(g.exam?.maxScore || 100),
+            grade: g.score >= 86 ? "A'lo" : g.score >= 71 ? "Yaxshi" : g.score >= 56 ? "Qoniqarli" : "Qoniqarsiz",
+            groupName: g.exam?.group?.name || "",
+            feedback: g.feedback,
+          }));
+        }
+      } catch (err) {
+        console.warn("Imtihon baholarini olishda xatolik:", err);
+        this.exams = [];
+      } finally {
+        this.examsLoading = false;
       }
     },
     getDaysLabel(days) {

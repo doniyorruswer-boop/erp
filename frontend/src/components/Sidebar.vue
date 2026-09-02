@@ -10,14 +10,14 @@
       >
         <img
           src="../assets/logo/logo.svg"
-          alt="EduHUB"
+          :alt="$brand.name"
           class="w-8 h-8 rounded-lg mt-1"
         />
         <h2
           class="text-2xl font-bold ml-3 mt-1 text-gray-800 dark:text-gray-200"
           translate="no"
         >
-          Edu<span class="text-primary">HUB</span>
+          {{ $brand.prefix }}<span class="text-primary">{{ $brand.suffix }}</span>
         </h2>
       </router-link>
       <div
@@ -71,17 +71,6 @@
             >
               <span class="mr-3 text-xl"><Icon icon="solar:tuning-square-2-bold" /></span>
               <span class="w-full"> Lidlar & Kanban </span>
-            </router-link>
-          </div>
-
-          <!-- CRM Sozlamalar -->
-          <div class="item mt-1">
-            <router-link
-              to="/crm/settings"
-              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              <span class="mr-3 text-xl text-primary"><Icon icon="solar:settings-minimalistic-bold" /></span>
-              <span class="w-full"> CRM Sozlamalar </span>
             </router-link>
           </div>
 
@@ -162,6 +151,17 @@
             </router-link>
           </div>
 
+          <!-- Xodimlar & HR -->
+          <div class="item mt-2">
+            <router-link
+              to="/employees"
+              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <span class="mr-3 text-xl"><Icon icon="solar:users-group-two-rounded-bold" /></span>
+              <span class="w-full"> Xodimlar & Oylik </span>
+            </router-link>
+          </div>
+
           <!-- Calendar -->
           <div class="item mt-2">
             <router-link
@@ -173,14 +173,77 @@
             </router-link>
           </div>
 
-          <!-- Setup Wizard Link (Quick Access / Configuration) -->
+          <!-- Xabarnomalar Markazi -->
+          <div class="item mt-2">
+            <router-link
+              to="/notifications"
+              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <span class="mr-3 text-xl"><Icon icon="solar:bell-bold" /></span>
+              <span class="w-full"> Xabarnomalar </span>
+            </router-link>
+          </div>
+
+          <!-- Boshqaruv & Xavfsizlik Section -->
           <div class="item mt-3 pt-3 border-t dark:border-gray-700">
+            <p class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+              Boshqaruv & RBAC
+            </p>
+
+            <!-- Users -->
+            <router-link
+              to="/users"
+              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700 mb-1"
+            >
+              <span class="mr-3 text-xl"><Icon icon="solar:users-group-rounded-bold" /></span>
+              <span class="w-full"> Foydalanuvchilar </span>
+            </router-link>
+
+            <!-- Roles -->
+            <router-link
+              to="/roles"
+              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700 mb-1"
+            >
+              <span class="mr-3 text-xl"><Icon icon="solar:shield-check-bold" /></span>
+              <span class="w-full"> Rollar & Ruxsatlar </span>
+            </router-link>
+
+            <!-- Audit Log -->
+            <router-link
+              to="/audit"
+              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700 mb-1"
+            >
+              <span class="mr-3 text-xl"><Icon icon="solar:history-bold" /></span>
+              <span class="w-full"> Xavfsizlik Jurnali </span>
+            </router-link>
+
+            <!-- Subscriptions -->
+            <router-link
+              to="/subscriptions"
+              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700 mb-1"
+            >
+              <span class="mr-3 text-xl"><Icon icon="solar:star-fall-bold" /></span>
+              <span class="w-full"> Tariflar & Obuna </span>
+            </router-link>
+
+            <!-- CRM & System Settings -->
+            <router-link
+              to="/crm/settings"
+              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700 mb-1"
+            >
+              <span class="mr-3 text-xl"><Icon icon="solar:settings-minimalistic-bold" /></span>
+              <span class="w-full"> Tizim Sozlamalari </span>
+            </router-link>
+          </div>
+
+          <!-- Setup Wizard Link (Quick Access / Configuration) -->
+          <div class="item mt-2">
             <router-link
               to="/setup"
               class="w-full flex text-left rounded-md box-border p-3 bg-primary/10 text-primary hover:bg-primary/20 transition font-semibold"
             >
               <span class="mr-3 text-xl"><Icon icon="solar:settings-bold" /></span>
-              <span class="w-full"> Setup & Sozlash </span>
+              <span class="w-full"> Setup Wizard </span>
             </router-link>
           </div>
         </div>

@@ -28,8 +28,8 @@ export class ModuleGuard implements CanActivate {
       throw new ForbiddenException('Foydalanuvchi autentifikatsiyadan otmagan');
     }
 
-    // Super admin bypasses module restriction if not bound to an org
-    if (user.role === Role.SUPER_ADMIN && !user.organizationId) {
+    // Super admin bypasses module restriction
+    if (user.role === Role.SUPER_ADMIN) {
       return true;
     }
 

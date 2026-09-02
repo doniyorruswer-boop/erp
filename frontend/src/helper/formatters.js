@@ -1,5 +1,5 @@
 /**
- * EduCRM Formatters & Helper Utilities
+ * EduHub Formatters & Helper Utilities
  * SOLID: Single Responsibility Principle for data formatting across the CRM
  */
 

@@ -20,7 +20,9 @@ export class NotificationsController {
   @Get()
   @RequirePermissions('notifications.view')
   findAll(@CurrentTenant() orgId: string, @Query() query: QueryNotificationDto, @Request() req: any) {
-    return this.notificationsService.findAll({ ...query, userId: query.userId || req.user?.id }, orgId);
+    const isOrgAdmin = req.user?.role === 'SUPER_ADMIN' || req.user?.role === 'ADMIN';
+    const userId = query.userId || (isOrgAdmin ? undefined : req.user?.id);
+    return this.notificationsService.findAll({ ...query, userId }, orgId);
   }
 
   @Post('send')

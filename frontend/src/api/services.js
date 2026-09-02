@@ -1,5 +1,5 @@
 /**
- * EduCRM Real API Services (Connected to NestJS + PostgreSQL)
+ * EduHub Real API Services (Connected to NestJS + PostgreSQL)
  */
 import api from './client';
 
@@ -10,6 +10,8 @@ export const authApi = {
       : (credential && credential.includes('@') ? { email: credential, password } : { phone: credential, password });
     return api.post('/auth/login', payload);
   },
+  refresh: (refreshToken) => api.post('/auth/refresh', { refreshToken }),
+  logout: (body = {}) => api.post('/auth/logout', body),
   register: (data) => api.post('/auth/register', data),
   getProfile: () => api.get('/auth/profile'),
 };
@@ -366,4 +368,56 @@ export const workflowsApi = {
   delete: (id) => api.delete(`/workflows/${id}`),
   triggerEvent: (data) => api.post('/workflows/trigger-event', data),
 };
+
+export const examsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return api.get(`/exams${query ? '?' + query : ''}`);
+  },
+  getOne: (id) => api.get(`/exams/${id}`),
+  create: (data) => api.post('/exams', data),
+  update: (id, data) => api.put(`/exams/${id}`, data),
+  delete: (id) => api.delete(`/exams/${id}`),
+  recordGrades: (data) => api.post('/exams/grades', data),
+  getStudentGrades: (studentId) => api.get(`/exams/students/${studentId}/grades`),
+};
+
+export const employeesApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return api.get(`/employees${query ? '?' + query : ''}`);
+  },
+  getOne: (id) => api.get(`/employees/${id}`),
+  create: (data) => api.post('/employees', data),
+  update: (id, data) => api.put(`/employees/${id}`, data),
+  delete: (id) => api.delete(`/employees/${id}`),
+  createPayroll: (data) => api.post('/employees/payroll', data),
+  getEmployeePayrolls: (id) => api.get(`/employees/${id}/payroll`),
+  getPayrollSummary: (period) => api.get(`/employees/payroll/summary${period ? '?period=' + period : ''}`),
+};
+
+export const lessonsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return api.get(`/lessons${query ? '?' + query : ''}`);
+  },
+  getOne: (id) => api.get(`/lessons/${id}`),
+  create: (data) => api.post('/lessons', data),
+  update: (id, data) => api.put(`/lessons/${id}`, data),
+  delete: (id) => api.delete(`/lessons/${id}`),
+};
+
+export const parentsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return api.get(`/parents${query ? '?' + query : ''}`);
+  },
+  getOne: (id) => api.get(`/parents/${id}`),
+  create: (data) => api.post('/parents', data),
+  update: (id, data) => api.put(`/parents/${id}`, data),
+  delete: (id) => api.delete(`/parents/${id}`),
+  linkStudent: (data) => api.post('/parents/link', data),
+  unlinkStudent: (parentId, studentId) => api.delete(`/parents/${parentId}/students/${studentId}`),
+};
+
 

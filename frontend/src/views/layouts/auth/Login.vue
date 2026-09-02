@@ -12,18 +12,41 @@
             >
               <img
                 src="../../../assets/logo/logo.svg"
-                alt=""
+                :alt="$brand.name"
                 class="w-10"
               />
             </div>
             <div class="space-y-3">
               <h2 class="dark:text-white font-semibold text-gray-800 text-4xl">
-                Edu<span class="text-primary">HUB.</span>
+                {{ $brand.prefix }}<span class="text-primary">{{ $brand.suffix }}.</span>
               </h2>
               <p class="dark:text-gray-400 text-gray-700">
                 Tizimga kirish uchun email va parolingizni kiriting.
               </p>
             </div>
+
+            <!-- Error Banner with Unlock Option -->
+            <div
+              v-if="errorMessage"
+              class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-3"
+            >
+              <Icon icon="solar:danger-circle-bold" class="w-5 h-5 shrink-0 text-rose-500 mt-0.5" />
+              <div class="flex-1">
+                <div class="font-bold">Kirish rad etildi</div>
+                <div class="mt-0.5 leading-relaxed">{{ errorMessage }}</div>
+                <button
+                  v-if="errorMessage.includes('bloklangan') || errorMessage.includes('bloklandi') || errorMessage.includes('vaqtincha')"
+                  type="button"
+                  @click="unlockAccount"
+                  :disabled="unlocking"
+                  class="mt-2.5 inline-flex items-center gap-1 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-xs transition disabled:opacity-50"
+                >
+                  <Icon icon="solar:lock-unlocked-bold" class="w-3.5 h-3.5" />
+                  {{ unlocking ? "Chiqarilmoqda..." : "Hisobni hoziroq blokdan chiqarish" }}
+                </button>
+              </div>
+            </div>
+
             <div class="space-y-5">
               <div class="relative z-0 w-full mb-6 group">
                 <input
@@ -109,34 +132,63 @@
 </template>
 
 <script>
+import { Icon } from "@iconify/vue";
 import { authApi } from "@/api/services";
+import api from "@/api/client";
+import BRAND_CONFIG from "@/config/brand.config";
 
 export default {
   name: "Login",
+  components: { Icon },
   data() {
     return {
-      email: "admin@educrm.uz",
+      email: BRAND_CONFIG.adminEmail,
       password: "admin123",
       rememberMe: true,
       loading: false,
+      unlocking: false,
+      errorMessage: "",
     };
   },
   methods: {
     async handleLogin() {
       this.loading = true;
+      this.errorMessage = "";
       try {
         const res = await authApi.login(this.email, this.password);
         if (res && res.accessToken) {
           localStorage.setItem("token", res.accessToken);
+          if (res.refreshToken) {
+            localStorage.setItem("refreshToken", res.refreshToken);
+          }
           if (res.user) {
             localStorage.setItem("user", JSON.stringify(res.user));
+            if (res.user.organization) {
+              localStorage.setItem("organization", JSON.stringify(res.user.organization));
+              localStorage.setItem("businessType", res.user.organization.businessType || "COURSE_CENTER");
+            }
           }
+          this.$toast.success("Tizimga muvaffaqiyatli kirdingiz!", "Xush kelibsiz!");
           this.$router.push("/");
         }
       } catch (err) {
-        alert(err.response?.data?.message || "Email yoki parol noto'g'ri");
+        const msg = err.response?.data?.message || err.message || "Email yoki parol noto'g'ri";
+        this.errorMessage = msg;
       } finally {
         this.loading = false;
+      }
+    },
+    async unlockAccount() {
+      this.unlocking = true;
+      try {
+        const res = await api.post("/auth/unlock", { identifier: this.email });
+        this.errorMessage = "";
+        this.$toast.success(res?.message || "Hisobingiz blokdan chiqarildi! Endi qayta kirishingiz mumkin.", "Blokdan chiqarildi");
+      } catch (err) {
+        const msg = err.response?.data?.message || "Blokdan chiqarishda xatolik yuz berdi";
+        this.$toast.error(msg);
+      } finally {
+        this.unlocking = false;
       }
     },
   },

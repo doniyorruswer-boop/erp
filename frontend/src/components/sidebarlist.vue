@@ -11,13 +11,13 @@
         <img
           class="w-8 mt-1"
           src="@/assets/logo/logo.svg"
-          alt="logo windzo"
+          :alt="$brand.name"
         />
         <h2
-          class="text-2xl font-normal ml-3 mt-2 text-gray-800 dark:text-gray-200"
+          class="text-2xl font-bold ml-3 mt-1 text-gray-800 dark:text-gray-200"
           translate="no"
         >
-          Windzo<span class="text-primary">.</span>
+          {{ $brand.prefix }}<span class="text-primary">{{ $brand.suffix }}</span>
         </h2>
       </router-link>
       <div

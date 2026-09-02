@@ -221,7 +221,7 @@
             </div>
             <div class="text-left hidden sm:block">
               <h2 class="text-xs font-semibold text-gray-800 dark:text-gray-100 leading-tight">Administrator</h2>
-              <p class="text-[10px] text-gray-400 mt-0.5">EduCRM Manager</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">{{ $brand.name }} Administrator</p>
             </div>
           </button>
 
@@ -233,7 +233,7 @@
               <!-- User Info -->
               <div class="px-4 py-3">
                 <p class="font-semibold text-sm text-gray-800 dark:text-gray-200">Administrator</p>
-                <p class="text-gray-400 text-xs truncate mt-0.5">admin@educrm.uz</p>
+                <p class="text-gray-400 text-xs truncate mt-0.5">{{ $brand.adminEmail }}</p>
               </div>
 
               <!-- Menu Links -->
@@ -299,6 +299,7 @@ import { Icon } from "@iconify/vue";
 import { fullscreen } from "@/helper/fullscreen";
 import { setDarkMode, loadDarkMode } from "@/helper/theme";
 import { useTenantStore } from "@/store/tenant";
+import { authApi, notificationsApi } from "@/api/services";
 
 export default {
   name: "Header",
@@ -370,7 +371,7 @@ export default {
       return "O'quv Markazi";
     },
     openPortal() {
-      window.open("https://educrm.uz", "_blank");
+      window.open(this.$brand.portalUrl, "_blank");
     },
     menuToggle() {
       this.menu = !this.menu;
@@ -380,12 +381,41 @@ export default {
     },
     notifToggle() {
       this.notification = !this.notification;
+      if (this.notification) {
+        this.loadNotifications();
+      }
     },
     closeNotif() {
       this.notification = false;
     },
-    markAllRead() {
-      this.notifList = [];
+    async loadNotifications() {
+      try {
+        const res = await notificationsApi.getAll({ limit: 10 });
+        if (res && (res.data || Array.isArray(res))) {
+          const list = res.data || res;
+          if (list.length > 0) {
+            this.notifList = list.map((n) => ({
+              id: n.id,
+              name: n.title || "Xabarnoma",
+              message: n.body,
+              icon: n.channel === "SMS" ? "solar:chat-round-dots-bold" : n.channel === "EMAIL" ? "solar:letter-bold" : "solar:bell-bold",
+              bgClass: n.channel === "SMS" ? "bg-amber-50 dark:bg-amber-900/30 text-amber-600" : "bg-blue-50 dark:bg-blue-900/30 text-primary",
+              hours: new Date(n.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+              isRead: n.isRead,
+            }));
+          }
+        }
+      } catch (err) {
+        // keep existing fallback items
+      }
+    },
+    async markAllRead() {
+      try {
+        await notificationsApi.markAllAsRead();
+        await this.loadNotifications();
+      } catch (err) {
+        this.notifList = [];
+      }
     },
     fullscreenToggle() {
       const isCurrentlyFullscreen = !!(
@@ -400,15 +430,24 @@ export default {
       this.darkMode = bool;
       this.setDarkMode(bool);
     },
-    logout() {
+    async logout() {
       this.menu = false;
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      this.$router.push("/auth/login");
+      try {
+        const refreshToken = localStorage.getItem("refreshToken");
+        await authApi.logout({ refreshToken });
+      } catch (e) {
+        console.warn("Logout error:", e);
+      } finally {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+        this.$router.push("/auth/login");
+      }
     },
   },
   mounted() {
     this.darkMode = this.loadDarkMode();
+    this.loadNotifications();
 
     // Listen to browser fullscreen changes (e.g. when user presses ESC key)
     this.onFullscreenChange = () => {

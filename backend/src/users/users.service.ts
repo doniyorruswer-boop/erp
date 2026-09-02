@@ -94,7 +94,11 @@ export class UsersService {
       }
     }
 
-    const passwordHash = await bcrypt.hash(data.password || 'admin123', 10);
+    if (!data.password && process.env.NODE_ENV === 'production') {
+      throw new BadRequestException('Foydalanuvchi paroli ko\'rsatilishi shart!');
+    }
+    const rawPassword = data.password || 'admin123';
+    const passwordHash = await bcrypt.hash(rawPassword, 10);
 
     const user = await this.prisma.user.create({
       data: {

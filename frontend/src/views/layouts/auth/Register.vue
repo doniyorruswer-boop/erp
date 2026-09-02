@@ -162,10 +162,11 @@ export default {
           if (res.user) {
             localStorage.setItem("user", JSON.stringify(res.user));
           }
+          this.$toast.success("Muvaffaqiyatli ro'yxatdan o'tdingiz!", "Xush kelibsiz!");
           this.$router.push("/");
         }
       } catch (err) {
-        alert(err.response?.data?.message || "Ro'yxatdan o'tishda xatolik yuz berdi");
+        this.$toast.error(err.response?.data?.message || "Ro'yxatdan o'tishda xatolik yuz berdi");
       } finally {
         this.loading = false;
       }

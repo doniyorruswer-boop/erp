@@ -287,7 +287,11 @@ export class SetupService {
       },
     });
 
-    const hashedPassword = await bcrypt.hash(data.adminPassword || 'admin123', 10);
+    if (!data.adminPassword && process.env.NODE_ENV === 'production') {
+      throw new BadRequestException('Administrator paroli ko\'rsatilishi shart!');
+    }
+    const rawAdminPassword = data.adminPassword || 'admin123';
+    const hashedPassword = await bcrypt.hash(rawAdminPassword, 10);
     const adminUser = await this.prisma.user.upsert({
       where: { phone: data.adminPhone },
       create: {
@@ -295,7 +299,7 @@ export class SetupService {
         firstName: data.adminFirstName,
         lastName: data.adminLastName,
         phone: data.adminPhone,
-        email: data.adminEmail || 'admin@educrm.uz',
+        email: data.adminEmail || `admin@${process.env.APP_DOMAIN || 'eduhub.uz'}`,
         password: hashedPassword,
         role: Role.SUPER_ADMIN,
         isActive: true,

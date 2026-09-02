@@ -7,15 +7,9 @@
     "dev": "vue-cli-service serve",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "windsass": "sass --watch src/assets/sass/app.windzo.scss src/assets/sass/css/windzo.css",
-    "require": "npm i -g sass @vue/cli"
+    "sass:watch": "sass --watch src/assets/sass/app.eduhub.scss src/assets/sass/css/eduhub.css"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sahrullahh/windzo.git"
-  },
-  "homepage": "https://windzo.vercel.app",
-  "author": "Mohammad Sahrullah",
+  "author": "EduHub Team",
   "license": "MIT",
   "dependencies": {
     "apexcharts": "^3.34.0",

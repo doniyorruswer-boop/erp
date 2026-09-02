@@ -64,6 +64,9 @@
         </transition>
       </div>
     </div>
+
+    <!-- Global Reactive Toast Notifications -->
+    <ToastContainer />
   </div>
   <!-- End app -->
 </template>
@@ -71,6 +74,7 @@
 <script>
   import Sidebar from "@/components/Sidebar";
   import Header from "@/components/Header";
+  import ToastContainer from "@/components/common/ToastContainer.vue";
   import Scrollbar from "smooth-scrollbar";
 
   export default {
@@ -84,6 +88,7 @@
     components: {
       Header,
       Sidebar,
+      ToastContainer,
     },
     methods: {
       open() {

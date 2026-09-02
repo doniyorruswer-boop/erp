@@ -1,0 +1,77 @@
+name: EduHub Backend CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  backend-test-and-build:
+    name: Backend CI (Prisma, Build, Jest Tests)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: eduhub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+          cache-dependency-path: erp/backend/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: erp/backend
+        run: npm ci
+
+      - name: Generate Prisma Client & Push Schema
+        working-directory: erp/backend
+        env:
+          DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/eduhub_test?schema=public"
+        run: |
+          npx prisma generate
+          npx prisma db push --skip-generate
+
+      - name: Verify TypeScript Typecheck
+        working-directory: erp/backend
+        run: npm run typecheck
+
+      - name: Run Jest Unit & Integration Tests
+        working-directory: erp/backend
+        env:
+          NODE_ENV: test
+          DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/eduhub_test?schema=public"
+          JWT_SECRET: "ci-testing-jwt-secret-minimum-32-chars-long-secure"
+          REDIS_URL: "redis://localhost:6379"
+        run: npm test
+
+      - name: Verify Backend Build
+        working-directory: erp/backend
+        run: npm run build

@@ -145,7 +145,7 @@
       </template>
     </DataTable>
 
-    <!-- Payment Modal (Original Windzo vmodal without trigger button) -->
+    <!-- Payment Modal -->
     <vmodal
       ref="paymentModal"
       class="hidden"

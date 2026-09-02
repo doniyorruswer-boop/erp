@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: eduhub-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-eduhub_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-eduhub_secure_password_2026}
+      POSTGRES_DB: ${DB_NAME:-eduhub}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - eduhub-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-eduhub_user} -d ${DB_NAME:-eduhub}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Redis In-Memory Store & Background Jobs
+  redis:
+    image: redis:7-alpine
+    container_name: eduhub-redis-prod
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - eduhub-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 3. NestJS Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: eduhub-backend-prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: "postgresql://${DB_USER:-eduhub_user}:${DB_PASSWORD:-eduhub_secure_password_2026}@postgres:5432/${DB_NAME:-eduhub}?schema=public"
+      REDIS_URL: "redis://redis:6379"
+      JWT_SECRET: ${JWT_SECRET:-generate-a-strong-64-character-random-secret-key-here}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-generate-another-strong-secret-key-for-refresh}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost,http://localhost:8080}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - eduhub-net
+
+  # 4. Vue.js 3 Frontend (Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VUE_APP_API_URL: ${VUE_APP_API_URL:-http://localhost:3000/api}
+    container_name: eduhub-frontend-prod
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - eduhub-net
+
+volumes:
+  postgres_data:
+    name: eduhub_postgres_prod_data
+  redis_data:
+    name: eduhub_redis_prod_data
+
+networks:
+  eduhub-net:
+    name: eduhub_prod_network
+    driver: bridge

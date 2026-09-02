@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+*/node_modules/
+.pnp
+.pnp.js
+
+# Production & Build outputs
+dist/
+*/dist/
+build/
+*/build/
+out/
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+*/.env
+*/.env.*
+!*/.env.example
+
+# Archives & Temp bundles
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Testing & Coverage
+coverage/
+*/coverage/
+.nyc_output/
+
+# Logs
+*.log
+logs/
+*/logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cache & Temporary
+.cache/
+*/.cache/
+.temp/
+.tmp/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Database backups
+backups/
+*/backups/

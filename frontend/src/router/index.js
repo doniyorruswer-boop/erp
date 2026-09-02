@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-// EduCRM Pages
+// EduHub Pages
 import Dashboard from "../views/Dashboard.vue";
 import StudentsList from "../views/students/StudentsList.vue";
 import StudentCreate from "../views/students/StudentCreate.vue";
@@ -14,34 +14,28 @@ import CalendarView from "../views/calendar/CalendarView.vue";
 import SetupWizard from "../views/setup/SetupWizard.vue";
 import SchoolClassesView from "../views/school/SchoolClassesView.vue";
 import ContractsList from "../views/contracts/ContractsList.vue";
+import EmployeesList from "../views/hr/EmployeesList.vue";
 import CrmSettings from "../views/settings/CrmSettings.vue";
+import UsersList from "../views/users/UsersList.vue";
+import RolesList from "../views/roles/RolesList.vue";
+import AuditLogsList from "../views/audit/AuditLogsList.vue";
+import NotificationsList from "../views/notifications/NotificationsList.vue";
+import SubscriptionsView from "../views/subscriptions/SubscriptionsView.vue";
 
-// Component Pages
-import Valert from "../views/components/alert.vue";
-import Vaccrodion from "../views/components/accordion.vue";
-import Vbadges from "../views/components/badges.vue";
-import Vbreadcumb from "../views/components/breadcumbs.vue";
-import Vbutton from "../views/components/button.vue";
-import Vcard from "../views/components/card.vue";
-import Vdropdown from "../views/components/dropdown.vue";
-import Vmodal from "../views/components/modal.vue";
+// Auth & Error Pages
 import Login from "../views/layouts/auth/Login.vue";
 import Register from "../views/layouts/auth/Register.vue";
 import ForgotPassword from "../views/layouts/auth/forgot-password.vue";
-
-// layouts
-import Blank from "../views/layouts/Blank.vue";
-
-// error page
 import Page404 from "../views/layouts/error/404.vue";
 import Page500 from "../views/layouts/error/500.vue";
 import PageMaintenance from "../views/layouts/error/maintenance.vue";
-import Tables from "../views/tables.vue";
 
-var appname = " - EduHub";
+import BRAND_CONFIG from "@/config/brand.config";
+
+const appname = ` - ${BRAND_CONFIG.name}`;
 
 const routes = [
-  // EduCRM Core Routes
+  // EduHub Core Routes
   {
     path: "/",
     name: "Dashboard",
@@ -107,6 +101,12 @@ const routes = [
     meta: { title: "Moliya & Kassa" + appname },
   },
   {
+    path: "/employees",
+    name: "Employees",
+    component: EmployeesList,
+    meta: { title: "Xodimlar & Oylik" + appname },
+  },
+  {
     path: "/contracts",
     name: "Contracts",
     component: ContractsList,
@@ -125,69 +125,47 @@ const routes = [
     meta: { title: "Taqvim va Topshiriqlar" + appname },
   },
   {
+    path: "/users",
+    name: "Users",
+    component: UsersList,
+    meta: { title: "Foydalanuvchilar" + appname },
+  },
+  {
+    path: "/roles",
+    name: "Roles",
+    component: RolesList,
+    meta: { title: "Rollar & Ruxsatlar" + appname },
+  },
+  {
+    path: "/audit",
+    name: "AuditLogs",
+    component: AuditLogsList,
+    meta: { title: "Xavfsizlik Jurnali (Audit)" + appname },
+  },
+  {
+    path: "/notifications",
+    name: "Notifications",
+    component: NotificationsList,
+    meta: { title: "Xabarnomalar Markazi" + appname },
+  },
+  {
+    path: "/subscriptions",
+    name: "Subscriptions",
+    component: SubscriptionsView,
+    meta: { title: "Tariflar & Obuna" + appname },
+  },
+  {
+    path: "/settings",
+    redirect: "/crm/settings",
+  },
+  {
     path: "/setup",
     name: "SetupWizard",
     component: SetupWizard,
     meta: { title: "Setup Wizard" + appname, hideNav: true },
   },
 
-  // Components based Routes
-  {
-    path: "/component/alert",
-    name: "Valert",
-    component: Valert,
-    meta: { title: "Alert" + appname },
-  },
-  {
-    path: "/component/accordion",
-    name: "Vaccordion",
-    component: Vaccrodion,
-    meta: { title: "Accordion" + appname },
-  },
-  {
-    path: "/component/badge",
-    name: "Vbadge",
-    component: Vbadges,
-    meta: { title: "Badge" + appname },
-  },
-  {
-    path: "/component/breadcumb",
-    name: "Vbreadcumb",
-    component: Vbreadcumb,
-    meta: { title: "Breadcumb" + appname },
-  },
-  {
-    path: "/component/button",
-    name: "Vbutton",
-    component: Vbutton,
-    meta: { title: "Button" + appname },
-  },
-  {
-    path: "/component/card",
-    name: "Vcard",
-    component: Vcard,
-    meta: { title: "Card" + appname },
-  },
-  {
-    path: "/component/dropdown",
-    name: "Vdropdown",
-    component: Vdropdown,
-    meta: { title: "Dropdown" + appname },
-  },
-  {
-    path: "/component/modal",
-    name: "Vmodal",
-    component: Vmodal,
-    meta: { title: "Modal" + appname },
-  },
-
-  // Layouts & Auth
-  {
-    path: "/blank",
-    name: "Blank Page",
-    component: Blank,
-    meta: { title: "Blank Page" + appname },
-  },
+  // Auth
   {
     path: "/auth/login",
     name: "Login",
@@ -208,12 +186,6 @@ const routes = [
   },
 
   // Error pages
-  {
-    path: "/tables",
-    name: "Tables",
-    component: Tables,
-    meta: { title: "Tables" + appname },
-  },
   {
     path: "/500",
     name: "Page500",
@@ -241,7 +213,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || "EduHub";
+  document.title = to.meta.title || BRAND_CONFIG.name;
 
   const token = localStorage.getItem("token");
   const isAuthRoute = to.path.startsWith("/auth") || to.path === "/500" || to.path === "/maintenance";

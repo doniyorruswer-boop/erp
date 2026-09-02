@@ -7,7 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 enum AuditAction {
   CREATE
   UPDATE
@@ -25,7 +24,6 @@ enum PaymentStatus {
   VOIDED
   REFUNDED
 }
-
 
 enum ActivityType {
   CALL
@@ -51,7 +49,6 @@ enum TaskPriority {
   URGENT
 }
 
-
 enum CustomFieldType {
   TEXT
   TEXTAREA
@@ -66,7 +63,6 @@ enum CustomFieldType {
   URL
   FILE
 }
-
 
 enum ResourceType {
   ROOM
@@ -88,7 +84,6 @@ enum RecurrenceType {
   WEEKLY
   CUSTOM
 }
-
 
 enum InvoiceStatus {
   DRAFT
@@ -199,48 +194,75 @@ enum LeadStatus {
   LOST
 }
 
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  HOURLY
+}
+
+enum SalaryType {
+  FIXED
+  HOURLY
+  PERCENTAGE
+  PER_STUDENT
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+enum PayrollStatus {
+  DRAFT
+  APPROVED
+  PAID
+  CANCELLED
+}
+
 model Organization {
-  workflows WorkflowRule[]
-  subscriptions Subscription[]
-  usages OrganizationUsage[]
-  jobs Job[]
-  notifications Notification[]
+  workflows             WorkflowRule[]
+  subscriptions         Subscription[]
+  usages                OrganizationUsage[]
+  jobs                  Job[]
+  notifications         Notification[]
   notificationTemplates NotificationTemplate[]
-  productServices ProductService[]
-  priceLists PriceList[]
-  cashboxes Cashbox[]
-  invoices Invoice[]
-  expenses Expense[]
-  expenseCategories ExpenseCategory[]
-  transactions Transaction[]
-  refundRecords RefundRecord[]
-  resources Resource[]
-  schedules Schedule[]
-  fieldDefinitions FieldDefinition[]
-  customers      Customer[]
-  pipelines      Pipeline[]
-  leadSources    LeadSource[]
-  tags           Tag[]
-  activities     Activity[]
-  tasks          Task[]
-  crmNotes       CrmNote[]
-  auditLogs        AuditLog[]
-  customRoles      CustomRole[]
-  id               String           @id @default(uuid())
-  name             String
-  slug             String           @unique
-  businessType     BusinessType     @default(COURSE_CENTER)
-  phone            String?
-  email            String?
-  address          String?
-  logo             String?
-  primaryColor     String?          @default("#4F46E5")
-  currency         String           @default("UZS")
-  plan             SubscriptionPlan @default(FREE)
-  subscriptionPlan SubscriptionPlan @default(FREE)
-  isSetupCompleted Boolean          @default(false)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  productServices       ProductService[]
+  priceLists            PriceList[]
+  cashboxes             Cashbox[]
+  invoices              Invoice[]
+  expenses              Expense[]
+  expenseCategories     ExpenseCategory[]
+  transactions          Transaction[]
+  refundRecords         RefundRecord[]
+  resources             Resource[]
+  schedules             Schedule[]
+  fieldDefinitions      FieldDefinition[]
+  customers             Customer[]
+  pipelines             Pipeline[]
+  leadSources           LeadSource[]
+  tags                  Tag[]
+  activities            Activity[]
+  tasks                 Task[]
+  crmNotes              CrmNote[]
+  auditLogs             AuditLog[]
+  customRoles           CustomRole[]
+  id                    String                 @id @default(uuid())
+  name                  String
+  slug                  String                 @unique
+  businessType          BusinessType           @default(COURSE_CENTER)
+  phone                 String?
+  email                 String?
+  address               String?
+  logo                  String?
+  primaryColor          String?                @default("#4F46E5")
+  currency              String                 @default("UZS")
+  plan                  SubscriptionPlan       @default(FREE)
+  subscriptionPlan      SubscriptionPlan       @default(FREE)
+  isSetupCompleted      Boolean                @default(false)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
 
   config           SystemConfig?
   branches         Branch[]
@@ -253,50 +275,56 @@ model Organization {
   leads            Lead[]
   contracts        Contract[]
   parents          Parent[]
+  employees        Employee[]
+  payrolls         Payroll[]
+  staffAttendances StaffAttendance[]
 }
 
 model Branch {
   productServices ProductService[]
-  cashboxes Cashbox[]
-  invoices Invoice[]
-  expenses Expense[]
-  transactions Transaction[]
-  refundRecords RefundRecord[]
-  resources Resource[]
-  schedules Schedule[]
-  customers      Customer[]
-  tasks          Task[]
-  auditLogs      AuditLog[]
-  deletedAt      DateTime?
-  id             String        @id @default(uuid())
-  organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  name           String
-  code           String?
-  phone          String?
-  address        String?
-  isActive       Boolean       @default(true)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  cashboxes       Cashbox[]
+  invoices        Invoice[]
+  expenses        Expense[]
+  transactions    Transaction[]
+  refundRecords   RefundRecord[]
+  resources       Resource[]
+  schedules       Schedule[]
+  customers       Customer[]
+  tasks           Task[]
+  auditLogs       AuditLog[]
+  deletedAt       DateTime?
+  id              String           @id @default(uuid())
+  organizationId  String
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name            String
+  code            String?
+  phone           String?
+  address         String?
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
-  userBranches   UserBranch[]
-  groups         Group[]
-  rooms          Room[]
-  students       Student[]
-  payments       Payment[]
-  leads          Lead[]
-  contracts      Contract[]
+  userBranches     UserBranch[]
+  groups           Group[]
+  rooms            Room[]
+  students         Student[]
+  payments         Payment[]
+  leads            Lead[]
+  contracts        Contract[]
+  employees        Employee[]
+  payrolls         Payroll[]
+  staffAttendances StaffAttendance[]
 
   @@unique([organizationId, name])
 }
 
 model UserBranch {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   branchId  String
-  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  isDefault Boolean  @default(false)
+  branch    Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  isDefault Boolean @default(false)
 
   @@unique([userId, branchId])
 }
@@ -315,34 +343,38 @@ model SystemConfig {
 }
 
 model User {
-  instructorSchedules Schedule[] @relation("InstructorSchedules")
-  customFields   Json?
-  assignedTasks  Task[]        @relation("AssignedTasks")
-  activities     Activity[]
-  crmNotes       CrmNote[]
-  auditLogs        AuditLog[]
-  deletedAt      DateTime?
-  customRoleId     String?
-  customRole       CustomRole?   @relation(fields: [customRoleId], references: [id], onDelete: SetNull)
-  id             String        @id @default(uuid())
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  firstName      String
-  lastName       String
-  phone          String        @unique
-  email          String?       @unique
-  password       String
-  role           Role          @default(MANAGER)
-  isActive       Boolean       @default(true)
-  salaryType     String?
-  salaryAmount   Decimal?      @db.Decimal(12, 2)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  instructorSchedules Schedule[]    @relation("InstructorSchedules")
+  customFields        Json?
+  assignedTasks       Task[]        @relation("AssignedTasks")
+  activities          Activity[]
+  crmNotes            CrmNote[]
+  auditLogs           AuditLog[]
+  deletedAt           DateTime?
+  customRoleId        String?
+  customRole          CustomRole?   @relation(fields: [customRoleId], references: [id], onDelete: SetNull)
+  id                  String        @id @default(uuid())
+  organizationId      String?
+  organization        Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  firstName           String
+  lastName            String
+  phone               String        @unique
+  email               String?       @unique
+  password            String
+  role                Role          @default(MANAGER)
+  isActive            Boolean       @default(true)
+  salaryType          String?
+  salaryAmount        Decimal?      @db.Decimal(12, 2)
+  hashedRefreshToken  String?
+  failedLoginAttempts Int           @default(0)
+  lockedUntil         DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 
   userBranches     UserBranch[]
-  taughtGroups     Group[]     @relation("TeacherGroups")
-  paymentsReceived Payment[]   @relation("ReceivedPayments")
-  leadsManaged     Lead[]      @relation("ManagedLeads")
+  taughtGroups     Group[]      @relation("TeacherGroups")
+  paymentsReceived Payment[]    @relation("ReceivedPayments")
+  leadsManaged     Lead[]       @relation("ManagedLeads")
+  employee         Employee?
 
   @@index([organizationId, role, isActive])
 }
@@ -350,20 +382,20 @@ model User {
 model Course {
   customFields   Json?
   deletedAt      DateTime?
-  id             String        @id @default(uuid())
+  id             String       @id @default(uuid())
   organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
   description    String?
-  price          Decimal       @default(0) @db.Decimal(12, 2)
+  price          Decimal      @default(0) @db.Decimal(12, 2)
   duration       Int
   lessonCount    Int
-  isActive       Boolean       @default(true)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  groups      Group[]
-  leads       Lead[]
+  groups Group[]
+  leads  Lead[]
 
   @@index([organizationId, isActive])
 }
@@ -380,38 +412,38 @@ model Room {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  groups    Group[]
+  groups Group[]
 
   @@index([organizationId, branchId])
 }
 
 model Group {
-  lessons Lesson[]
-  exams Exam[]
+  lessons             Lesson[]
+  exams               Exam[]
   enrollmentHistories EnrollmentHistory[]
-  schedules Schedule[]
-  customFields   Json?
-  deletedAt      DateTime?
-  id             String        @id @default(uuid())
-  organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  branchId       String?
-  branch         Branch?       @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  name           String
-  courseId       String
-  course         Course        @relation(fields: [courseId], references: [id], onDelete: Restrict)
-  teacherId      String?
-  teacher        User?         @relation("TeacherGroups", fields: [teacherId], references: [id], onDelete: SetNull)
-  roomId         String?
-  room           Room?         @relation(fields: [roomId], references: [id], onDelete: SetNull)
-  days           LessonDays    @default(ODD_DAYS)
-  startTime      String
-  endTime        String
-  startDate      DateTime?
-  endDate        DateTime?
-  status         GroupStatus   @default(PLANNING)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  schedules           Schedule[]
+  customFields        Json?
+  deletedAt           DateTime?
+  id                  String              @id @default(uuid())
+  organizationId      String
+  organization        Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branchId            String?
+  branch              Branch?             @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  name                String
+  courseId            String
+  course              Course              @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  teacherId           String?
+  teacher             User?               @relation("TeacherGroups", fields: [teacherId], references: [id], onDelete: SetNull)
+  roomId              String?
+  room                Room?               @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  days                LessonDays          @default(ODD_DAYS)
+  startTime           String
+  endTime             String
+  startDate           DateTime?
+  endDate             DateTime?
+  status              GroupStatus         @default(PLANNING)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
 
   enrollments GroupEnrollment[]
   attendances Attendance[]
@@ -421,50 +453,50 @@ model Group {
 }
 
 model Student {
-  parents StudentParent[]
-  grades Grade[]
+  parents             StudentParent[]
+  grades              Grade[]
   enrollmentHistories EnrollmentHistory[]
-  invoices Invoice[]
-  schedules Schedule[]
-  customFields   Json?
-  deletedAt      DateTime?
-  id             String        @id @default(uuid())
-  organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  branchId       String?
-  branch         Branch?       @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  firstName      String
-  lastName       String
-  phone          String
-  email          String?
-  passportNumber String?
-  pinfl          String?
-  gender         String?       @default("MALE")
-  enrolledDate   DateTime?     @default(now())
-  level          String?
-  studyDays      String[]      @default([])
-  studyLanguages String[]      @default([])
-  contactTime    String?
-  contractNumber String?
-  region         String?
-  city           String?
-  address        String?
-  workplace      String?
-  source         String?
-  parentName     String?
-  parentPhone    String?
-  parentEmail    String?
-  balance        Decimal       @default(0) @db.Decimal(12, 2)
-  status         StudentStatus @default(ACTIVE)
-  birthDate      DateTime?
-  notes          String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  invoices            Invoice[]
+  schedules           Schedule[]
+  customFields        Json?
+  deletedAt           DateTime?
+  id                  String              @id @default(uuid())
+  organizationId      String
+  organization        Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branchId            String?
+  branch              Branch?             @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  firstName           String
+  lastName            String
+  phone               String
+  email               String?
+  passportNumber      String?
+  pinfl               String?
+  gender              String?             @default("MALE")
+  enrolledDate        DateTime?           @default(now())
+  level               String?
+  studyDays           String[]            @default([])
+  studyLanguages      String[]            @default([])
+  contactTime         String?
+  contractNumber      String?
+  region              String?
+  city                String?
+  address             String?
+  workplace           String?
+  source              String?
+  parentName          String?
+  parentPhone         String?
+  parentEmail         String?
+  balance             Decimal             @default(0) @db.Decimal(12, 2)
+  status              StudentStatus       @default(ACTIVE)
+  birthDate           DateTime?
+  notes               String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
 
-  enrollments    GroupEnrollment[]
-  attendances    Attendance[]
-  payments       Payment[]
-  contracts      Contract[]
+  enrollments GroupEnrollment[]
+  attendances Attendance[]
+  payments    Payment[]
+  contracts   Contract[]
 
   @@unique([organizationId, phone])
   @@index([organizationId, branchId, status])
@@ -472,56 +504,56 @@ model Student {
 }
 
 model Contract {
-  id             String        @id @default(uuid())
+  id             String       @id @default(uuid())
   organizationId String
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   branchId       String?
-  branch         Branch?       @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  contractNumber String        @unique
+  branch         Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  contractNumber String       @unique
   studentId      String
-  student        Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  totalAmount    Decimal       @default(0) @db.Decimal(12, 2)
-  discountAmount Decimal       @default(0) @db.Decimal(12, 2)
-  startDate      DateTime      @default(now())
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  totalAmount    Decimal      @default(0) @db.Decimal(12, 2)
+  discountAmount Decimal      @default(0) @db.Decimal(12, 2)
+  startDate      DateTime     @default(now())
   endDate        DateTime?
-  status         String        @default("ACTIVE")
+  status         String       @default("ACTIVE")
   notes          String?
   deletedAt      DateTime?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  payments       Payment[]
+  payments Payment[]
 
   @@index([organizationId, branchId, deletedAt])
   @@index([organizationId, studentId])
 }
 
 model GroupEnrollment {
-  id         String    @id @default(uuid())
-  groupId    String
-  group      Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  studentId  String
-  student    Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  joinedAt   DateTime  @default(now())
-  isActive   Boolean   @default(true)
+  id        String   @id @default(uuid())
+  groupId   String
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime @default(now())
+  isActive  Boolean  @default(true)
 
   @@unique([groupId, studentId])
   @@index([studentId, isActive])
 }
 
 model Attendance {
-  lessonId String?
-  lesson Lesson? @relation(fields: [lessonId], references: [id], onDelete: SetNull)
-  id         String           @id @default(uuid())
-  groupId    String
-  group      Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  studentId  String
-  student    Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  date       DateTime         @db.Date
-  status     AttendanceStatus @default(PRESENT)
-  comment    String?
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
+  lessonId  String?
+  lesson    Lesson?          @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  id        String           @id @default(uuid())
+  groupId   String
+  group     Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  date      DateTime         @db.Date
+  status    AttendanceStatus @default(PRESENT)
+  comment   String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   @@unique([groupId, studentId, date])
   @@index([studentId, date])
@@ -567,46 +599,45 @@ model Payment {
 
 model Lead {
   deletedAt      DateTime?
-  id             String          @id @default(uuid())
+  id             String         @id @default(uuid())
   organizationId String?
-  organization   Organization?   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   branchId       String?
-  branch         Branch?         @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  branch         Branch?        @relation(fields: [branchId], references: [id], onDelete: SetNull)
   customerId     String?
-  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  customer       Customer?      @relation(fields: [customerId], references: [id], onDelete: SetNull)
   pipelineId     String?
-  pipeline       Pipeline?       @relation(fields: [pipelineId], references: [id], onDelete: SetNull)
+  pipeline       Pipeline?      @relation(fields: [pipelineId], references: [id], onDelete: SetNull)
   stageId        String?
-  stage          PipelineStage?  @relation(fields: [stageId], references: [id], onDelete: SetNull)
+  stage          PipelineStage? @relation(fields: [stageId], references: [id], onDelete: SetNull)
   sourceId       String?
-  leadSource     LeadSource?     @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  leadSource     LeadSource?    @relation(fields: [sourceId], references: [id], onDelete: SetNull)
   fullName       String
   phone          String
   email          String?
-  amount         Decimal?        @db.Decimal(12, 2)
+  amount         Decimal?       @db.Decimal(12, 2)
   courseId       String?
-  course         Course?         @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  course         Course?        @relation(fields: [courseId], references: [id], onDelete: SetNull)
   source         String?
-  status         LeadStatus      @default(NEW)
+  status         LeadStatus     @default(NEW)
   managerId      String?
-  manager        User?           @relation("ManagedLeads", fields: [managerId], references: [id], onDelete: SetNull)
-  tags           String[]        @default([])
+  manager        User?          @relation("ManagedLeads", fields: [managerId], references: [id], onDelete: SetNull)
+  tags           String[]       @default([])
   customFields   Json?
   notes          String?
   lostReason     String?
   convertedAt    DateTime?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
-  activities     Activity[]
-  tasks          Task[]
-  crmNotes       CrmNote[]
+  activities Activity[]
+  tasks      Task[]
+  crmNotes   CrmNote[]
 
   @@index([organizationId])
   @@index([pipelineId])
   @@index([stageId])
 }
-
 
 enum PermissionScope {
   ORGANIZATION
@@ -616,28 +647,28 @@ enum PermissionScope {
 
 model CustomRole {
   deletedAt      DateTime?
-  id             String           @id @default(uuid())
+  id             String       @id @default(uuid())
   organizationId String
-  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
   description    String?
-  isSystem       Boolean          @default(false)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  isSystem       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  users          User[]
-  permissions    RolePermission[]
+  users       User[]
+  permissions RolePermission[]
 
   @@unique([organizationId, name])
 }
 
 model Permission {
-  id          String           @id @default(uuid())
-  code        String           @unique
+  id          String  @id @default(uuid())
+  code        String  @unique
   module      String
   description String?
 
-  roles       RolePermission[]
+  roles RolePermission[]
 }
 
 model RolePermission {
@@ -650,7 +681,6 @@ model RolePermission {
 
   @@unique([roleId, permissionId])
 }
-
 
 model AuditLog {
   id             String        @id @default(uuid())
@@ -674,46 +704,45 @@ model AuditLog {
   @@index([createdAt])
 }
 
-
 model Pipeline {
-  id             String          @id @default(uuid())
+  id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization?   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
   code           String?
-  isDefault      Boolean         @default(false)
-  isActive       Boolean         @default(true)
+  isDefault      Boolean       @default(false)
+  isActive       Boolean       @default(true)
   deletedAt      DateTime?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
-  stages         PipelineStage[]
-  leads          Lead[]
+  stages PipelineStage[]
+  leads  Lead[]
 
   @@unique([organizationId, name])
 }
 
 model PipelineStage {
-  id             String        @id @default(uuid())
+  id             String    @id @default(uuid())
   pipelineId     String
-  pipeline       Pipeline      @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  pipeline       Pipeline  @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
   name           String
   code           String?
-  color          String?       @default("#3B82F6")
-  order          Int           @default(0)
-  winProbability Int           @default(0)
-  isWon          Boolean       @default(false)
-  isLost         Boolean       @default(false)
+  color          String?   @default("#3B82F6")
+  order          Int       @default(0)
+  winProbability Int       @default(0)
+  isWon          Boolean   @default(false)
+  isLost         Boolean   @default(false)
   deletedAt      DateTime?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  leads          Lead[]
+  leads Lead[]
 }
 
 model Customer {
-  invoices Invoice[]
-  payments Payment[]
+  invoices       Invoice[]
+  payments       Payment[]
   id             String        @id @default(uuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -732,10 +761,10 @@ model Customer {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  leads          Lead[]
-  activities     Activity[]
-  tasks          Task[]
-  crmNotes       CrmNote[]
+  leads      Lead[]
+  activities Activity[]
+  tasks      Task[]
+  crmNotes   CrmNote[]
 }
 
 model LeadSource {
@@ -748,7 +777,7 @@ model LeadSource {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  leads          Lead[]
+  leads Lead[]
 
   @@unique([organizationId, name])
 }
@@ -833,7 +862,6 @@ model CrmNote {
   @@index([customerId])
 }
 
-
 model FieldDefinition {
   id             String          @id @default(uuid())
   organizationId String?
@@ -856,7 +884,6 @@ model FieldDefinition {
   @@unique([organizationId, entityType, key])
   @@index([organizationId, entityType])
 }
-
 
 model Resource {
   id             String         @id @default(uuid())
@@ -909,16 +936,15 @@ model Schedule {
   @@index([instructorId, startAt, endAt])
 }
 
-
 model ProductService {
-  id             String         @id @default(uuid())
+  id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   branchId       String?
-  branch         Branch?        @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  branch         Branch?       @relation(fields: [branchId], references: [id], onDelete: SetNull)
   name           String
   code           String?
-  type           ItemType       @default(SERVICE)
+  type           ItemType      @default(SERVICE)
   unitPrice      Decimal       @default(0) @db.Decimal(12, 2)
   unit           String?
   taxRate        Decimal       @default(0) @db.Decimal(5, 2)
@@ -926,22 +952,22 @@ model ProductService {
   customFields   Json?
   invoiceItems   InvoiceItem[]
   deletedAt      DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@index([organizationId, branchId, type])
 }
 
 model PriceList {
-  id             String         @id @default(uuid())
+  id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
-  currency       String         @default("UZS")
-  isActive       Boolean        @default(true)
+  currency       String        @default("UZS")
+  isActive       Boolean       @default(true)
   deletedAt      DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 model Cashbox {
@@ -1025,23 +1051,23 @@ model PaymentAllocation {
 }
 
 model RefundRecord {
-  id             String         @id @default(uuid())
+  id             String        @id @default(uuid())
   organizationId String?
-  organization   Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   branchId       String?
-  branch         Branch?        @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  branch         Branch?       @relation(fields: [branchId], references: [id], onDelete: SetNull)
   cashboxId      String?
-  cashbox        Cashbox?       @relation(fields: [cashboxId], references: [id], onDelete: SetNull)
+  cashbox        Cashbox?      @relation(fields: [cashboxId], references: [id], onDelete: SetNull)
   paymentId      String
-  payment        Payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-  amount         Decimal        @default(0) @db.Decimal(12, 2)
+  payment        Payment       @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  amount         Decimal       @default(0) @db.Decimal(12, 2)
   reason         String
-  date           DateTime       @default(now())
-  status         String         @default("COMPLETED")
+  date           DateTime      @default(now())
+  status         String        @default("COMPLETED")
   transactions   Transaction[]
   deletedAt      DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@index([organizationId, branchId, paymentId])
 }
@@ -1077,6 +1103,7 @@ model Expense {
   receiptUrl     String?
   notes          String?
   transactions   Transaction[]
+  payroll        Payroll?
   deletedAt      DateTime?
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
@@ -1109,34 +1136,33 @@ model Transaction {
   @@index([organizationId, branchId, cashboxId, date])
 }
 
-
 model Parent {
-  id             String          @id @default(uuid())
+  id             String       @id @default(uuid())
   organizationId String
-  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   fullName       String
   phone          String
   relationship   String?
-  isPrimary      Boolean         @default(true)
+  isPrimary      Boolean      @default(true)
   deletedAt      DateTime?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  students       StudentParent[]
+  students StudentParent[]
 
   @@unique([organizationId, phone])
   @@index([organizationId, phone])
 }
 
 model StudentParent {
-  id           String    @id @default(uuid())
+  id           String   @id @default(uuid())
   studentId    String
-  student      Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   parentId     String
-  parent       Parent    @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parent       Parent   @relation(fields: [parentId], references: [id], onDelete: Cascade)
   relationship String?
-  isPrimary    Boolean   @default(false)
-  createdAt    DateTime  @default(now())
+  isPrimary    Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
   @@unique([studentId, parentId])
   @@index([studentId])
@@ -1144,18 +1170,18 @@ model StudentParent {
 }
 
 model Lesson {
-  id           String       @id @default(uuid())
-  groupId      String
-  group        Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  title        String
-  date         DateTime     @default(now())
-  resourceId   String?
-  homework     Homework?
-  attendances  Attendance[]
-  grades       Grade[]
-  deletedAt    DateTime?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id          String       @id @default(uuid())
+  groupId     String
+  group       Group        @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  title       String
+  date        DateTime     @default(now())
+  resourceId  String?
+  homework    Homework?
+  attendances Attendance[]
+  grades      Grade[]
+  deletedAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   @@index([groupId, date])
 }
@@ -1219,7 +1245,6 @@ model EnrollmentHistory {
   @@index([studentId, groupId])
 }
 
-
 enum NotificationChannel {
   IN_APP
   EMAIL
@@ -1234,7 +1259,6 @@ enum NotificationStatus {
   FAILED
   READ
 }
-
 
 model Notification {
   id             String              @id @default(uuid())
@@ -1256,7 +1280,7 @@ model Notification {
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
 
-  logs           NotificationLog[]
+  logs NotificationLog[]
 
   @@index([organizationId, channel, status])
 }
@@ -1294,7 +1318,6 @@ model NotificationLog {
   @@index([notificationId, channel, status])
 }
 
-
 enum JobStatus {
   PENDING
   PROCESSING
@@ -1304,25 +1327,24 @@ enum JobStatus {
 }
 
 model Job {
-  id             String      @id @default(uuid())
+  id             String        @id @default(uuid())
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   type           String
   payload        Json
   result         Json?
-  status         JobStatus   @default(PENDING)
-  attempts       Int         @default(0)
-  maxRetries     Int         @default(3)
+  status         JobStatus     @default(PENDING)
+  attempts       Int           @default(0)
+  maxRetries     Int           @default(3)
   error          String?
-  runAt          DateTime    @default(now())
+  runAt          DateTime      @default(now())
   startedAt      DateTime?
   completedAt    DateTime?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@index([organizationId, status, runAt])
 }
-
 
 enum SubscriptionStatus {
   ACTIVE
@@ -1337,18 +1359,17 @@ enum BillingPeriod {
   ANNUAL
 }
 
-
 model Plan {
-  id            String         @id @default(uuid())
-  code          String         @unique
-  name          String
-  description   String?
-  monthlyPrice  Decimal        @default(0) @db.Decimal(12, 2)
-  annualPrice   Decimal        @default(0) @db.Decimal(12, 2)
-  currency      String         @default("UZS")
-  isPublic      Boolean        @default(true)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id           String   @id @default(uuid())
+  code         String   @unique
+  name         String
+  description  String?
+  monthlyPrice Decimal  @default(0) @db.Decimal(12, 2)
+  annualPrice  Decimal  @default(0) @db.Decimal(12, 2)
+  currency     String   @default("UZS")
+  isPublic     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   features      PlanFeature[]
   limits        PlanLimit[]
@@ -1408,23 +1429,22 @@ model OrganizationUsage {
   @@unique([organizationId, metric, period])
 }
 
-
 model WorkflowRule {
-  id             String                 @id @default(uuid())
+  id             String       @id @default(uuid())
   organizationId String
-  organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
   description    String?
-  isActive       Boolean                @default(true)
+  isActive       Boolean      @default(true)
   event          String
   conditions     Json
   actions        Json
-  executionCount Int                    @default(0)
+  executionCount Int          @default(0)
   lastExecutedAt DateTime?
-  createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @updatedAt
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  logs           WorkflowExecutionLog[]
+  logs WorkflowExecutionLog[]
 
   @@index([organizationId, event, isActive])
 }
@@ -1441,4 +1461,94 @@ model WorkflowExecutionLog {
   executedAt     DateTime     @default(now())
 
   @@index([workflowRuleId, executedAt])
+}
+
+model Employee {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branchId       String?
+  branch         Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  userId         String?      @unique
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  firstName  String
+  lastName   String
+  phone      String
+  email      String?
+  position   String
+  department String?
+
+  employmentType EmploymentType @default(FULL_TIME)
+  salaryType     SalaryType     @default(FIXED)
+  baseSalary     Decimal        @default(0) @db.Decimal(12, 2)
+
+  hireDate        DateTime       @default(now())
+  terminationDate DateTime?
+  status          EmployeeStatus @default(ACTIVE)
+  notes           String?
+
+  payrolls    Payroll[]
+  attendances StaffAttendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId, branchId, status])
+  @@index([phone])
+}
+
+model Payroll {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branchId       String?
+  branch         Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  period          String
+  baseAmount      Decimal @default(0) @db.Decimal(12, 2)
+  bonusAmount     Decimal @default(0) @db.Decimal(12, 2)
+  deductionAmount Decimal @default(0) @db.Decimal(12, 2)
+  netAmount       Decimal @default(0) @db.Decimal(12, 2)
+
+  status      PayrollStatus @default(DRAFT)
+  paymentDate DateTime?
+  paidVia     PaymentMethod @default(CASH)
+
+  expenseId String?  @unique
+  expense   Expense? @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId, period, status])
+  @@index([employeeId, period])
+}
+
+model StaffAttendance {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branchId       String?
+  branch         Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  date        DateTime         @db.Date
+  status      AttendanceStatus @default(PRESENT)
+  checkIn     DateTime?
+  checkOut    DateTime?
+  hoursWorked Decimal?         @db.Decimal(4, 2)
+  notes       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([employeeId, date])
+  @@index([organizationId, date])
 }

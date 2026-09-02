@@ -1,5 +1,5 @@
 /**
- * EduCRM Markazlashgan API Konfiguratsiyasi
+ * EduHub Markazlashgan API Konfiguratsiyasi
  * Barcha API manzillari, timeout va server sozlamalari yagona joyda boshqariladi.
  */
 
@@ -7,7 +7,7 @@ export const API_CONFIG = {
   // Asosiy Backend URL manzili
   BASE_URL:
     process.env.VUE_APP_API_URL ||
-    (typeof window !== 'undefined' && localStorage.getItem('EDUC_CRM_API_URL')) ||
+    (typeof window !== 'undefined' && (localStorage.getItem('EDUHUB_API_URL') || localStorage.getItem('EDUC_CRM_API_URL'))) ||
     'http://localhost:3000/api',
 
   // So'rov kutish vaqti (ms)

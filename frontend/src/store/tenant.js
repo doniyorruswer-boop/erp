@@ -1,13 +1,14 @@
 import { defineStore } from "pinia";
 import { setupApi } from "@/api/services";
 import { setPrimaryColor } from "@/helper/theme";
+import BRAND_CONFIG from "@/config/brand.config";
 
 export const useTenantStore = defineStore("tenant", {
   state: () => ({
     isSetupCompleted: localStorage.getItem("isSetupCompleted") === "true",
     businessType: localStorage.getItem("businessType") || "COURSE_CENTER",
     organization: JSON.parse(localStorage.getItem("organization") || "null") || {
-      name: "EduCRM Markazi",
+      name: `${BRAND_CONFIG.name} Markazi`,
       slug: "main",
       primaryColor: "#4F46E5",
       currency: "UZS",
@@ -49,7 +50,7 @@ export const useTenantStore = defineStore("tenant", {
     hasModule: (state) => (moduleName) => {
       return state.enabledModules.includes(moduleName);
     },
-    orgName: (state) => state.organization?.name || "EduCRM",
+    orgName: (state) => state.organization?.name || BRAND_CONFIG.name,
   },
 
   actions: {

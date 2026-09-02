@@ -1,12 +1,10 @@
-/**
- * EduCRM Global Configuration & Formatting Standards
- * Markazlashtirilgan tizim konfiguratsiyasi va formatlash utilitalari
- */
+import BRAND_CONFIG from "./brand.config";
 
 export const APP_CONFIG = {
-  name: "EduHub",
+  name: BRAND_CONFIG.name,
+  brand: BRAND_CONFIG,
   version: "1.0.1",
-  description: "Ta'lim va Biznes Boshqaruv Platformasi",
+  description: BRAND_CONFIG.description,
   apiBaseUrl: process.env.VUE_APP_API_URL || "http://localhost:3000/api",
   
   // Filiallar ro'yxati
