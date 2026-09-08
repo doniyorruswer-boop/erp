@@ -11,7 +11,8 @@
       ref="triggerInput"
       @click="togglePicker"
       :class="[
-        'w-full h-11 text-xs sm:text-sm rounded-xl border flex items-center justify-between transition-colors bg-white dark:bg-gray-900 cursor-pointer shadow-2xs px-3.5',
+        'w-full border flex items-center justify-between transition-colors bg-white dark:bg-gray-900 cursor-pointer shadow-2xs',
+        size === 'sm' ? 'h-9 px-2.5 rounded-lg text-xs' : 'h-11 px-3.5 rounded-xl text-xs sm:text-sm',
         isOpen ? 'border-primary ring-2 ring-primary/20' : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600',
         error ? 'border-red-500 ring-2 ring-red-500/20' : '',
         disabled ? 'bg-gray-100 dark:bg-gray-800 opacity-60 cursor-not-allowed' : ''
@@ -44,8 +45,8 @@
     </div>
 
     <!-- Error/Hint Message -->
-    <p v-if="error" class="text-xs text-red-500 mt-1">{{ error }}</p>
-    <p v-else-if="hint" class="text-[11px] text-gray-400 mt-1">{{ hint }}</p>
+    <FormFieldError :error="error" />
+    <p v-if="!error && hint" class="text-[11px] text-gray-400 mt-1">{{ hint }}</p>
 
     <!-- Teleported Calendar Dropdown Popup -->
     <Teleport to="body">
@@ -241,6 +242,10 @@ export default {
     placeholder: {
       type: String,
       default: "Sanani tanlang...",
+    },
+    size: {
+      type: String,
+      default: "md", // 'sm' | 'md' | 'lg'
     },
     required: {
       type: Boolean,

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="calendar-board space-y-4 font-lexend">
     <!-- Header with Action Button -->
     <div class="flex items-center justify-between flex-wrap gap-4" v-if="showHeader">
@@ -180,8 +180,14 @@
             </button>
           </div>
 
+          <!-- Loading state -->
+          <div v-if="loading" class="py-8 text-center text-gray-400 text-xs flex items-center justify-center gap-2">
+            <Icon icon="solar:spinner-linear" class="animate-spin text-base" />
+            <span>Topshiriqlar yuklanmoqda...</span>
+          </div>
+
           <!-- Tasks Items with clear visible icons -->
-          <div v-if="tasks.length > 0" class="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
+          <div v-else-if="tasks.length > 0" class="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
             <div
               v-for="task in tasks"
               :key="task.id"
@@ -191,8 +197,8 @@
                 <div class="flex items-start gap-2.5 min-w-0 flex-1">
                   <input
                     type="checkbox"
-                    v-model="task.completed"
-                    @change="saveTasks"
+                    :checked="task.completed"
+                    @change="toggleTaskComplete(task)"
                     class="mt-0.5 rounded text-primary focus:ring-primary h-4 w-4 cursor-pointer"
                   />
                   <div class="min-w-0 flex-1">
@@ -251,6 +257,7 @@ import FormSelect from "@/components/FormSelect.vue";
 import FormInput from "@/components/FormInput.vue";
 import FormDatePicker from "@/components/FormDatePicker.vue";
 import EmptyState from "@/components/EmptyState.vue";
+import { tasksApi } from "@/api/services";
 
 export default {
   name: "CalendarBoard",
@@ -283,6 +290,7 @@ export default {
       currentMonth: now.getMonth(), // 0-indexed
       selectedDateStr: null,
       isEditing: false,
+      loading: false,
       formData: {
         id: null,
         title: "",
@@ -290,12 +298,7 @@ export default {
         type: "task",
         description: "",
       },
-      tasks: [
-        { id: 1, title: "112345", date: "2026-05-26", completed: false, type: "task" },
-        { id: 2, title: "ehth", date: "2026-08-09", completed: true, type: "task" },
-        { id: 3, title: "IELTS Mock Test (Barcha guruhlar)", date: "2026-08-29", completed: false, type: "exam" },
-        { id: 4, title: "Frontend Bootcamp Yangi Qabul", date: "2026-09-01", completed: false, type: "masterclass" },
-      ],
+      tasks: [],
       monthNames: [
         "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
         "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
@@ -377,21 +380,51 @@ export default {
     },
   },
   mounted() {
-    const saved = localStorage.getItem("educrm_tasks");
-    if (saved) {
-      try {
-        this.tasks = JSON.parse(saved);
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    this.fetchTasks();
   },
   methods: {
+    normalizeTask(task) {
+      if (!task) return null;
+      let date = "";
+      if (task.dueDate) {
+        if (typeof task.dueDate === "string") {
+          date = task.dueDate.split("T")[0];
+        } else {
+          try {
+            date = new Date(task.dueDate).toISOString().split("T")[0];
+          } catch (e) {
+            date = "";
+          }
+        }
+      } else if (task.date) {
+        date = task.date;
+      }
+      return {
+        id: task.id,
+        title: task.title || "",
+        description: task.description || "",
+        date: date,
+        dueDate: task.dueDate || null,
+        status: task.status || "PENDING",
+        priority: task.priority || "MEDIUM",
+        completed: task.status === "COMPLETED",
+        type: task.type || "task",
+      };
+    },
+    async fetchTasks() {
+      this.loading = true;
+      try {
+        const response = await tasksApi.getAll();
+        const list = Array.isArray(response) ? response : (response?.data || []);
+        this.tasks = list.map(this.normalizeTask).filter(Boolean);
+      } catch (error) {
+        console.error("Vazifalarni yuklashda xatolik:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
     getEventsForDate(dateStr) {
       return this.tasks.filter((t) => t.date === dateStr);
-    },
-    saveTasks() {
-      localStorage.setItem("educrm_tasks", JSON.stringify(this.tasks));
     },
     prevMonth() {
       if (this.currentMonth === 0) {
@@ -439,34 +472,102 @@ export default {
     },
     editTask(task) {
       this.isEditing = true;
-      this.formData = { ...task };
+      this.formData = {
+        id: task.id,
+        title: task.title,
+        date: task.date || "",
+        type: task.type || "task",
+        description: task.description || "",
+      };
       if (this.$refs.taskModal) {
         this.$refs.taskModal.isOpen = true;
       }
     },
-    deleteTask(id) {
-      this.tasks = this.tasks.filter((t) => t.id !== id);
-      this.saveTasks();
+    async toggleTaskComplete(task) {
+      const prevCompleted = task.completed;
+      task.completed = !prevCompleted;
+      task.status = task.completed ? "COMPLETED" : "PENDING";
+      try {
+        if (task.completed) {
+          const res = await tasksApi.complete(task.id);
+          if (res) {
+            const normalized = this.normalizeTask(res);
+            normalized.type = task.type || "task";
+            const idx = this.tasks.findIndex((t) => t.id === task.id);
+            if (idx !== -1) this.tasks.splice(idx, 1, normalized);
+          }
+        } else {
+          const res = await tasksApi.update(task.id, { status: "PENDING" });
+          if (res) {
+            const normalized = this.normalizeTask(res);
+            normalized.type = task.type || "task";
+            const idx = this.tasks.findIndex((t) => t.id === task.id);
+            if (idx !== -1) this.tasks.splice(idx, 1, normalized);
+          }
+        }
+      } catch (error) {
+        console.error("Vazifa holatini o'zgartirishda xatolik:", error);
+        task.completed = prevCompleted;
+        task.status = prevCompleted ? "COMPLETED" : "PENDING";
+      }
+    },
+    async deleteTask(id) {
+      try {
+        await tasksApi.delete(id);
+        this.tasks = this.tasks.filter((t) => t.id !== id);
+      } catch (error) {
+        console.error("Vazifani o'chirishda xatolik:", error);
+      }
     },
     viewEvent(ev) {
       this.editTask(ev);
     },
-    saveTaskForm() {
-      if (this.isEditing && this.formData.id) {
-        const idx = this.tasks.findIndex((t) => t.id === this.formData.id);
-        if (idx !== -1) {
-          this.tasks[idx] = { ...this.formData };
+    async saveTaskForm() {
+      if (!this.formData.title) return;
+
+      let dueDate = null;
+      if (this.formData.date) {
+        try {
+          const d = new Date(this.formData.date);
+          dueDate = isNaN(d.getTime()) ? null : d.toISOString();
+        } catch (e) {
+          dueDate = null;
         }
-      } else {
-        this.tasks.push({
-          id: Date.now(),
-          ...this.formData,
-          completed: false,
-        });
       }
-      this.saveTasks();
-      if (this.$refs.taskModal) {
-        this.$refs.taskModal.isOpen = false;
+
+      try {
+        if (this.isEditing && this.formData.id) {
+          const payload = {
+            title: this.formData.title,
+            description: this.formData.description || undefined,
+            dueDate: dueDate || undefined,
+          };
+          const updated = await tasksApi.update(this.formData.id, payload);
+          const normalized = this.normalizeTask(updated);
+          normalized.type = this.formData.type || "task";
+          const idx = this.tasks.findIndex((t) => t.id === this.formData.id);
+          if (idx !== -1) {
+            this.tasks.splice(idx, 1, normalized);
+          } else {
+            this.tasks.push(normalized);
+          }
+        } else {
+          const payload = {
+            title: this.formData.title,
+            description: this.formData.description || undefined,
+            dueDate: dueDate || undefined,
+          };
+          const created = await tasksApi.create(payload);
+          const normalized = this.normalizeTask(created);
+          normalized.type = this.formData.type || "task";
+          this.tasks.push(normalized);
+        }
+
+        if (this.$refs.taskModal) {
+          this.$refs.taskModal.isOpen = false;
+        }
+      } catch (error) {
+        console.error("Vazifani saqlashda xatolik:", error);
       }
     },
   },

@@ -31,9 +31,11 @@ describe('AuthService (Unit Tests)', () => {
   });
 
   beforeEach(async () => {
+    const userFinderMock = jest.fn();
     prisma = {
       user: {
-        findUnique: jest.fn(),
+        findUnique: userFinderMock,
+        findFirst: userFinderMock,
         update: jest.fn(),
       },
     };

@@ -41,6 +41,7 @@
         <Icon icon="solar:alt-arrow-down-linear" class="text-gray-400 text-xs transition-transform" :class="{ 'rotate-180': isOpen }" />
       </div>
     </div>
+    <FormFieldError :error="error" />
 
     <!-- Teleported Dropdown Time Picker Popover (Ochilib chiqadigan oyna) -->
     <Teleport to="body">

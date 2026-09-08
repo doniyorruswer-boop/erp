@@ -10,9 +10,16 @@ import GroupsList from "../views/groups/GroupsList.vue";
 import CoursesList from "../views/courses/CoursesList.vue";
 import AttendanceView from "../views/attendance/AttendanceView.vue";
 import FinanceView from "../views/finance/FinanceView.vue";
+import PaymentStatsView from "../views/finance/PaymentStatsView.vue";
+import PaymentMonthDetailView from "../views/finance/PaymentMonthDetailView.vue";
 import CalendarView from "../views/calendar/CalendarView.vue";
 import SetupWizard from "../views/setup/SetupWizard.vue";
 import SchoolClassesView from "../views/school/SchoolClassesView.vue";
+import SchoolClassDetailView from "../views/school/SchoolClassDetailView.vue";
+import SchoolLevelsView from "../views/school/SchoolLevelsView.vue";
+import SchoolStudentsView from "../views/school/SchoolStudentsView.vue";
+import SchoolParentsView from "../views/school/SchoolParentsView.vue";
+import SchoolDroppedView from "../views/school/SchoolDroppedView.vue";
 import ContractsList from "../views/contracts/ContractsList.vue";
 import EmployeesList from "../views/hr/EmployeesList.vue";
 import CrmSettings from "../views/settings/CrmSettings.vue";
@@ -21,6 +28,12 @@ import RolesList from "../views/roles/RolesList.vue";
 import AuditLogsList from "../views/audit/AuditLogsList.vue";
 import NotificationsList from "../views/notifications/NotificationsList.vue";
 import SubscriptionsView from "../views/subscriptions/SubscriptionsView.vue";
+import ScheduleView from "../views/education/ScheduleView.vue";
+import ClassScheduleView from "../views/education/ClassScheduleView.vue";
+import ReplaceTeacherView from "../views/education/ReplaceTeacherView.vue";
+import GradebookView from "../views/education/GradebookView.vue";
+import FinalGradesView from "../views/education/FinalGradesView.vue";
+import AcademicActionsView from "../views/education/AcademicActionsView.vue";
 
 // Auth & Error Pages
 import Login from "../views/layouts/auth/Login.vue";
@@ -101,6 +114,18 @@ const routes = [
     meta: { title: "Moliya & Kassa" + appname },
   },
   {
+    path: "/payment-stats",
+    name: "PaymentStats",
+    component: PaymentStatsView,
+    meta: { title: "To'lovlar statistikasi" + appname },
+  },
+  {
+    path: "/payment-stats/month/:monthKey",
+    name: "PaymentMonthDetail",
+    component: PaymentMonthDetailView,
+    meta: { title: "Oylik To'lovlar Tahlili" + appname },
+  },
+  {
     path: "/employees",
     name: "Employees",
     component: EmployeesList,
@@ -114,9 +139,90 @@ const routes = [
   },
   {
     path: "/school/classes",
+    alias: ["/education/classes"],
     name: "SchoolClasses",
     component: SchoolClassesView,
-    meta: { title: "Maktab Sinflari & Fanlar" + appname },
+    meta: { title: "Sinflar" + appname },
+  },
+  {
+    path: "/school/classes/:id",
+    alias: ["/education/classes/:id"],
+    name: "SchoolClassDetail",
+    component: SchoolClassDetailView,
+    meta: { title: "O'quvchilar ro'yxati" + appname },
+  },
+  {
+    path: "/school/levels",
+    alias: ["/levels", "/education/levels", "/school/groups"],
+    name: "SchoolLevels",
+    component: SchoolLevelsView,
+    meta: { title: "Darajalar va to'garaklar" + appname },
+  },
+  {
+    path: "/school/students",
+    alias: ["/education/students"],
+    name: "SchoolStudents",
+    component: SchoolStudentsView,
+    meta: { title: "O'quvchilar" + appname },
+  },
+  {
+    path: "/school/parents",
+    alias: ["/parents", "/education/parents"],
+    name: "SchoolParents",
+    component: SchoolParentsView,
+    meta: { title: "Ota-onalar" + appname },
+  },
+  {
+    path: "/school/dropped",
+    alias: ["/dropped", "/school/withdrawn", "/education/dropped", "/school/chetlatilganlar"],
+    name: "SchoolDroppedStudents",
+    component: SchoolDroppedView,
+    meta: { title: "Chetlatilganlar" + appname },
+  },
+  {
+    path: "/education/schedule",
+    alias: ["/school/schedule", "/schedule"],
+    name: "EducationSchedule",
+    component: ScheduleView,
+    meta: { title: "Dars jadvali" + appname },
+  },
+  {
+    path: "/education/schedule/class/:classId",
+    alias: [
+      "/education/class-schedule/:classId",
+      "/education/class-schedule/:quarter/:dates/:classId",
+    ],
+    name: "EducationClassScheduleDetail",
+    component: ClassScheduleView,
+    meta: { title: "Dars jadvali - Sinf ko'rinishi" + appname },
+  },
+  {
+    path: "/education/replace-teacher",
+    alias: ["/school/replace-teacher"],
+    name: "EducationReplaceTeacher",
+    component: ReplaceTeacherView,
+    meta: { title: "O'qituvchini almashtirish" + appname },
+  },
+  {
+    path: "/education/gradebook",
+    alias: ["/school/gradebook"],
+    name: "EducationGradebook",
+    component: GradebookView,
+    meta: { title: "Baholar jurnali" + appname },
+  },
+  {
+    path: "/education/final-grades",
+    alias: ["/school/final-grades"],
+    name: "EducationFinalGrades",
+    component: FinalGradesView,
+    meta: { title: "Yakuniy baholar" + appname },
+  },
+  {
+    path: "/education/academic-actions",
+    alias: ["/school/academic-actions"],
+    name: "EducationAcademicActions",
+    component: AcademicActionsView,
+    meta: { title: "Akademik harakatlar" + appname },
   },
   {
     path: "/calendar",

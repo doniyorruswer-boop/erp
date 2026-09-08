@@ -59,6 +59,10 @@
               <FormInput v-model="newGroup.startTime" label="Boshlanish vaqti" required placeholder="14:00" icon="solar:clock-circle-linear" />
               <FormInput v-model="newGroup.endTime" label="Tugash vaqti" required placeholder="16:00" icon="solar:clock-circle-linear" />
             </div>
+            <div class="grid grid-cols-2 gap-3">
+              <FormInput v-model="newGroup.startDate" type="date" label="Boshlanish sanasi" placeholder="2026-09-01" icon="solar:calendar-date-linear" />
+              <FormInput v-model="newGroup.endDate" type="date" label="Tugash sanasi" placeholder="2026-11-30" icon="solar:calendar-date-linear" />
+            </div>
           </div>
         </template>
       </vmodal>
@@ -105,20 +109,46 @@
             <div><span class="text-gray-400">O'qituvchi:</span> {{ group.teacher ? group.teacher.firstName + ' ' + group.teacher.lastName : '-' }}</div>
             <div><span class="text-gray-400">Kunlar:</span> {{ formatDays(group.days) }} ({{ group.startTime }} - {{ group.endTime }})</div>
             <div><span class="text-gray-400">Xona:</span> {{ group.room?.name || '-' }}</div>
+            <div v-if="group.startDate || group.endDate">
+              <span class="text-gray-400">Davr:</span> {{ formatDate(group.startDate) }} — {{ formatDate(group.endDate) }}
+            </div>
           </div>
         </div>
 
-        <div class="flex items-center justify-between pt-3 border-t dark:border-gray-700">
-          <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-            {{ group._count?.enrollments || 0 }} ta o'quvchi
+        <div class="flex flex-col gap-2.5 pt-3 border-t dark:border-gray-700">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-gray-700 dark:text-gray-200">
+              {{ group._count?.enrollments || 0 }} ta o'quvchi
+            </span>
+            <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-600 dark:text-gray-300 font-medium">
+              <Icon icon="solar:notes-linear" class="text-xs" />
+              {{ group._count?.lessons || 0 }} ta dars
+            </span>
           </div>
-          <router-link
-            :to="`/attendance?groupId=${group.id}`"
-            class="inline-flex items-center gap-1.5 bg-primary text-white text-sm px-4 py-2 rounded-md hover:bg-opacity-90 transition font-medium shadow-sm"
-          >
-            <Icon icon="fluent:calendar-checkmark-24-filled" class="text-base" />
-            <span>Davomat</span>
-          </router-link>
+
+          <div class="flex items-center gap-2 mt-1">
+            <button
+              type="button"
+              :disabled="generatingGroupId === group.id"
+              @click="handleGenerateLessons(group)"
+              class="flex-1 inline-flex items-center justify-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs px-2.5 py-2 rounded-md transition font-medium disabled:opacity-50"
+              title="Guruh jadvali asosida darslarni avtomatik generatsiya qilish"
+            >
+              <Icon
+                :icon="generatingGroupId === group.id ? 'line-md:loading-loop' : 'solar:calendar-add-bold'"
+                class="text-sm shrink-0"
+              />
+              <span class="truncate">{{ generatingGroupId === group.id ? 'Generatsiya...' : 'Darslarni generatsiya qilish' }}</span>
+            </button>
+
+            <router-link
+              :to="`/attendance?groupId=${group.id}`"
+              class="inline-flex items-center gap-1 bg-primary text-white text-xs px-3 py-2 rounded-md hover:bg-opacity-90 transition font-medium shadow-sm shrink-0"
+            >
+              <Icon icon="fluent:calendar-checkmark-24-filled" class="text-sm" />
+              <span>Davomat</span>
+            </router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -156,6 +186,7 @@ export default {
       rooms: [],
       loading: false,
       alertMessage: "",
+      generatingGroupId: null,
       newGroup: {
         name: "",
         courseId: "",
@@ -164,6 +195,8 @@ export default {
         days: "ODD_DAYS",
         startTime: "14:00",
         endTime: "16:00",
+        startDate: "",
+        endDate: "",
       },
     };
   },
@@ -250,9 +283,30 @@ export default {
       };
       return map[days] || days;
     },
+    formatDate(val) {
+      if (!val) return "-";
+      const d = new Date(val);
+      return d.toLocaleDateString("uz-UZ", { year: "numeric", month: "2-digit", day: "2-digit" });
+    },
     formatUZS(val) {
       if (!val) return "0 so'm";
       return new Intl.NumberFormat("uz-UZ").format(val) + " so'm";
+    },
+    async handleGenerateLessons(group) {
+      if (this.generatingGroupId) return;
+      this.generatingGroupId = group.id;
+      try {
+        const res = await groupsApi.generateLessons(group.id);
+        const count = res?.createdCount ?? 0;
+        const msg = res?.message || `${count} ta dars muvaffaqiyatli generatsiya qilindi!`;
+        this.alertMessage = msg;
+        await this.fetchGroups();
+      } catch (err) {
+        console.error("Darslarni generatsiya qilishda xatolik:", err);
+        alert(err.response?.data?.message || err.message || "Darslarni generatsiya qilishda xatolik yuz berdi");
+      } finally {
+        this.generatingGroupId = null;
+      }
     },
     async submitAddGroup() {
       try {
@@ -264,11 +318,23 @@ export default {
           days: this.newGroup.days,
           startTime: this.newGroup.startTime,
           endTime: this.newGroup.endTime,
+          startDate: this.newGroup.startDate || undefined,
+          endDate: this.newGroup.endDate || undefined,
         });
         if (this.$refs.addGroupModal) {
           this.$refs.addGroupModal.isOpen = false;
         }
-        this.newGroup = { name: "", courseId: this.courses[0]?.id || "", teacherId: "", roomId: "", days: "ODD_DAYS", startTime: "14:00", endTime: "16:00" };
+        this.newGroup = {
+          name: "",
+          courseId: this.courses[0]?.id || "",
+          teacherId: "",
+          roomId: "",
+          days: "ODD_DAYS",
+          startTime: "14:00",
+          endTime: "16:00",
+          startDate: "",
+          endDate: "",
+        };
         this.alertMessage = "Yangi guruh muvaffaqiyatli ochildi!";
         await this.fetchGroups();
       } catch (err) {

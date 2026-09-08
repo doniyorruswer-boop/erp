@@ -5,7 +5,7 @@
       <div>
         <Breadcrumb :items="breadcrumbItems" />
         <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 dark:text-gray-100 flex items-center gap-2.5 mt-1">
-          <span class="p-2 rounded-xl bg-primary/10 text-primary">
+          <span class="p-2 rounded-md bg-primary/10 text-primary">
             <Icon icon="solar:settings-bold" class="text-2xl" />
           </span>
           <span>CRM Sozlamalari</span>
@@ -50,7 +50,7 @@
     <Alert v-if="alertMessage" :message="alertMessage" @close="alertMessage = ''" />
 
     <!-- 8 Tabs Header Bar -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 p-2 shadow-xs overflow-x-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-2 shadow-xs overflow-x-auto">
       <div class="flex items-center gap-1.5 min-w-max">
         <button
           v-for="tab in tabs"
@@ -58,7 +58,7 @@
           type="button"
           @click="activeTab = tab.id"
           :class="[
-            'flex items-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer',
+            'flex items-center gap-2 py-2.5 px-4 rounded-md text-xs sm:text-sm font-bold transition cursor-pointer',
             activeTab === tab.id
               ? 'bg-primary text-white shadow-xs'
               : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/60'
@@ -80,7 +80,7 @@
     </div>
 
     <!-- TAB 1: MIJOZ DARAJASI -->
-    <div v-if="activeTab === 'tiers'" class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div v-if="activeTab === 'tiers'" class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
           <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
@@ -135,7 +135,7 @@
     </div>
 
     <!-- TAB 2: TAGLAR -->
-    <div v-if="activeTab === 'tags'" class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div v-if="activeTab === 'tags'" class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
           <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
@@ -189,7 +189,7 @@
     </div>
 
     <!-- TAB 3: MANBALAR -->
-    <div v-if="activeTab === 'sources'" class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div v-if="activeTab === 'sources'" class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
           <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
@@ -259,7 +259,7 @@
     </div>
 
     <!-- TAB 4: VORONKALAR -->
-    <div v-if="activeTab === 'pipelines'" class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div v-if="activeTab === 'pipelines'" class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
           <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
@@ -314,7 +314,7 @@
     </div>
 
     <!-- TAB 5: YO'QOTILGAN LID SABABLARI -->
-    <div v-if="activeTab === 'lostReasons'" class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div v-if="activeTab === 'lostReasons'" class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
           <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
@@ -349,7 +349,7 @@
     </div>
 
     <!-- TAB 6: IP TELEFONIYA -->
-    <div v-if="activeTab === 'telephony'" class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div v-if="activeTab === 'telephony'" class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
           <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
@@ -387,7 +387,7 @@
     </div>
 
     <!-- TAB 7: SIP RAQAMLAR -->
-    <div v-if="activeTab === 'sip'" class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div v-if="activeTab === 'sip'" class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
           <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
@@ -428,7 +428,7 @@
     </div>
 
     <!-- TAB 8: RUXSATLAR -->
-    <div v-if="activeTab === 'permissions'" class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div v-if="activeTab === 'permissions'" class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
           <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
@@ -468,8 +468,8 @@
     <div v-if="activeTab === 'notifications'" class="space-y-6">
       <!-- Status Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border dark:border-gray-700 shadow-xs flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center text-2xl shrink-0">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-xs flex items-center gap-4">
+          <div class="w-12 h-12 rounded-md bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center text-2xl shrink-0">
             <Icon icon="solar:chat-round-dots-bold" />
           </div>
           <div>
@@ -481,8 +481,8 @@
           </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border dark:border-gray-700 shadow-xs flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center text-2xl shrink-0">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-xs flex items-center gap-4">
+          <div class="w-12 h-12 rounded-md bg-blue-50 dark:bg-blue-900/30 text-primary flex items-center justify-center text-2xl shrink-0">
             <Icon icon="solar:letter-bold" />
           </div>
           <div>
@@ -494,8 +494,8 @@
           </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border dark:border-gray-700 shadow-xs flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-900/30 text-sky-500 flex items-center justify-center text-2xl shrink-0">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-xs flex items-center gap-4">
+          <div class="w-12 h-12 rounded-md bg-sky-50 dark:bg-sky-900/30 text-sky-500 flex items-center justify-center text-2xl shrink-0">
             <Icon icon="solar:plain-bold" />
           </div>
           <div>
@@ -511,7 +511,7 @@
       <!-- Send Form & Recent Logs -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Send Form -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl border dark:border-gray-700 shadow-xs space-y-4">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border dark:border-gray-700 shadow-xs space-y-4">
           <h3 class="font-bold text-base text-gray-800 dark:text-gray-100 flex items-center gap-2">
             <Icon icon="solar:plain-2-bold" class="text-primary text-xl" />
             Sinov Xabarini Yuborish
@@ -521,7 +521,7 @@
           <div class="space-y-3 text-xs sm:text-sm">
             <div>
               <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Kanal</label>
-              <select v-model="testNotifForm.channel" class="w-full px-3 py-2 border dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+              <select v-model="testNotifForm.channel" class="w-full px-3 py-2 border dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
                 <option value="SMS">SMS (Eskiz.uz)</option>
                 <option value="EMAIL">Email (SMTP)</option>
                 <option value="TELEGRAM">Telegram Bot</option>
@@ -532,24 +532,24 @@
               <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">
                 {{ testNotifForm.channel === 'SMS' ? 'Telefon raqam (+998...)' : testNotifForm.channel === 'EMAIL' ? 'Email manzili' : 'Telegram Chat ID' }}
               </label>
-              <input v-model="testNotifForm.recipient" class="w-full px-3 py-2 border dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100" />
+              <input v-model="testNotifForm.recipient" class="w-full px-3 py-2 border dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100" />
             </div>
 
             <div>
               <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Sarlavha</label>
-              <input v-model="testNotifForm.title" class="w-full px-3 py-2 border dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100" />
+              <input v-model="testNotifForm.title" class="w-full px-3 py-2 border dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100" />
             </div>
 
             <div>
               <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">Xabar matni</label>
-              <textarea v-model="testNotifForm.body" rows="3" class="w-full px-3 py-2 border dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100"></textarea>
+              <textarea v-model="testNotifForm.body" rows="3" class="w-full px-3 py-2 border dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100"></textarea>
             </div>
 
             <button
               type="button"
               @click="sendTestNotification"
               :disabled="sendingNotif"
-              class="w-full py-2.5 px-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+              class="w-full py-2.5 px-4 bg-primary text-white font-bold rounded-md hover:bg-primary/90 transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               <Icon v-if="sendingNotif" icon="solar:spinner-line" class="animate-spin text-lg" />
               <Icon v-else icon="solar:plain-bold" class="text-lg" />
@@ -559,7 +559,7 @@
         </div>
 
         <!-- Recent Notifications Table -->
-        <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-2xl border dark:border-gray-700 shadow-xs">
+        <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg border dark:border-gray-700 shadow-xs">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-bold text-base text-gray-800 dark:text-gray-100 flex items-center gap-2">
               <Icon icon="solar:history-bold" class="text-primary text-xl" />
@@ -610,9 +610,9 @@
     <!-- TAB 10: FON VAZIFALARI (QUEUE) -->
     <div v-if="activeTab === 'jobs'" class="space-y-6">
       <!-- Status Bar -->
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl border dark:border-gray-700 shadow-xs flex flex-wrap items-center justify-between gap-4">
+      <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 flex items-center justify-center text-2xl">
+          <div class="w-12 h-12 rounded-md bg-red-50 dark:bg-red-900/30 text-red-600 flex items-center justify-center text-2xl">
             <Icon icon="solar:server-bold" />
           </div>
           <div>
@@ -630,7 +630,7 @@
             type="button"
             @click="triggerJobMaintenance"
             :disabled="triggeringJob"
-            class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:bg-primary/90 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+            class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-md hover:bg-primary/90 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <Icon v-if="triggeringJob" icon="solar:spinner-line" class="animate-spin text-base" />
             <Icon v-else icon="solar:play-circle-bold" class="text-base" />
@@ -640,7 +640,7 @@
       </div>
 
       <!-- Jobs List Table -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+      <div class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
         <div class="p-4 border-b dark:border-gray-700 flex items-center justify-between">
           <h4 class="font-bold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
             <Icon icon="solar:list-check-bold" class="text-primary text-lg" />
@@ -725,7 +725,7 @@
                 type="button"
                 @click="tierForm.badgeClass = color.class"
                 :class="[
-                  'py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1.5',
+                  'py-2 px-3 rounded-md text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1.5',
                   color.class,
                   tierForm.badgeClass === color.class ? 'ring-2 ring-primary border-primary' : 'border-transparent'
                 ]"
@@ -764,7 +764,7 @@
                 type="button"
                 @click="tagForm.badgeClass = color.class"
                 :class="[
-                  'py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1.5',
+                  'py-2 px-3 rounded-md text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1.5',
                   color.class,
                   tagForm.badgeClass === color.class ? 'ring-2 ring-primary border-primary' : 'border-transparent'
                 ]"
@@ -817,7 +817,7 @@
       <template v-slot:body>
         <div class="space-y-3 text-sm text-left">
           <FormInput v-model="pipelineForm.name" label="Voronka nomi" required placeholder="Qabul 2026-2027, Bog'cha uchun..." />
-          <label class="flex items-center gap-2 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
+          <label class="flex items-center gap-2 p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
             <input type="checkbox" v-model="pipelineForm.isDefault" class="rounded text-primary" />
             <span class="text-xs font-semibold text-gray-700 dark:text-gray-200">Asosiy standart voronka sifatida belgilash</span>
           </label>
@@ -885,19 +885,19 @@
       </template>
       <template v-slot:body>
         <div class="space-y-2.5 text-xs text-left">
-          <label class="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
+          <label class="flex items-center justify-between p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
             <span>Barcha lidlarni ko'rish</span>
             <input type="checkbox" v-model="employeePermissions.viewAllLeads" class="rounded text-primary" />
           </label>
-          <label class="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
+          <label class="flex items-center justify-between p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
             <span>Lid ma'lumotlarini tahrirlash</span>
             <input type="checkbox" v-model="employeePermissions.editLeads" class="rounded text-primary" />
           </label>
-          <label class="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
+          <label class="flex items-center justify-between p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
             <span>O'quvchiga aylantirish (Qabul qilish)</span>
             <input type="checkbox" v-model="employeePermissions.convertLeads" class="rounded text-primary" />
           </label>
-          <label class="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
+          <label class="flex items-center justify-between p-3 rounded-md bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
             <span>Lidlarni o'chirish huquqi</span>
             <input type="checkbox" v-model="employeePermissions.deleteLeads" class="rounded text-primary" />
           </label>
@@ -912,6 +912,7 @@ import { Icon } from "@iconify/vue";
 import Breadcrumb from "@/components/Breadcrumb.vue";
 import Alert from "@/components/Alert.vue";
 import FormInput from "@/components/FormInput.vue";
+import { getPaymentMethodsList, savePaymentMethodsList, DEFAULT_PAYMENT_METHODS } from "@/config/paymentMethods";
 import vmodal from "@/components/modal.vue";
 import { useTenantStore } from "@/store/tenant";
 import { notificationsApi, jobsApi } from "@/api/services";
@@ -987,6 +988,7 @@ export default {
       jobsList: [],
       loadingJobs: false,
       triggeringJob: false,
+      paymentMethodsConfigList: getPaymentMethodsList(),
       // Tier Form
       editingTierId: null,
       tierForm: { name: "", emoji: "❤️", badgeClass: "bg-rose-50 text-rose-600" },
@@ -1096,6 +1098,16 @@ export default {
     this.loadJobsTab();
   },
   methods: {
+    togglePaymentMethodStatus(pm) {
+      pm.enabled = pm.enabled === false ? true : false;
+      savePaymentMethodsList(this.paymentMethodsConfigList);
+      this.alertMessage = `${pm.name} holati o'zgartirildi!`;
+    },
+    resetPaymentMethodsToDefault() {
+      this.paymentMethodsConfigList = JSON.parse(JSON.stringify(DEFAULT_PAYMENT_METHODS));
+      savePaymentMethodsList(this.paymentMethodsConfigList);
+      this.alertMessage = "To'lov usullari boshlang'ich holatga qaytarildi!";
+    },
     // NOTIFICATIONS & JOBS INTEGRATION
     async loadNotificationsTab() {
       try {

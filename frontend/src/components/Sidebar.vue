@@ -63,6 +63,17 @@
             </router-link>
           </div>
 
+          <!-- To'lovlar statistikasi -->
+          <div class="item mt-2">
+            <router-link
+              to="/payment-stats"
+              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <span class="mr-3 text-xl"><Icon icon="solar:chart-2-bold" /></span>
+              <span class="w-full"> To'lovlar statistikasi </span>
+            </router-link>
+          </div>
+
           <!-- Lidlar & Kanban -->
           <div class="item mt-2">
             <router-link
@@ -74,6 +85,156 @@
             </router-link>
           </div>
 
+          <!-- Ta'lim (Obucheniye Accordion) -->
+          <div class="item mt-2">
+            <div
+              @click="toggleEducationMenu"
+              class="w-full flex items-center justify-between text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer transition select-none"
+              :class="{ 'bg-gray-200/70 dark:bg-gray-700/60 font-semibold': isEducationOpen || isEducationRouteActive }"
+            >
+              <div class="flex items-center">
+                <span class="mr-3 text-xl"><Icon icon="solar:users-group-rounded-bold" /></span>
+                <span>Ta'lim</span>
+              </div>
+              <Icon
+                icon="solar:alt-arrow-down-linear"
+                class="text-xs text-gray-400 transition-transform duration-200"
+                :class="{ 'rotate-180': isEducationOpen }"
+              />
+            </div>
+
+            <!-- Submenu -->
+            <transition name="fade">
+              <div v-show="isEducationOpen" class="mt-1 space-y-1 pl-3 pr-1 py-1">
+                <!-- Sinflar (Asosiy faol bo'lim) -->
+                <router-link
+                  to="/school/classes"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">{{ tenantStore.classesLabel }}</span>
+                </router-link>
+
+                <!-- Darajalar va to'garaklar (Faol bo'lim) -->
+                <router-link
+                  to="/school/levels"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">{{ tenantStore.isSchool ? "Darajalar" : "Bosqich guruhlari" }}</span>
+                </router-link>
+                <router-link
+                  to="/school/students"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">{{ tenantStore.isKindergarten ? "Tarbiyalanuvchilar" : "O'quvchilar" }}</span>
+                </router-link>
+                <router-link
+                  to="/school/parents"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">Ota-onalar</span>
+                </router-link>
+                <router-link
+                  to="/school/dropped"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">Chetlatilganlar</span>
+                </router-link>
+                <div class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60">
+                  <span class="w-1.5 h-1.5 rounded-full bg-gray-400 mr-2.5 shrink-0"></span>
+                  <span>Arxiv</span>
+                </div>
+                <div class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60">
+                  <span class="w-1.5 h-1.5 rounded-full bg-gray-400 mr-2.5 shrink-0"></span>
+                  <span>Ota-onalar arxivi</span>
+                </div>
+              </div>
+            </transition>
+          </div>
+
+          <!-- O'quv jarayoni (Учебный процесс Accordion) -->
+          <div class="item mt-2">
+            <div
+              @click="toggleProcessMenu"
+              class="w-full flex items-center justify-between text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer transition select-none"
+              :class="{ 'bg-gray-200/70 dark:bg-gray-700/60 font-semibold': isProcessOpen || isProcessRouteActive }"
+            >
+              <div class="flex items-center">
+                <span class="mr-3 text-xl text-primary"><Icon icon="solar:calendar-date-bold" /></span>
+                <span>O'quv jarayoni</span>
+              </div>
+              <Icon
+                icon="solar:alt-arrow-down-linear"
+                class="text-xs text-gray-400 transition-transform duration-200"
+                :class="{ 'rotate-180': isProcessOpen }"
+              />
+            </div>
+
+            <!-- Submenu -->
+            <transition name="fade">
+              <div v-show="isProcessOpen" class="mt-1 space-y-1 pl-3 pr-1 py-1">
+                <!-- Dars jadvali -->
+                <router-link
+                  to="/education/schedule"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">Dars jadvali</span>
+                </router-link>
+
+                <!-- O'qituvchini almashtirish -->
+                <router-link
+                  to="/education/replace-teacher"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">O'qituvchini almashtirish</span>
+                </router-link>
+
+                <!-- Baholar jurnali -->
+                <router-link
+                  to="/education/gradebook"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">Baholar jurnali</span>
+                </router-link>
+
+                <!-- Yakuniy baholar -->
+                <router-link
+                  to="/education/final-grades"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">Yakuniy baholar</span>
+                </router-link>
+
+                <!-- Akademik harakatlar -->
+                <router-link
+                  to="/education/academic-actions"
+                  class="w-full flex items-center text-left rounded-md box-border py-2 px-3 text-sm transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                  active-class="bg-primary/10 text-primary font-bold dark:bg-primary/20"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary mr-2.5 shrink-0"></span>
+                  <span class="w-full">Akademik harakatlar</span>
+                </router-link>
+              </div>
+            </transition>
+          </div>
+
           <!-- Students -->
           <div class="item mt-2">
             <router-link
@@ -82,17 +243,6 @@
             >
               <span class="mr-3 text-xl"><Icon icon="ph:student-fill" /></span>
               <span class="w-full"> O'quvchilar </span>
-            </router-link>
-          </div>
-
-          <!-- School Classes (If School) -->
-          <div v-if="tenantStore.isSchool" class="item mt-2">
-            <router-link
-              to="/school/classes"
-              class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700"
-            >
-              <span class="mr-3 text-xl"><Icon icon="solar:buildings-3-bold" /></span>
-              <span class="w-full"> Maktab Sinflari </span>
             </router-link>
           </div>
 
@@ -265,8 +415,51 @@ export default {
     const tenantStore = useTenantStore();
     return { tenantStore };
   },
+  data() {
+    return {
+      isEducationOpen: true,
+      isProcessOpen: true,
+    };
+  },
+  computed: {
+    isEducationRouteActive() {
+      return (
+        this.$route.path.startsWith("/school") ||
+        this.$route.path.startsWith("/education/classes") ||
+        this.$route.path.startsWith("/education/students") ||
+        this.$route.path.startsWith("/education/levels") ||
+        this.$route.path.startsWith("/education/parents") ||
+        this.$route.path.startsWith("/education/dropped")
+      );
+    },
+    isProcessRouteActive() {
+      return (
+        this.$route.path.startsWith("/education/schedule") ||
+        this.$route.path.startsWith("/education/replace-teacher") ||
+        this.$route.path.startsWith("/education/gradebook") ||
+        this.$route.path.startsWith("/education/final-grades") ||
+        this.$route.path.startsWith("/education/academic-actions") ||
+        this.$route.path.startsWith("/school/schedule") ||
+        this.$route.path.startsWith("/schedule")
+      );
+    },
+  },
+  methods: {
+    toggleEducationMenu() {
+      this.isEducationOpen = !this.isEducationOpen;
+    },
+    toggleProcessMenu() {
+      this.isProcessOpen = !this.isProcessOpen;
+    },
+  },
   mounted() {
     this.tenantStore.fetchTenantConfig();
+    if (this.isEducationRouteActive) {
+      this.isEducationOpen = true;
+    }
+    if (this.isProcessRouteActive) {
+      this.isProcessOpen = true;
+    }
   },
 };
 </script>

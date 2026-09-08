@@ -8,238 +8,287 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Rollar & Tizim Ruxsatlari (RBAC)</h1>
         <p class="text-sm text-gray-400 mt-0.5">
-          Foydalanuvchi rollari, maxsus huquqlar va modul bo'yicha ruxsatnomalar boshqaruvi.
+          Foydalanuvchi rollari, maxsus huquqlar va modul bo'yicha ruxsatnomalar boshqaruvi
         </p>
       </div>
       <div class="flex items-center gap-2.5">
         <button
+          type="button"
           @click="openCreateModal"
-          class="inline-flex items-center px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-xl shadow-sm transition duration-150 ease-in-out cursor-pointer"
+          class="border flex items-center text-sm gap-2 text-white bg-primary hover:bg-primary/90 dark:border-gray-700 rounded-md py-2 px-4 font-medium shadow-sm transition cursor-pointer"
         >
-          <Icon icon="solar:shield-plus-bold" class="w-5 h-5 mr-1.5" />
-          Yangi Rol Yaratish
+          <Icon icon="solar:shield-plus-bold" class="text-lg" />
+          <span>Yangi Rol Yaratish</span>
         </button>
       </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Jami Rollar</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ roles.length }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Tizim Rollari</p>
-        <p class="text-2xl font-bold text-primary mt-2">{{ systemRolesCount }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Maxsus (Custom) Rollar</p>
-        <p class="text-2xl font-bold text-emerald-600 mt-2">{{ customRolesCount }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Mavjud Ruxsatlar</p>
-        <p class="text-2xl font-bold text-indigo-600 mt-2">{{ availablePermissions.length }} ta</p>
-      </div>
+    <!-- Alert Message -->
+    <Alert v-if="alertMessage" :message="alertMessage" :type="alertType" @close="alertMessage = ''" />
+
+    <!-- 4 Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <StatsCard
+        title="Jami Rollar"
+        :value="`${roles.length} ta`"
+        icon="solar:shield-check-bold"
+        variant="primary"
+      />
+      <StatsCard
+        title="Tizim Rollari"
+        :value="`${systemRolesCount} ta`"
+        icon="solar:shield-star-bold"
+        variant="purple"
+        valueClass="text-primary"
+      />
+      <StatsCard
+        title="Maxsus (Custom) Rollar"
+        :value="`${customRolesCount} ta`"
+        icon="solar:shield-user-bold"
+        variant="success"
+        valueClass="text-green-600 dark:text-green-400"
+      />
+      <StatsCard
+        title="Mavjud Ruxsatlar"
+        :value="`${availablePermissions.length} ta`"
+        icon="solar:key-minimalistic-square-bold"
+        variant="info"
+        valueClass="text-indigo-600 dark:text-indigo-400"
+      />
     </div>
 
-    <!-- Roles Grid / Table -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-      <div v-if="loading" class="p-8 text-center text-gray-500">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent mb-2"></div>
-        <p>Yuklanmoqda...</p>
-      </div>
+    <!-- Data Table Component -->
+    <DataTable
+      title="Barcha Rollar"
+      subtitle="Tizimda mavjud rollar va ularga biriktirilgan funksional imkoniyatlar"
+      :columns="columns"
+      :data="roles"
+      :loading="loading"
+      :searchable="true"
+      :showIndex="true"
+      :showPerPage="true"
+      searchPlaceholder="Rol nomi yoki kodi..."
+      rowKey="id"
+    >
+      <!-- Custom Role Name Cell -->
+      <template #cell(name)="{ row }">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <Icon icon="solar:shield-check-bold" class="text-base" />
+          </div>
+          <div>
+            <span class="font-semibold text-gray-800 dark:text-gray-100">{{ row.name }}</span>
+            <div class="text-xs text-gray-400">{{ row.description || 'Tavsif berilmagan' }}</div>
+          </div>
+        </div>
+      </template>
 
-      <div v-else-if="roles.length === 0" class="p-12 text-center text-gray-400">
-        <Icon icon="solar:shield-warning-bold" class="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-        <p class="text-base font-medium">Hech qanday rol topilmadi</p>
-      </div>
+      <!-- Custom Code Cell -->
+      <template #cell(code)="{ row }">
+        <span class="font-mono text-xs text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+          {{ row.code || row.name?.toUpperCase().replace(/\s+/g, '_') }}
+        </span>
+      </template>
 
-      <div v-else class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-gray-600 dark:text-gray-300">
-          <thead class="bg-gray-50 dark:bg-gray-700/50 text-xs uppercase font-semibold text-gray-500 dark:text-gray-400">
-            <tr>
-              <th class="px-6 py-4">Rol Nomi</th>
-              <th class="px-6 py-4">Kodi</th>
-              <th class="px-6 py-4">Tavsif</th>
-              <th class="px-6 py-4">Ruxsatlar soni</th>
-              <th class="px-6 py-4">Turi</th>
-              <th class="px-6 py-4 text-right">Amallar</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-            <tr v-for="role in roles" :key="role.id" class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-              <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                <div class="flex items-center gap-2">
-                  <Icon icon="solar:shield-check-bold" class="w-5 h-5 text-primary" />
-                  {{ role.name }}
-                </div>
-              </td>
-              <td class="px-6 py-4 font-mono text-xs text-gray-500">
-                {{ role.code || role.name?.toUpperCase().replace(/\s+/g, '_') }}
-              </td>
-              <td class="px-6 py-4 text-xs text-gray-500 max-w-xs truncate">
-                {{ role.description || "Standart tizim roli" }}
-              </td>
-              <td class="px-6 py-4">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                  {{ role.permissions ? (Array.isArray(role.permissions) ? role.permissions.length : Object.keys(role.permissions).length) : "Barchasi" }} ta ruxsat
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  :class="role.isSystem ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'"
-                >
-                  {{ role.isSystem ? "Tizim" : "Maxsus" }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right space-x-2">
-                <button
-                  @click="openEditModal(role)"
-                  class="p-1.5 text-gray-500 hover:text-primary transition rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                  title="Tahrirlash"
-                >
-                  <Icon icon="solar:pen-bold" class="w-4 h-4" />
-                </button>
-                <button
-                  v-if="!role.isSystem"
-                  @click="deleteRole(role)"
-                  class="p-1.5 text-gray-500 hover:text-rose-600 transition rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                  title="O'chirish"
-                >
-                  <Icon icon="solar:trash-bin-trash-bold" class="w-4 h-4" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <!-- Custom Permissions Cell -->
+      <template #cell(permissions)="{ row }">
+        <Badge variant="primary" size="xs">
+          {{ (row.permissions || row.rolePermissions || []).length }} ta ruxsat
+        </Badge>
+      </template>
 
-    <!-- Create/Edit Role Modal -->
-    <div v-if="showModal" class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-gray-100 dark:border-gray-700 max-h-[90vh] flex flex-col">
-        <div class="flex items-center justify-between pb-4 border-b dark:border-gray-700">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white">
-            {{ isEditing ? "Rolni Tahrirlash" : "Yangi Maxsus Rol Yaratish" }}
-          </h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-            <Icon icon="solar:close-circle-bold" class="w-6 h-6" />
+      <!-- Custom Type Cell -->
+      <template #cell(isSystem)="{ row }">
+        <Badge :variant="row.isSystem ? 'purple' : 'success'" size="sm">
+          {{ row.isSystem ? 'Tizim roli' : 'Maxsus rol' }}
+        </Badge>
+      </template>
+
+      <!-- Actions Slot -->
+      <template #actions="{ row }">
+        <div class="flex items-center justify-end gap-1.5">
+          <button
+            type="button"
+            @click="openEditModal(row)"
+            title="Tahrirlash"
+            class="p-1.5 text-xs text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded transition cursor-pointer"
+          >
+            <Icon icon="solar:pen-linear" class="text-base" />
+          </button>
+          <button
+            v-if="!row.isSystem"
+            type="button"
+            @click="deleteRole(row)"
+            title="O'chirish"
+            class="p-1.5 text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition cursor-pointer"
+          >
+            <Icon icon="solar:trash-bin-trash-linear" class="text-base" />
           </button>
         </div>
+      </template>
+    </DataTable>
 
-        <form @submit.prevent="saveRole" class="mt-4 space-y-4 overflow-y-auto flex-1 pr-1">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Rol Nomi *</label>
-              <input
-                v-model="form.name"
-                required
-                type="text"
-                placeholder="Masalan: Metodist, Nazoratchi"
-                class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Rol Kodi *</label>
-              <input
-                v-model="form.code"
-                required
-                type="text"
-                placeholder="METHODIST"
-                class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm font-mono"
-              />
-            </div>
-          </div>
+    <!-- Create / Edit Role Modal -->
+    <vmodal
+      :model-value="showModal"
+      @update:model-value="showModal = $event"
+      :title="isEditing ? 'Rolni Tahrirlash' : 'Yangi Rol Yaratish'"
+      subtitle="Rol parametrlari va ruxsatnomalar matritsasini belgilang"
+      width="max-w-2xl"
+      :hide-button="true"
+    >
+      <form @submit.prevent="saveRole" class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <FormInput
+            v-model="form.name"
+            label="Rol Nomi"
+            required
+            placeholder="Masalan: Filial Menejeri"
+            icon="solar:shield-linear"
+          />
+          <FormInput
+            v-model="form.code"
+            label="Rol Kodi (Katta harflarda)"
+            required
+            placeholder="BRANCH_MANAGER"
+            icon="solar:code-linear"
+          />
+        </div>
 
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Tavsif</label>
-            <input
-              v-model="form.description"
-              type="text"
-              placeholder="Ushbu rol foydalanuvchilarining vazifalari haqida qisqacha..."
-              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm"
-            />
-          </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Tavsif</label>
+          <textarea
+            v-model="form.description"
+            rows="2"
+            placeholder="Ushbu rol foydalanuvchilariga qanday vakolatlar beriladi..."
+            class="w-full text-sm rounded-md border border-gray-300 dark:border-gray-700 p-2 outline-none focus:border-primary dark:bg-gray-900 text-gray-800 dark:text-gray-100"
+          ></textarea>
+        </div>
 
-          <!-- Permissions Checkboxes Grouped -->
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Biriktiriladigan Huquqlar (Ruxsatnomalar)
+        <!-- Permissions Matrix Grouped by Module -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              Ruxsatlar Matritsasi ({{ selectedPermissionCodes.length }} / {{ availablePermissions.length }} tanlandi)
             </label>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 max-h-60 overflow-y-auto">
-              <label
-                v-for="perm in availablePermissions"
-                :key="perm.id || perm"
-                class="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 cursor-pointer hover:text-primary transition"
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                @click="selectAllPermissions"
+                class="text-[11px] text-primary hover:underline font-medium cursor-pointer"
               >
-                <input
-                  type="checkbox"
-                  :value="perm.id || perm"
-                  v-model="form.permissions"
-                  class="rounded text-primary focus:ring-primary h-4 w-4"
-                />
-                <span>{{ perm.label || perm.id || perm }}</span>
-              </label>
+                Barchasini tanlash
+              </button>
+              <span class="text-gray-300">|</span>
+              <button
+                type="button"
+                @click="clearAllPermissions"
+                class="text-[11px] text-rose-500 hover:underline font-medium cursor-pointer"
+              >
+                Tozalash
+              </button>
             </div>
           </div>
 
-          <div class="pt-4 border-t dark:border-gray-700 flex justify-end gap-3">
-            <button
-              type="button"
-              @click="closeModal"
-              class="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+          <div class="max-h-60 overflow-y-auto space-y-3 p-3 bg-gray-50 dark:bg-gray-900/60 rounded-md border dark:border-gray-700">
+            <div
+              v-for="(perms, moduleName) in groupedPermissions"
+              :key="moduleName"
+              class="space-y-1.5"
             >
-              Bekor qilish
-            </button>
-            <button
-              type="submit"
-              :disabled="saving"
-              class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition disabled:opacity-50"
-            >
-              {{ saving ? "Saqlanmoqda..." : "Saqlash" }}
-            </button>
+              <div class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide border-b dark:border-gray-700 pb-1 flex items-center justify-between">
+                <span>{{ moduleName }} Moduli</span>
+                <span class="text-[10px] text-gray-400 font-normal">({{ perms.length }} ta)</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <label
+                  v-for="perm in perms"
+                  :key="perm.code"
+                  class="flex items-start gap-2 text-xs text-gray-700 dark:text-gray-300 hover:text-primary cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    :value="perm.code"
+                    v-model="selectedPermissionCodes"
+                    class="mt-0.5 rounded text-primary focus:ring-primary dark:bg-gray-800"
+                  />
+                  <div>
+                    <div class="font-medium font-mono text-[11px]">{{ perm.code }}</div>
+                    <div class="text-[10px] text-gray-400">{{ perm.description }}</div>
+                  </div>
+                </label>
+              </div>
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t dark:border-gray-700">
+          <button
+            type="button"
+            @click="showModal = false"
+            class="px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition cursor-pointer"
+          >
+            Bekor qilish
+          </button>
+          <button
+            type="submit"
+            :disabled="saving"
+            class="px-5 py-2 text-xs font-semibold bg-primary hover:bg-primary/90 text-white rounded-md shadow-sm transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+          >
+            <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-sm" />
+            <span>{{ saving ? 'Saqlanmoqda...' : 'Saqlash' }}</span>
+          </button>
+        </div>
+      </form>
+    </vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
 import Breadcrumb from "@/components/Breadcrumb.vue";
+import StatsCard from "@/components/StatsCard.vue";
+import DataTable from "@/components/DataTable.vue";
+import Badge from "@/components/Badge.vue";
+import Alert from "@/components/Alert.vue";
+import vmodal from "@/components/modal.vue";
+import FormInput from "@/components/FormInput.vue";
 import { rolesApi } from "@/api/services";
 
 export default {
   name: "RolesList",
-  components: { Icon, Breadcrumb },
+  components: {
+    Icon,
+    Breadcrumb,
+    StatsCard,
+    DataTable,
+    Badge,
+    Alert,
+    vmodal,
+    FormInput,
+  },
   data() {
     return {
       roles: [],
-      availablePermissions: [
-        { id: "students.view", label: "O'quvchilarni ko'rish" },
-        { id: "students.create", label: "O'quvchi qo'shish" },
-        { id: "students.edit", label: "O'quvchini tahrirlash" },
-        { id: "students.delete", label: "O'quvchini o'chirish" },
-        { id: "courses.manage", label: "Kurslarni boshqarish" },
-        { id: "groups.manage", label: "Guruhlarni boshqarish" },
-        { id: "attendance.mark", label: "Davomatni belgilash" },
-        { id: "finance.view", label: "Moliyani ko'rish" },
-        { id: "payments.create", label: "To'lovlarni qabul qilish" },
-        { id: "notifications.send", label: "Xabarnomalar yuborish" },
-        { id: "settings.manage", label: "Tizim sozlamalari" },
-      ],
-      loading: true,
+      availablePermissions: [],
+      selectedPermissionCodes: [],
+      loading: false,
       saving: false,
+      alertMessage: "",
+      alertType: "success",
       showModal: false,
       isEditing: false,
       currentRoleId: null,
+      columns: [
+        { key: "name", label: "Rol Nomi" },
+        { key: "code", label: "Kodi" },
+        { key: "permissions", label: "Ruxsatlar" },
+        { key: "isSystem", label: "Turi" },
+      ],
       form: {
         name: "",
         code: "",
         description: "",
-        permissions: [],
       },
     };
   },
@@ -249,6 +298,15 @@ export default {
     },
     customRolesCount() {
       return this.roles.filter((r) => !r.isSystem).length;
+    },
+    groupedPermissions() {
+      const groups = {};
+      this.availablePermissions.forEach((p) => {
+        const mod = p.module || "UMUMIY";
+        if (!groups[mod]) groups[mod] = [];
+        groups[mod].push(p);
+      });
+      return groups;
     },
   },
   mounted() {
@@ -263,13 +321,17 @@ export default {
           rolesApi.getPermissions(),
         ]);
         if (rolesRes.status === "fulfilled") {
-          this.roles = Array.isArray(rolesRes.value) ? rolesRes.value : (rolesRes.value?.items || []);
+          const val = rolesRes.value;
+          this.roles = Array.isArray(val) ? val : (val?.data || val?.items || []);
         }
-        if (permsRes.status === "fulfilled" && Array.isArray(permsRes.value) && permsRes.value.length > 0) {
-          this.availablePermissions = permsRes.value;
+        if (permsRes.status === "fulfilled") {
+          const val = permsRes.value;
+          this.availablePermissions = Array.isArray(val) ? val : (val?.data || val?.items || []);
         }
       } catch (err) {
-        console.error("Error fetching roles:", err);
+        console.error("Rollar va ruxsatlarni yuklashda xatolik:", err);
+        this.alertType = "danger";
+        this.alertMessage = "Ma'lumotlarni yuklashda xatolik yuz berdi.";
       } finally {
         this.loading = false;
       }
@@ -281,8 +343,8 @@ export default {
         name: "",
         code: "",
         description: "",
-        permissions: [],
       };
+      this.selectedPermissionCodes = [];
       this.showModal = true;
     },
     openEditModal(role) {
@@ -290,40 +352,59 @@ export default {
       this.currentRoleId = role.id;
       this.form = {
         name: role.name,
-        code: role.code || "",
+        code: role.code,
         description: role.description || "",
-        permissions: Array.isArray(role.permissions) ? [...role.permissions] : [],
       };
+      const perms = role.permissions || role.rolePermissions || [];
+      this.selectedPermissionCodes = perms.map((p) => (typeof p === "string" ? p : p.permission?.code || p.code));
       this.showModal = true;
     },
-    closeModal() {
-      this.showModal = false;
+    selectAllPermissions() {
+      this.selectedPermissionCodes = this.availablePermissions.map((p) => p.code);
+    },
+    clearAllPermissions() {
+      this.selectedPermissionCodes = [];
     },
     async saveRole() {
+      if (!this.form.name || !this.form.code) {
+        this.alertType = "danger";
+        this.alertMessage = "Iltimos, rol nomi va kodini kiriting!";
+        return;
+      }
       this.saving = true;
       try {
+        const payload = {
+          ...this.form,
+          permissions: this.selectedPermissionCodes,
+        };
         if (this.isEditing) {
-          await rolesApi.update(this.currentRoleId, this.form);
+          await rolesApi.update(this.currentRoleId, payload);
+          this.alertType = "success";
+          this.alertMessage = "Rol muvaffaqiyatli yangilandi!";
         } else {
-          await rolesApi.create(this.form);
+          await rolesApi.create(payload);
+          this.alertType = "success";
+          this.alertMessage = "Yangi rol muvaffaqiyatli yaratildi!";
         }
-        this.$toast.success(this.isEditing ? "Rol yangilandi!" : "Yangi rol yaratildi!");
-        this.closeModal();
+        this.showModal = false;
         await this.fetchData();
       } catch (err) {
-        this.$toast.error(err.response?.data?.message || "Rolni saqlashda xatolik yuz berdi");
+        this.alertType = "danger";
+        this.alertMessage = "Xatolik: " + (err.response?.data?.message || err.message);
       } finally {
         this.saving = false;
       }
     },
     async deleteRole(role) {
-      if (!confirm(`"${role.name}" rolini o'chirishni tasdiqlaysizmi?`)) return;
+      if (!confirm(`${role.name} rolini o'chirmoqchimisiz?`)) return;
       try {
         await rolesApi.delete(role.id);
-        this.$toast.success("Rol muvaffaqiyatli o'chirildi");
+        this.alertType = "success";
+        this.alertMessage = "Rol muvaffaqiyatli o'chirildi!";
         await this.fetchData();
       } catch (err) {
-        this.$toast.error(err.response?.data?.message || "O'chirishda xatolik");
+        this.alertType = "danger";
+        this.alertMessage = "O'chirishda xatolik: " + (err.response?.data?.message || err.message);
       }
     },
   },

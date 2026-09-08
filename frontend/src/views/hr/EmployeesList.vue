@@ -8,212 +8,327 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Xodimlar & Oylik Maosh (HR)</h1>
         <p class="text-sm text-gray-400 mt-0.5">
-          O'qituvchilar va xodimlar ro'yxati, lavozimlar va oylik ish haqi fondi boshqaruvi.
+          O'qituvchilar va xodimlar ro'yxati, lavozimlar va oylik ish haqi fondi boshqaruvi
         </p>
       </div>
       <div class="flex items-center gap-2.5">
         <button
+          type="button"
           @click="openCreateModal"
-          class="inline-flex items-center px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-xl shadow-sm transition duration-150 ease-in-out cursor-pointer"
+          class="border flex items-center text-sm gap-2 text-white bg-primary hover:bg-primary/90 dark:border-gray-700 rounded-md py-2 px-4 font-medium shadow-sm transition cursor-pointer"
         >
-          <Icon icon="solar:user-plus-bold" class="w-5 h-5 mr-1.5" />
-          Yangi Xodim
+          <Icon icon="solar:user-plus-bold" class="text-lg" />
+          <span>Yangi Xodim</span>
         </button>
       </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Jami Xodimlar</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ employees.length }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Faol Xodimlar</p>
-        <p class="text-2xl font-bold text-emerald-600 mt-2">{{ activeCount }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Oylik Maosh Jamg'armasi</p>
-        <p class="text-2xl font-bold text-blue-600 mt-2">{{ formatMoney(totalSalaryFund) }} so'm</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Joriy Davr</p>
-        <p class="text-2xl font-bold text-purple-600 mt-2">{{ currentPeriod }}</p>
-      </div>
+    <!-- Alert Message -->
+    <Alert v-if="alertMessage" :message="alertMessage" :type="alertType" @close="alertMessage = ''" />
+
+    <!-- 4 Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <StatsCard
+        title="Jami Xodimlar"
+        :value="`${employees.length} ta`"
+        icon="solar:users-group-two-rounded-bold"
+        variant="primary"
+      />
+      <StatsCard
+        title="Faol Xodimlar"
+        :value="`${activeCount} ta`"
+        icon="solar:user-check-bold"
+        variant="success"
+        valueClass="text-green-600 dark:text-green-400"
+      />
+      <StatsCard
+        title="Oylik Maosh Jamg'armasi"
+        :value="`${formatMoney(totalSalaryFund)} so'm`"
+        icon="solar:wallet-money-bold"
+        variant="purple"
+        valueClass="text-primary"
+      />
+      <StatsCard
+        title="Joriy Davr"
+        :value="currentPeriod"
+        icon="solar:calendar-bold"
+        variant="danger"
+        valueClass="text-purple-600 dark:text-purple-400"
+      />
     </div>
 
-    <!-- Filters & Search -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="relative w-full sm:w-80">
-        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-        </span>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Ism, familiya yoki lavozim..."
-          class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-        />
-      </div>
-
-      <div class="flex items-center gap-3 w-full sm:w-auto">
+    <!-- Data Table Component -->
+    <DataTable
+      title="Barcha Xodimlar"
+      subtitle="O'qituvchi va xodimlar ro'yxati, lavozimi va maosh holati"
+      :columns="columns"
+      :data="filteredEmployees"
+      :loading="loading"
+      :searchable="true"
+      :showIndex="true"
+      :showPerPage="true"
+      searchPlaceholder="Ism, familiya, lavozim yoki telefon..."
+      rowKey="id"
+    >
+      <!-- Header Actions: Status Filter -->
+      <template #headerActions>
         <select
           v-model="selectedStatus"
-          class="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+          class="py-1.5 px-3 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none text-gray-800 dark:text-gray-200"
         >
           <option value="">Barcha holatlar</option>
           <option value="ACTIVE">Faol</option>
           <option value="ON_LEAVE">Ta'tilda</option>
           <option value="TERMINATED">Bo'shatilgan</option>
         </select>
-      </div>
-    </div>
+      </template>
 
-    <!-- Table -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-      <div v-if="loading" class="p-8 text-center text-gray-500">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent mb-2"></div>
-        <p>Yuklanmoqda...</p>
-      </div>
+      <!-- Custom Employee Name Cell (Universal AppUserCell - 1-rasm standarti) -->
+      <template #cell(name)="{ row }">
+        <AppUserCell
+          :name="(row.firstName || '') + ' ' + (row.lastName || '')"
+          :image="row.avatar"
+          :subtitle="row.phone || '-'"
+        />
+      </template>
 
-      <div v-else-if="filteredEmployees.length === 0" class="p-12 text-center text-gray-400">
-        <p class="text-base font-medium">Hech qanday xodim topilmadi</p>
-        <p class="text-sm mt-1">Yangi xodim qo'shish uchun yuqoridagi tugmani bosing.</p>
-      </div>
+      <!-- Custom Position Cell -->
+      <template #cell(position)="{ row }">
+        <div class="text-gray-800 dark:text-gray-200 font-medium">{{ row.position || 'Xodim' }}</div>
+        <div class="text-xs text-gray-400">{{ row.department || row.branch?.name || 'Asosiy filial' }}</div>
+      </template>
 
-      <div v-else class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-gray-600 dark:text-gray-300">
-          <thead class="bg-gray-50 dark:bg-gray-700/50 text-xs uppercase font-semibold text-gray-500 dark:text-gray-400">
-            <tr>
-              <th class="px-6 py-4">Xodim</th>
-              <th class="px-6 py-4">Lavozim & Bo'lim</th>
-              <th class="px-6 py-4">Bandlik & Stavka</th>
-              <th class="px-6 py-4">Asosiy Oylik</th>
-              <th class="px-6 py-4">Holat</th>
-              <th class="px-6 py-4 text-right">Amallar</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-            <tr v-for="emp in filteredEmployees" :key="emp.id" class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                <div>{{ emp.firstName }} {{ emp.lastName }}</div>
-                <div class="text-xs text-gray-400 mt-0.5">{{ emp.phone }}</div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="font-medium text-gray-800 dark:text-gray-200">{{ emp.position }}</div>
-                <div class="text-xs text-gray-400">{{ emp.department || 'Boshqaruv' }}</div>
-              </td>
-              <td class="px-6 py-4">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                  {{ emp.employmentType }}
-                </span>
-              </td>
-              <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                {{ formatMoney(emp.baseSalary) }} so'm
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  :class="emp.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-800'"
-                >
-                  {{ emp.status === 'ACTIVE' ? 'Faol' : emp.status }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right space-x-2">
-                <button
-                  @click="openPayrollModal(emp)"
-                  class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-medium rounded-lg transition"
-                >
-                  Maosh to'lash
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <!-- Custom Salary Cell -->
+      <template #cell(baseSalary)="{ row }">
+        <span class="font-semibold text-gray-800 dark:text-gray-100">
+          {{ formatMoney(row.baseSalary) }} so'm
+        </span>
+        <div class="text-[11px] text-gray-400 capitalize">
+          {{ formatEmploymentType(row.employmentType) }}
+        </div>
+      </template>
+
+      <!-- Custom Status Cell -->
+      <template #cell(status)="{ row }">
+        <Badge
+          :variant="row.status === 'ACTIVE' ? 'success' : row.status === 'ON_LEAVE' ? 'warning' : 'danger'"
+          :dot="true"
+          size="sm"
+        >
+          {{ formatStatus(row.status) }}
+        </Badge>
+      </template>
+
+      <!-- Actions Slot -->
+      <template #actions="{ row }">
+        <div class="flex items-center justify-end gap-1.5">
+          <button
+            type="button"
+            @click="openPayrollModal(row)"
+            title="Oylik maosh to'lash"
+            class="p-1.5 text-xs text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded transition flex items-center gap-1 font-medium cursor-pointer"
+          >
+            <Icon icon="solar:wallet-money-bold" class="text-base" />
+            <span>Maosh</span>
+          </button>
+          <button
+            type="button"
+            @click="deleteEmployee(row)"
+            title="O'chirish"
+            class="p-1.5 text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition cursor-pointer"
+          >
+            <Icon icon="solar:trash-bin-trash-linear" class="text-base" />
+          </button>
+        </div>
+      </template>
+    </DataTable>
 
     <!-- Create Employee Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Yangi Xodim Qo'shish</h3>
-        <div class="space-y-3">
-          <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Ism</label>
-            <input v-model="form.firstName" type="text" class="w-full px-3 py-2 border rounded-xl text-sm dark:bg-gray-700" placeholder="Anvar" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Familiya</label>
-            <input v-model="form.lastName" type="text" class="w-full px-3 py-2 border rounded-xl text-sm dark:bg-gray-700" placeholder="Qodirov" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Telefon</label>
-            <input v-model="form.phone" type="text" class="w-full px-3 py-2 border rounded-xl text-sm dark:bg-gray-700" placeholder="+998901234567" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Lavozim</label>
-            <input v-model="form.position" type="text" class="w-full px-3 py-2 border rounded-xl text-sm dark:bg-gray-700" placeholder="Katta O'qituvchi" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Asosiy Oylik (so'm)</label>
-            <input v-model.number="form.baseSalary" type="number" class="w-full px-3 py-2 border rounded-xl text-sm dark:bg-gray-700" placeholder="6000000" />
-          </div>
+    <vmodal
+      :model-value="showCreateModal"
+      @update:model-value="showCreateModal = $event"
+      title="Yangi Xodim Qo'shish"
+      subtitle="Xodim shaxsiy va mehnat ma'lumotlarini kiriting"
+      width="max-w-lg"
+      :hide-button="true"
+    >
+      <form @submit.prevent="saveEmployee" class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <FormInput
+            v-model="form.firstName"
+            label="Ism"
+            required
+            placeholder="Ali"
+            icon="solar:user-linear"
+          />
+          <FormInput
+            v-model="form.lastName"
+            label="Familiya"
+            required
+            placeholder="Valiyev"
+            icon="solar:user-linear"
+          />
         </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button @click="showCreateModal = false" class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Bekor qilish</button>
-          <button @click="saveEmployee" :disabled="saving" class="px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-700">
-            {{ saving ? "Saqlanmoqda..." : "Saqlash" }}
+
+        <div class="grid grid-cols-2 gap-3">
+          <FormInput
+            v-model="form.phone"
+            label="Telefon"
+            required
+            placeholder="+998901234567"
+            icon="solar:phone-linear"
+          />
+          <FormInput
+            v-model="form.position"
+            label="Lavozim"
+            required
+            placeholder="O'qituvchi, Admin..."
+            icon="solar:case-linear"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <FormCurrencyInput
+            v-model="form.baseSalary"
+            label="Asosiy oylik maosh (so'm)"
+            required
+            placeholder="5 000 000"
+          />
+          <FormSelect
+            v-model="form.employmentType"
+            label="Bandlik turi"
+            :options="[
+              { value: 'FULL_TIME', label: 'To\'liq stavka (Full-time)' },
+              { value: 'PART_TIME', label: 'Yarim stavka (Part-time)' },
+              { value: 'CONTRACT', label: 'Shartnoma asosida' },
+              { value: 'HOURLY', label: 'Soatbay' }
+            ]"
+          />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t dark:border-gray-700">
+          <button
+            type="button"
+            @click="showCreateModal = false"
+            class="px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition cursor-pointer"
+          >
+            Bekor qilish
+          </button>
+          <button
+            type="submit"
+            :disabled="saving"
+            class="px-5 py-2 text-xs font-semibold bg-primary hover:bg-primary/90 text-white rounded-md shadow-sm transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+          >
+            <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-sm" />
+            <span>{{ saving ? 'Saqlanmoqda...' : 'Saqlash' }}</span>
           </button>
         </div>
-      </div>
-    </div>
+      </form>
+    </vmodal>
 
-    <!-- Issue Payroll Modal -->
-    <div v-if="showPayrollModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
-          Maosh To'lash: {{ selectedEmployee?.firstName }} {{ selectedEmployee?.lastName }}
-        </h3>
-        <div class="space-y-3">
-          <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Davr (Oy)</label>
-            <input v-model="payrollForm.period" type="month" class="w-full px-3 py-2 border rounded-xl text-sm dark:bg-gray-700" />
-          </div>
+    <!-- Payroll Modal -->
+    <vmodal
+      :model-value="showPayrollModal"
+      @update:model-value="showPayrollModal = $event"
+      :title="`Oylik Maosh To'lash: ${selectedEmployee ? selectedEmployee.firstName + ' ' + selectedEmployee.lastName : ''}`"
+      subtitle="Belgilangan davr uchun hisoblangan ish haqini to'lovga chiqarish"
+      width="max-w-md"
+      :hide-button="true"
+    >
+      <form @submit.prevent="submitPayroll" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Davr (Oy)</label>
+          <input
+            v-model="payrollForm.period"
+            type="month"
+            required
+            class="w-full text-sm rounded-md border border-gray-300 dark:border-gray-700 p-2 outline-none focus:border-primary dark:bg-gray-900 text-gray-800 dark:text-gray-100"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Asosiy Miqdor (so'm)</label>
-            <input v-model.number="payrollForm.baseAmount" type="number" class="w-full px-3 py-2 border rounded-xl text-sm dark:bg-gray-700" />
+            <input
+              v-model.number="payrollForm.baseAmount"
+              type="number"
+              required
+              class="w-full text-sm rounded-md border border-gray-300 dark:border-gray-700 p-2 outline-none focus:border-primary dark:bg-gray-900 text-gray-800 dark:text-gray-100"
+            />
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Bonus / Rag'batlantirish (so'm)</label>
-            <input v-model.number="payrollForm.bonusAmount" type="number" class="w-full px-3 py-2 border rounded-xl text-sm dark:bg-gray-700" />
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Ushlab qolish / Jarima (so'm)</label>
-            <input v-model.number="payrollForm.deductionAmount" type="number" class="w-full px-3 py-2 border rounded-xl text-sm dark:bg-gray-700" />
-          </div>
-          <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl">
-            <p class="text-xs text-emerald-700 dark:text-emerald-300">To'lanadigan Yakuniy Summa:</p>
-            <p class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mt-1">
-              {{ formatMoney(calculatedNet) }} so'm
-            </p>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Bonus (so'm)</label>
+            <input
+              v-model.number="payrollForm.bonusAmount"
+              type="number"
+              class="w-full text-sm rounded-md border border-gray-300 dark:border-gray-700 p-2 outline-none focus:border-primary dark:bg-gray-900 text-gray-800 dark:text-gray-100"
+            />
           </div>
         </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button @click="showPayrollModal = false" class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Bekor qilish</button>
-          <button @click="submitPayroll" :disabled="saving" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700">
-            {{ saving ? "To'lanmoqda..." : "To'lovni Tasdiqlash" }}
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Ushlab qolish (so'm)</label>
+            <input
+              v-model.number="payrollForm.deductionAmount"
+              type="number"
+              class="w-full text-sm rounded-md border border-gray-300 dark:border-gray-700 p-2 outline-none focus:border-primary dark:bg-gray-900 text-gray-800 dark:text-gray-100"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">To'lov usuli</label>
+            <select
+              v-model="payrollForm.paidVia"
+              class="w-full text-sm rounded-md border border-gray-300 dark:border-gray-700 p-2 outline-none focus:border-primary dark:bg-gray-900 text-gray-800 dark:text-gray-100"
+            >
+              <option value="CASH">Naqd kassa</option>
+              <option value="CARD">Plastik karta</option>
+              <option value="BANK_TRANSFER">Bank o'tkazmasi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Calculated Summary Card -->
+        <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-md border border-emerald-200 dark:border-emerald-800/50">
+          <p class="text-xs text-emerald-700 dark:text-emerald-300 font-medium">To'lanadigan Yakuniy Summa:</p>
+          <p class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mt-1">
+            {{ formatMoney(calculatedNet) }} so'm
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t dark:border-gray-700">
+          <button
+            type="button"
+            @click="showPayrollModal = false"
+            class="px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition cursor-pointer"
+          >
+            Bekor qilish
+          </button>
+          <button
+            type="submit"
+            :disabled="saving"
+            class="px-5 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-md shadow-sm transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+          >
+            <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-sm" />
+            <span>{{ saving ? 'To\'lanmoqda...' : 'To\'lovni Tasdiqlash' }}</span>
           </button>
         </div>
-      </div>
-    </div>
+      </form>
+    </vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
 import Breadcrumb from "@/components/Breadcrumb.vue";
+import StatsCard from "@/components/StatsCard.vue";
+import DataTable from "@/components/DataTable.vue";
+import Badge from "@/components/Badge.vue";
+import Alert from "@/components/Alert.vue";
+import vmodal from "@/components/modal.vue";
+import FormInput from "@/components/FormInput.vue";
+import FormSelect from "@/components/FormSelect.vue";
+import FormCurrencyInput from "@/components/FormCurrencyInput.vue";
 import { employeesApi } from "@/api/services";
 
 export default {
@@ -221,24 +336,40 @@ export default {
   components: {
     Icon,
     Breadcrumb,
+    StatsCard,
+    DataTable,
+    Badge,
+    Alert,
+    vmodal,
+    FormInput,
+    FormSelect,
+    FormCurrencyInput,
   },
   data() {
     return {
       employees: [],
       loading: false,
       saving: false,
-      searchQuery: "",
       selectedStatus: "",
+      alertMessage: "",
+      alertType: "success",
       showCreateModal: false,
       showPayrollModal: false,
       selectedEmployee: null,
       currentPeriod: new Date().toISOString().slice(0, 7),
+      columns: [
+        { key: "name", label: "Xodim" },
+        { key: "position", label: "Lavozim & Bo'lim" },
+        { key: "baseSalary", label: "Asosiy Oylik" },
+        { key: "status", label: "Holat" },
+      ],
       form: {
         firstName: "",
         lastName: "",
-        phone: "",
-        position: "",
+        phone: "+998",
+        position: "O'qituvchi",
         baseSalary: 5000000,
+        employmentType: "FULL_TIME",
       },
       payrollForm: {
         period: new Date().toISOString().slice(0, 7),
@@ -257,17 +388,8 @@ export default {
       return this.employees.reduce((sum, e) => sum + Number(e.baseSalary || 0), 0);
     },
     filteredEmployees() {
-      return this.employees.filter((emp) => {
-        const matchesStatus = !this.selectedStatus || emp.status === this.selectedStatus;
-        const q = this.searchQuery.toLowerCase();
-        const matchesSearch =
-          !q ||
-          emp.firstName?.toLowerCase().includes(q) ||
-          emp.lastName?.toLowerCase().includes(q) ||
-          emp.position?.toLowerCase().includes(q) ||
-          emp.phone?.includes(q);
-        return matchesStatus && matchesSearch;
-      });
+      if (!this.selectedStatus) return this.employees;
+      return this.employees.filter((emp) => emp.status === this.selectedStatus);
     },
     calculatedNet() {
       const b = Number(this.payrollForm.baseAmount || 0);
@@ -284,12 +406,30 @@ export default {
       this.loading = true;
       try {
         const res = await employeesApi.getAll();
-        this.employees = res.data || [];
+        this.employees = Array.isArray(res) ? res : (res?.data || res?.items || []);
       } catch (err) {
         console.error("Xodimlarni yuklashda xatolik:", err);
+        this.alertType = "danger";
+        this.alertMessage = "Xodimlarni yuklashda xatolik yuz berdi.";
       } finally {
         this.loading = false;
       }
+    },
+    formatEmploymentType(type) {
+      if (!type) return "to'liq stavka";
+      const map = {
+        FULL_TIME: "to'liq stavka",
+        PART_TIME: "yarim stavka",
+        CONTRACT: "shartnoma asosida",
+        HOURLY: "soatbay",
+      };
+      return map[type] || type.toLowerCase();
+    },
+    formatStatus(status) {
+      if (status === "ACTIVE") return "Faol";
+      if (status === "ON_LEAVE") return "Ta'tilda";
+      if (status === "TERMINATED") return "Bo'shatilgan";
+      return status || "Faol";
     },
     openCreateModal() {
       this.form = {
@@ -298,21 +438,26 @@ export default {
         phone: "+998",
         position: "O'qituvchi",
         baseSalary: 5000000,
+        employmentType: "FULL_TIME",
       };
       this.showCreateModal = true;
     },
     async saveEmployee() {
       if (!this.form.firstName || !this.form.lastName || !this.form.phone) {
-        alert("Iltimos, ism, familiya va telefonni to'ldiring!");
+        this.alertType = "danger";
+        this.alertMessage = "Iltimos, ism, familiya va telefon raqamini kiriting!";
         return;
       }
       this.saving = true;
       try {
         await employeesApi.create(this.form);
+        this.alertType = "success";
+        this.alertMessage = "Yangi xodim muvaffaqiyatli qo'shildi!";
         this.showCreateModal = false;
         await this.fetchEmployees();
       } catch (err) {
-        alert("Xodim qo'shishda xatolik: " + (err.response?.data?.message || err.message));
+        this.alertType = "danger";
+        this.alertMessage = "Xodim qo'shishda xatolik: " + (err.response?.data?.message || err.message);
       } finally {
         this.saving = false;
       }
@@ -335,17 +480,31 @@ export default {
         await employeesApi.createPayroll({
           employeeId: this.selectedEmployee.id,
           period: this.payrollForm.period,
-          baseAmount: this.payrollForm.baseAmount,
-          bonusAmount: this.payrollForm.bonusAmount,
-          deductionAmount: this.payrollForm.deductionAmount,
+          baseAmount: Number(this.payrollForm.baseAmount),
+          bonusAmount: Number(this.payrollForm.bonusAmount || 0),
+          deductionAmount: Number(this.payrollForm.deductionAmount || 0),
           paidVia: this.payrollForm.paidVia,
         });
-        alert("Maosh muvaffaqiyatli to'landi!");
+        this.alertType = "success";
+        this.alertMessage = "Oylik maosh to'lovi muvaffaqiyatli amalga oshirildi!";
         this.showPayrollModal = false;
       } catch (err) {
-        alert("To'lovda xatolik: " + (err.response?.data?.message || err.message));
+        this.alertType = "danger";
+        this.alertMessage = "To'lovda xatolik: " + (err.response?.data?.message || err.message);
       } finally {
         this.saving = false;
+      }
+    },
+    async deleteEmployee(emp) {
+      if (!confirm(`${emp.firstName} ${emp.lastName}ni xodimlar ro'yxatidan o'chirmoqchimisiz?`)) return;
+      try {
+        await employeesApi.delete(emp.id);
+        this.alertType = "success";
+        this.alertMessage = "Xodim muvaffaqiyatli o'chirildi!";
+        await this.fetchEmployees();
+      } catch (err) {
+        this.alertType = "danger";
+        this.alertMessage = "O'chirishda xatolik: " + (err.response?.data?.message || err.message);
       }
     },
     formatMoney(val) {

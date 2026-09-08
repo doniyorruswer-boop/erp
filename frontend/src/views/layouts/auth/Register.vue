@@ -2,7 +2,7 @@
   <div class="w-full h-screen">
     <div class="flex shadow bg-waves rounded-md h-screen">
       <div class="bg-white dark:bg-gray-900 w-full">
-        <form @submit.prevent="handleRegister">
+        <form @submit.prevent="handleRegister" novalidate>
           <div
             class="form-body max-w-xl mx-auto lg:p-20 p-8 lg:mt-10 mt-5 space-y-8"
           >
@@ -31,15 +31,19 @@
                   type="text"
                   name="floating_text"
                   id="floating_text"
-                  class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
+                  @input="clearFieldError('firstName')"
+                  :class="[
+                    'block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-white focus:outline-none focus:ring-0 peer transition',
+                    formErrors.firstName ? 'border-rose-500 focus:border-rose-500' : 'border-gray-300 dark:border-gray-600 dark:focus:border-primary focus:border-primary'
+                  ]"
                   placeholder=" "
-                  required
                 />
                 <label
                   for="floating_text"
                   class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                   >Ism</label
                 >
+                <FormFieldError :error="formErrors.firstName" />
               </div>
               <div class="relative z-0 w-full mb-6 group">
                 <input
@@ -47,15 +51,19 @@
                   type="text"
                   name="floating_last"
                   id="floating_last"
-                  class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
+                  @input="clearFieldError('lastName')"
+                  :class="[
+                    'block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-white focus:outline-none focus:ring-0 peer transition',
+                    formErrors.lastName ? 'border-rose-500 focus:border-rose-500' : 'border-gray-300 dark:border-gray-600 dark:focus:border-primary focus:border-primary'
+                  ]"
                   placeholder=" "
-                  required
                 />
                 <label
                   for="floating_last"
                   class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                   >Familiya</label
                 >
+                <FormFieldError :error="formErrors.lastName" />
               </div>
               <div class="relative z-0 w-full mb-6 group">
                 <input
@@ -63,15 +71,19 @@
                   type="text"
                   name="floating_phone"
                   id="floating_phone"
-                  class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
+                  @input="onPhoneInput"
+                  :class="[
+                    'block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-white focus:outline-none focus:ring-0 peer transition',
+                    formErrors.phone ? 'border-rose-500 focus:border-rose-500' : 'border-gray-300 dark:border-gray-600 dark:focus:border-primary focus:border-primary'
+                  ]"
                   placeholder=" "
-                  required
                 />
                 <label
                   for="floating_phone"
                   class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                   >Telefon raqam</label
                 >
+                <FormFieldError :error="formErrors.phone" />
               </div>
               <div class="relative z-0 w-full mb-6 group">
                 <input
@@ -79,15 +91,19 @@
                   type="text"
                   name="floating_org"
                   id="floating_org"
-                  class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
+                  @input="clearFieldError('orgName')"
+                  :class="[
+                    'block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-white focus:outline-none focus:ring-0 peer transition',
+                    formErrors.orgName ? 'border-rose-500 focus:border-rose-500' : 'border-gray-300 dark:border-gray-600 dark:focus:border-primary focus:border-primary'
+                  ]"
                   placeholder=" "
-                  required
                 />
                 <label
                   for="floating_org"
                   class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                   >O'quv markazi nomi</label
                 >
+                <FormFieldError :error="formErrors.orgName" />
               </div>
               <div class="relative z-0 w-full mb-6 group">
                 <input
@@ -95,22 +111,26 @@
                   type="password"
                   name="floating_password"
                   id="floating_password"
-                  class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
+                  @input="clearFieldError('password')"
+                  :class="[
+                    'block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-white focus:outline-none focus:ring-0 peer transition',
+                    formErrors.password ? 'border-rose-500 focus:border-rose-500' : 'border-gray-300 dark:border-gray-600 dark:focus:border-primary focus:border-primary'
+                  ]"
                   placeholder=" "
-                  required
                 />
                 <label
                   for="floating_password"
                   class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                   >Parol</label
                 >
+                <FormFieldError :error="formErrors.password" />
               </div>
             </div>
 
             <button
               type="submit"
               :disabled="loading"
-              class="text-white bg-primary hover:bg-primary/80 p-3 w-full rounded-md"
+              class="text-white bg-primary hover:bg-primary/80 p-3 w-full rounded-md font-semibold cursor-pointer transition shadow-sm"
             >
               {{ loading ? "Ro'yxatdan o'tkazilmoqda..." : "Ro'yxatdan o'tish" }}
             </button>
@@ -118,7 +138,7 @@
               Profilingiz bormi?<button
                 type="button"
                 @click="$router.push('/auth/login')"
-                class="ml-2 text-primary"
+                class="ml-2 text-primary hover:underline font-bold"
               >
                 Tizimga kirish
               </button>
@@ -132,6 +152,7 @@
 
 <script>
 import { authApi } from "@/api/services";
+import { validateForm, registerFormRules, formatPhone } from "@/utils/validators";
 
 export default {
   name: "Register",
@@ -139,14 +160,40 @@ export default {
     return {
       firstName: "",
       lastName: "",
-      phone: "",
+      phone: "+998 ",
       orgName: "",
       password: "",
       loading: false,
+      formErrors: {},
     };
   },
   methods: {
+    clearFieldError(field) {
+      if (this.formErrors && this.formErrors[field]) {
+        delete this.formErrors[field];
+      }
+    },
+    onPhoneInput() {
+      this.phone = formatPhone(this.phone);
+      this.clearFieldError("phone");
+    },
     async handleRegister() {
+      const formData = {
+        firstName: this.firstName,
+        lastName: this.lastName,
+        phone: this.phone,
+        orgName: this.orgName,
+        password: this.password,
+      };
+
+      const validation = validateForm(formData, registerFormRules);
+      if (!validation.isValid) {
+        this.formErrors = validation.errors;
+        this.$toast.error(validation.firstError || "Iltimos, maydonlarni to'g'ri to'ldiring");
+        return;
+      }
+      this.formErrors = {};
+
       this.loading = true;
       try {
         const res = await authApi.register({

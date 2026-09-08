@@ -71,19 +71,24 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   // Swagger OpenAPI Documentation
-  const config = new DocumentBuilder()
-    .setTitle(BrandConfig.apiTitle)
-    .setDescription(BrandConfig.apiDescription)
-    .setVersion(BrandConfig.apiVersion)
-    .addBearerAuth()
-    .build();
+  const isSwaggerEnabled = process.env.NODE_ENV !== 'production' || process.env.SWAGGER_ENABLED === 'true';
+  if (isSwaggerEnabled) {
+    const config = new DocumentBuilder()
+      .setTitle(BrandConfig.apiTitle)
+      .setDescription(BrandConfig.apiDescription)
+      .setVersion(BrandConfig.apiVersion)
+      .addBearerAuth()
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+  }
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`🚀 ${BrandConfig.name} Server ishga tushdi: http://localhost:${port}/api`);
-  console.log(`📚 Swagger API Hujjatlari: http://localhost:${port}/api/docs`);
+  if (isSwaggerEnabled) {
+    console.log(`📚 Swagger API Hujjatlari: http://localhost:${port}/api/docs`);
+  }
 }
 bootstrap();

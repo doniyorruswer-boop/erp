@@ -25,14 +25,14 @@
           class="text-xs font-medium text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white inline-flex items-center"
         >
           <Icon v-if="item.icon" :icon="item.icon" class="mr-1 text-sm" />
-          {{ item.title }}
+          {{ item.title || item.label }}
         </router-link>
         <span
           v-else
           class="text-xs font-semibold text-gray-700 dark:text-gray-200 inline-flex items-center"
         >
           <Icon v-if="item.icon" :icon="item.icon" class="mr-1 text-sm" />
-          {{ item.title }}
+          {{ item.title || item.label }}
         </span>
       </li>
     </ol>

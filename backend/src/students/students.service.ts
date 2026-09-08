@@ -1,14 +1,20 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, ConflictException, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { WorkflowService } from '../workflow/workflow.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { StudentStatus, AuditAction, AttendanceStatus } from '@prisma/client';
 import { BranchContext, buildBranchWhere, assertBranchAccess } from '../auth/branch-access';
 
 @Injectable()
 export class StudentsService {
+  private readonly logger = new Logger(StudentsService.name);
+
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
+    @Optional() private workflowService?: WorkflowService,
+    @Optional() private subscriptionsService?: SubscriptionsService,
   ) {}
 
   async findAll(
@@ -116,6 +122,10 @@ export class StudentsService {
   }
 
   async create(data: any, orgId: string, userId?: string, branchCtx?: BranchContext) {
+    if (this.subscriptionsService) {
+      await this.subscriptionsService.checkLimit('MAX_STUDENTS_CUSTOMERS', 1, orgId);
+    }
+
     let targetBranchId = data.branchId;
     if (branchCtx) {
       targetBranchId = assertBranchAccess(branchCtx, data.branchId);
@@ -329,6 +339,25 @@ export class StudentsService {
       entityId: student.id,
       after: student,
     });
+
+    if (this.workflowService) {
+      try {
+        await this.workflowService.processEvent(
+          'student.created',
+          {
+            id: student.id,
+            firstName: student.firstName,
+            lastName: student.lastName,
+            phone: student.phone,
+            branchId: student.branchId,
+            status: student.status,
+          },
+          orgId,
+        );
+      } catch (err: any) {
+        this.logger.warn(`Workflow execution failed for student.created: ${err.message}`);
+      }
+    }
 
     return student;
   }

@@ -53,13 +53,45 @@ export class AuthService {
   }
 
   async login(loginDto: { phone?: string; email?: string; password: string }, ip?: string, userAgent?: string) {
-    const where = loginDto.email ? { email: loginDto.email } : { phone: loginDto.phone };
-    let user = await this.prisma.user.findUnique({
-      where: where as any,
-      include: { organization: true },
-    });
+    const rawEmail = loginDto.email ? loginDto.email.trim() : undefined;
+    const rawPhone = loginDto.phone ? loginDto.phone.trim() : undefined;
+    const identifier = rawEmail || rawPhone || '';
 
-    if (!user || !user.isActive || user.deletedAt) {
+    let user: any = null;
+
+    if (rawEmail) {
+      user = await this.prisma.user.findFirst({
+        where: {
+          email: { equals: rawEmail, mode: 'insensitive' },
+          deletedAt: null,
+        },
+        include: { organization: true },
+      });
+
+      // Compatibility fallback: eduhub.uz <-> educrm.uz admin aliases
+      if (!user && (rawEmail.toLowerCase() === 'admin@eduhub.uz' || rawEmail.toLowerCase() === 'admin@educrm.uz')) {
+        user = await this.prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: { in: ['admin@eduhub.uz', 'admin@educrm.uz'], mode: 'insensitive' } },
+              { phone: '+998901234567' },
+            ],
+            deletedAt: null,
+          },
+          include: { organization: true },
+        });
+      }
+    } else if (rawPhone) {
+      user = await this.prisma.user.findFirst({
+        where: {
+          phone: rawPhone,
+          deletedAt: null,
+        },
+        include: { organization: true },
+      });
+    }
+
+    if (!user || user.deletedAt) {
       await this.auditService.log({
         organizationId: undefined,
         action: AuditAction.LOGIN,
@@ -67,9 +99,23 @@ export class AuthService {
         entityId: 'failed-login',
         ip,
         userAgent,
-        after: { identifier: loginDto.email || loginDto.phone, status: 'FAILED_USER_NOT_FOUND_OR_INACTIVE' },
+        after: { identifier, status: 'FAILED_USER_NOT_FOUND' },
       });
       throw new UnauthorizedException('Email yoki parol xato!');
+    }
+
+    if (!user.isActive) {
+      await this.auditService.log({
+        organizationId: user.organizationId || undefined,
+        userId: user.id,
+        action: AuditAction.LOGIN,
+        entityType: 'User',
+        entityId: user.id,
+        ip,
+        userAgent,
+        after: { identifier, status: 'FAILED_ACCOUNT_INACTIVE' },
+      });
+      throw new UnauthorizedException("Hisobingiz nofaol holatda. Iltimos, ma'muriyatga murojaat qiling!");
     }
 
     // Check if account is currently locked out
@@ -83,7 +129,7 @@ export class AuthService {
         entityId: user.id,
         ip,
         userAgent,
-        after: { identifier: loginDto.email || loginDto.phone, status: 'BLOCKED_ACCOUNT_LOCKED', remainingMinutes },
+        after: { identifier, status: 'BLOCKED_ACCOUNT_LOCKED', remainingMinutes },
       });
       throw new UnauthorizedException(
         `Hisobingiz ketma-ket 5 ta muvaffaqiyatsiz urinish sababli vaqtincha bloklangan. Iltimos, ${remainingMinutes} daqiqadan so'ng qayta urinib ko'ring.`
@@ -119,7 +165,7 @@ export class AuthService {
         entityId: user.id,
         ip,
         userAgent,
-        after: { identifier: loginDto.email || loginDto.phone, status: failedAttempts >= 5 ? 'ACCOUNT_LOCKED_15M' : 'FAILED_INVALID_PASSWORD', failedAttempts },
+        after: { identifier, status: failedAttempts >= 5 ? 'ACCOUNT_LOCKED_15M' : 'FAILED_INVALID_PASSWORD', failedAttempts },
       });
 
       throw new UnauthorizedException(errorMessage);
@@ -371,9 +417,14 @@ export class AuthService {
       });
       return { success: true, count: result.count, message: 'Barcha hisoblar blokdan chiqarildi.' };
     }
+    const cleanId = identifier.trim();
     const user = await this.prisma.user.findFirst({
       where: {
-        OR: [{ email: identifier }, { phone: identifier }, { id: identifier }],
+        OR: [
+          { email: { equals: cleanId, mode: 'insensitive' } },
+          { phone: cleanId },
+          { id: cleanId },
+        ],
       },
     });
     if (!user) {

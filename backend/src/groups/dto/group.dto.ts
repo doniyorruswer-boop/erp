@@ -109,3 +109,20 @@ export class QueryGroupDto extends PaginationDto {
   @IsOptional()
   days?: LessonDays;
 }
+
+export class GenerateLessonsDto {
+  @ApiPropertyOptional({ description: 'Boshlanish sanasi (agar ko\'rsatilmasa, guruhning startDate ishlatiladi)', example: '2026-09-01' })
+  @IsDateString()
+  @IsOptional()
+  startDate?: string;
+
+  @ApiPropertyOptional({ description: 'Tugash sanasi (agar ko\'rsatilmasa, guruhning endDate ishlatiladi)', example: '2026-11-30' })
+  @IsDateString()
+  @IsOptional()
+  endDate?: string;
+
+  @ApiPropertyOptional({ description: 'Maksimal darslar soni', example: 36 })
+  @IsOptional()
+  count?: number;
+}
+

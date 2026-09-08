@@ -41,13 +41,7 @@
             <FormSelect
               v-model="paymentForm.method"
               label="To'lov usuli"
-              :options="[
-                { value: 'CASH', label: 'Naqd pul' },
-                { value: 'CARD', label: 'Plastik karta' },
-                { value: 'PAYME', label: 'Payme' },
-                { value: 'CLICK', label: 'Click' },
-                { value: 'UZUM', label: 'Uzum Pay' },
-              ]"
+              :options="paymentMethodOptions"
             />
             <FormInput
               v-model="paymentForm.notes"
@@ -100,9 +94,15 @@
       </template>
 
       <template #cell(method)="{ row }">
-        <Badge variant="primary" size="xs">
-          {{ row.method }}
-        </Badge>
+        <span
+          :class="[
+            'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border',
+            getPaymentMethodBadgeClass(row.method)
+          ]"
+        >
+          <Icon :icon="getPaymentMethodIcon(row.method)" class="text-xs" />
+          <span>{{ getPaymentMethodName(row.method) }}</span>
+        </span>
       </template>
 
       <template #cell(paymentDate)="{ row }">
@@ -123,6 +123,12 @@ import Badge from "@/components/Badge.vue";
 import FormInput from "@/components/FormInput.vue";
 import FormSelect from "@/components/FormSelect.vue";
 import { paymentsApi, studentsApi } from "@/api/services";
+import {
+  getPaymentMethodOptions,
+  getPaymentMethodName,
+  getPaymentMethodIcon,
+  getPaymentMethodBadgeClass,
+} from "@/config/paymentMethods";
 
 export default {
   name: "FinanceView",
@@ -161,6 +167,9 @@ export default {
     };
   },
   computed: {
+    paymentMethodOptions() {
+      return getPaymentMethodOptions();
+    },
     studentOptions() {
       return this.students.map((s) => ({
         value: s.id,
@@ -172,6 +181,9 @@ export default {
     this.fetchData();
   },
   methods: {
+    getPaymentMethodName,
+    getPaymentMethodIcon,
+    getPaymentMethodBadgeClass,
     async fetchData() {
       this.loading = true;
       try {

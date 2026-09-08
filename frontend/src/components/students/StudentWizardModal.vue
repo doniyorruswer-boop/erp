@@ -603,49 +603,44 @@
 
         <!-- Modal Footer Navigation Buttons -->
         <div class="p-4 sm:px-6 border-t dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/80 flex items-center justify-between gap-3">
-          <button
-            type="button"
+          <AppButton
+            variant="outline"
             @click="close"
-            class="px-5 py-2.5 rounded border dark:border-gray-600 dark:text-white text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-normal transition cursor-pointer"
           >
             Bekor qilish
-          </button>
+          </AppButton>
 
           <div class="flex items-center gap-2.5">
             <!-- Previous Step Button -->
-            <button
+            <AppButton
               v-if="currentStep > 1"
-              type="button"
+              variant="outline"
+              icon="solar:arrow-left-linear"
               @click="prevStep"
-              class="px-5 py-2.5 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <Icon icon="solar:arrow-left-linear" class="text-base" />
-              <span>Orqaga</span>
-            </button>
+              Orqaga
+            </AppButton>
 
             <!-- Next Step Button -->
-            <button
+            <AppButton
               v-if="currentStep < totalSteps"
-              type="button"
+              variant="primary"
               @click="nextStep"
-              class="px-6 py-2.5 text-sm font-semibold rounded-lg bg-primary hover:bg-primary/90 text-white shadow-sm transition flex items-center gap-1.5 cursor-pointer"
             >
               <span>Keyingisi</span>
-              <Icon icon="solar:arrow-right-linear" class="text-base" />
-            </button>
+              <Icon icon="solar:arrow-right-linear" class="text-base ml-1" />
+            </AppButton>
 
             <!-- Final Submit Button -->
-            <button
+            <AppButton
               v-else
-              type="button"
+              variant="success"
+              icon="solar:check-circle-bold"
+              :loading="saving"
               @click="submitWizard"
-              :disabled="saving"
-              class="px-7 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition flex items-center gap-2 cursor-pointer"
             >
-              <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-base" />
-              <Icon v-else icon="solar:check-circle-bold" class="text-base" />
-              <span>{{ saving ? 'Saqlanmoqda...' : 'Saqlash va Qabul Qilish' }}</span>
-            </button>
+              {{ saving ? 'Saqlanmoqda...' : 'Saqlash va Qabul Qilish' }}
+            </AppButton>
           </div>
         </div>
       </div>
@@ -656,6 +651,7 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+import AppButton from "@/components/AppButton.vue";
 import FormInput from "@/components/FormInput.vue";
 import FormSelect from "@/components/FormSelect.vue";
 import FormDatePicker from "@/components/FormDatePicker.vue";
@@ -667,6 +663,7 @@ import { useTenantStore } from "@/store/tenant";
 export default {
   name: "StudentWizardModal",
   components: {
+    AppButton,
     Icon,
     FormInput,
     FormSelect,

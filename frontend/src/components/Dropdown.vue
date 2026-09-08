@@ -23,7 +23,7 @@
       <transition name="fade">
         <div
           @blur="close"
-          class="absolute right-0 shadow-lg rounded-md border dark:border-gray-600 w-48 text-sm mt-2 bg-white dark:bg-gray-800 dark:text-white z-50"
+          :class="['absolute right-0 shadow-lg rounded-md border dark:border-gray-600 text-sm mt-2 bg-white dark:bg-gray-800 dark:text-white z-50', width || 'w-auto min-w-max']"
           v-show="open"
         >
           <slot name="content"></slot>
@@ -37,7 +37,7 @@
       <transition name="fade">
         <div
           @blur="close"
-          class="absolute left-0 shadow-lg rounded-md border dark:border-gray-600 w-48 text-sm mt-2 bg-white dark:bg-gray-800 dark:text-white z-50"
+          :class="['absolute left-0 shadow-lg rounded-md border dark:border-gray-600 text-sm mt-2 bg-white dark:bg-gray-800 dark:text-white z-50', width || 'w-auto min-w-max']"
           v-show="open"
         >
           <slot name="content"></slot>
@@ -57,6 +57,10 @@
     props: {
       placement: String,
       dropdown: Boolean,
+      width: {
+        type: String,
+        default: "w-auto min-w-max",
+      },
     },
     methods: {
       toggle() {

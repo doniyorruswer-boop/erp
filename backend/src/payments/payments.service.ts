@@ -1,14 +1,18 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { WorkflowService } from '../workflow/workflow.service';
 import { PaymentMethod, PaymentStatus, AuditAction, TransactionType, InvoiceStatus } from '@prisma/client';
 import { BranchContext, buildBranchWhere, assertBranchAccess } from '../auth/branch-access';
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
+
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
+    @Optional() private workflowService?: WorkflowService,
   ) {}
 
   private async ensureDefaultCashbox(orgId: string, branchId?: string) {
@@ -297,6 +301,26 @@ export class PaymentsService {
       entityId: payment.id,
       after: payment,
     });
+
+    if (this.workflowService) {
+      try {
+        await this.workflowService.processEvent(
+          'payment.created',
+          {
+            id: payment.id,
+            amount: payment.amount,
+            studentId: payment.studentId,
+            customerId: payment.customerId,
+            receiptNumber: payment.receiptNumber,
+            method: payment.method,
+            branchId: payment.branchId,
+          },
+          orgId,
+        );
+      } catch (err: any) {
+        this.logger.warn(`Workflow execution failed for payment.created: ${err.message}`);
+      }
+    }
 
     return payment;
   }

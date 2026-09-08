@@ -20,7 +20,16 @@ export class DashboardController {
     @CurrentBranch() branchCtx: BranchContext,
     @Query() query: QueryDashboardStatsDto,
   ) {
-    return this.dashboardService.getStats(orgId, query.type, branchCtx);
+    return this.dashboardService.getStats(
+      orgId,
+      query.type,
+      branchCtx,
+      query.month,
+      query.year,
+      query.startDate,
+      query.endDate,
+      query.range,
+    );
   }
 
   @Get('widgets')
@@ -31,5 +40,15 @@ export class DashboardController {
     @Query('role') role?: string,
   ) {
     return this.dashboardService.getWidgets(role, orgId, branchCtx);
+  }
+
+  @Get('payment-stats')
+  @RequirePermissions('reports.view')
+  getPaymentStats(
+    @CurrentTenant() orgId: string,
+    @CurrentBranch() branchCtx: BranchContext,
+    @Query('year') year?: string,
+  ) {
+    return this.dashboardService.getPaymentStats(orgId, branchCtx, year);
   }
 }

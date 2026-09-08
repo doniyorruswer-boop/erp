@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { Role, AuditAction } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 
@@ -9,6 +10,7 @@ export class UsersService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
+    @Optional() private subscriptionsService?: SubscriptionsService,
   ) {}
 
   async findAll(query: { role?: Role; search?: string; branchId?: string; orgId: string }) {
@@ -80,6 +82,10 @@ export class UsersService {
     salaryType?: string;
     salaryAmount?: number;
   }, orgId: string, userId?: string) {
+    if (this.subscriptionsService) {
+      await this.subscriptionsService.checkLimit('MAX_USERS', 1, orgId);
+    }
+
     // Privilege Escalation Protection: Cannot create SUPER_ADMIN
     if (data.role === Role.SUPER_ADMIN) {
       throw new ForbiddenException('SUPER_ADMIN rolini yaratish yoki biriktirish taqiqlanadi');

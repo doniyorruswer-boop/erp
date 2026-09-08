@@ -4,6 +4,7 @@ module.exports = defineConfig({
   devServer: {
     port: 8080,
     hot: true,
+    historyApiFallback: true,
   },
   chainWebpack: config => {
     config.plugin('html').tap(args => {

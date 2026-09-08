@@ -63,14 +63,27 @@ export class SetupService {
   }
 
   async getOrganizations() {
+    const approvedSlugs = [
+      'educrm-markaziy',
+      'profi-maktab',
+      'yulduzcha-bogcha',
+      'universal-servis',
+    ];
+
     let orgs = await this.prisma.organization.findMany({
+      where: {
+        slug: { in: approvedSlugs },
+      },
       include: { config: true },
       orderBy: { createdAt: 'asc' },
     });
 
-    if (orgs.length <= 1) {
+    if (orgs.length < approvedSlugs.length) {
       await this.seedDemoOrganizations();
       orgs = await this.prisma.organization.findMany({
+        where: {
+          slug: { in: approvedSlugs },
+        },
         include: { config: true },
         orderBy: { createdAt: 'asc' },
       });
@@ -157,6 +170,17 @@ export class SetupService {
         modules: ['STUDENTS', 'GROUPS', 'ATTENDANCE', 'FINANCE', 'SERVICES', 'SMS'],
         features: { contracts: true, canteenService: true, transportService: false },
         terminology: { groupLabel: 'Guruh', courseLabel: 'Mashg\'ulot', studentLabel: 'Tarbiyalanuvchi', teacherLabel: 'Tarbiyachi' },
+      },
+      {
+        name: "Universal Ta'lim Servis",
+        slug: 'universal-servis',
+        businessType: BusinessType.COURSE_CENTER,
+        phone: '+998907778899',
+        address: 'Toshkent sh., Mirobod t.',
+        primaryColor: '#2563EB',
+        modules: ['LEADS', 'STUDENTS', 'GROUPS', 'COURSES', 'ATTENDANCE', 'FINANCE', 'SMS', 'PAYMENTS'],
+        features: { contracts: true, trialLessons: true, gradingSystem: false },
+        terminology: { groupLabel: 'Guruh', courseLabel: 'Yo\'nalish', studentLabel: 'Tinglovchi', teacherLabel: 'Instruktor' },
       },
     ];
 

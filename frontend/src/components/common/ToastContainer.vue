@@ -4,25 +4,25 @@
       <div
         v-for="t in toasts"
         :key="t.id"
-        class="pointer-events-auto p-4 rounded-2xl shadow-xl border backdrop-blur-md flex items-start gap-3 transition-all duration-300"
+        class="pointer-events-auto p-3.5 sm:p-4 rounded-xl shadow-xl border backdrop-blur-md flex items-start gap-3 transition-all duration-300"
         :class="getToastClasses(t.type)"
       >
         <div class="shrink-0 mt-0.5">
-          <Icon :icon="getToastIcon(t.type)" class="w-6 h-6" :class="getIconColorClass(t.type)" />
+          <Icon :icon="getToastIcon(t.type)" class="w-5 h-5 sm:w-6 sm:h-6" :class="getIconColorClass(t.type)" />
         </div>
         <div class="flex-1 min-w-0 pr-1">
-          <h4 class="text-sm font-bold text-gray-900 dark:text-white leading-tight">
+          <h4 class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white leading-tight">
             {{ t.title }}
           </h4>
-          <p class="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-normal break-words">
+          <p class="text-xs text-gray-600 dark:text-gray-300 mt-0.5 leading-normal break-words">
             {{ t.message }}
           </p>
         </div>
         <button
           @click="removeToast(t.id)"
-          class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition"
+          class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition cursor-pointer p-0.5"
         >
-          <Icon icon="solar:close-circle-linear" class="w-5 h-5" />
+          <Icon icon="solar:close-circle-linear" class="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </div>
     </transition-group>
@@ -47,10 +47,10 @@ export default {
     },
     getToastClasses(type) {
       const map = {
-        success: "bg-white/95 dark:bg-gray-850/95 border-emerald-500/30 shadow-emerald-500/10",
-        error: "bg-white/95 dark:bg-gray-850/95 border-rose-500/40 shadow-rose-500/10",
-        warning: "bg-white/95 dark:bg-gray-850/95 border-amber-500/30 shadow-amber-500/10",
-        info: "bg-white/95 dark:bg-gray-850/95 border-blue-500/30 shadow-blue-500/10",
+        success: "bg-white dark:bg-gray-800 border-emerald-500/40 shadow-emerald-500/10",
+        error: "bg-white dark:bg-gray-800 border-rose-500/50 shadow-rose-500/10",
+        warning: "bg-white dark:bg-gray-800 border-amber-500/40 shadow-amber-500/10",
+        info: "bg-white dark:bg-gray-800 border-blue-500/40 shadow-blue-500/10",
       };
       return map[type] || map.info;
     },

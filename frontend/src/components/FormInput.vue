@@ -29,8 +29,8 @@
         @input="$emit('update:modelValue', $event.target.value)"
       />
     </div>
-    <p v-if="error" class="text-xs text-red-500 mt-1">{{ error }}</p>
-    <p v-else-if="hint" class="text-[11px] text-gray-400 mt-1">{{ hint }}</p>
+    <FormFieldError :error="error" />
+    <p v-if="!error && hint" class="text-[11px] text-gray-400 mt-1">{{ hint }}</p>
   </div>
 </template>
 

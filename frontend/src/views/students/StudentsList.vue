@@ -11,14 +11,14 @@
       </div>
 
       <div class="flex items-center gap-2.5">
-        <button
-          type="button"
+        <AppButton
+          variant="primary"
+          icon="solar:user-plus-bold"
+          icon-class="text-lg"
           @click="$refs.studentWizard.open()"
-          class="border flex items-center text-sm gap-2 text-white bg-primary hover:bg-primary/90 dark:border-gray-700 rounded py-2.5 px-4 font-medium shadow-sm transition cursor-pointer"
         >
-          <Icon icon="solar:user-plus-bold" class="text-lg" />
-          <span>Yangi O'quvchi Qo'shish</span>
-        </button>
+          Yangi O'quvchi Qo'shish
+        </AppButton>
       </div>
     </div>
 

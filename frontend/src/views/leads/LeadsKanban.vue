@@ -4,14 +4,14 @@
     <Breadcrumb :items="[{ title: 'Lidlar & CRM' }, { title: 'Sotuv Voronkasi' }]" />
 
     <!-- TOP TOOLBAR: Academic Season, Import, Template, Export, Settings, Add Button -->
-    <div class="flex items-center justify-between flex-wrap gap-3 bg-white dark:bg-gray-800 p-3.5 rounded-2xl border dark:border-gray-700 shadow-xs">
+    <div class="flex items-center justify-between flex-wrap gap-3 bg-white dark:bg-gray-800 p-3.5 rounded-lg border dark:border-gray-700 shadow-xs">
       <!-- Left: Season / Blackboard Dropdown -->
       <div class="flex items-center gap-2">
         <div class="relative season-dropdown-container">
           <button
             type="button"
             @click.stop="showSeasonMenu = !showSeasonMenu"
-            class="py-2 px-3.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-100 hover:border-primary flex items-center gap-2 transition cursor-pointer shadow-2xs"
+            class="py-2 px-3.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-100 hover:border-primary flex items-center gap-2 transition cursor-pointer shadow-2xs"
           >
             <Icon icon="solar:filter-bold" class="text-primary text-base" />
             <span>{{ selectedSeason }}</span>
@@ -22,7 +22,7 @@
           <div
             v-if="showSeasonMenu"
             @click.stop
-            class="absolute left-0 mt-1.5 w-52 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl shadow-lg py-1 z-50 text-xs font-medium"
+            class="absolute left-0 mt-1.5 w-52 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg py-1 z-50 text-xs font-medium"
           >
             <div
               v-for="s in seasonOptions"
@@ -52,64 +52,52 @@
       <!-- Right Actions: Import, Import Shabloni, Export, Sozlash, Yangi Lid -->
       <div class="flex items-center gap-2 flex-wrap">
         <!-- Import Button -->
-        <button
-          type="button"
+        <AppButton
+          icon="solar:import-linear"
           @click="openImportModal"
-          class="py-2 px-3 rounded-xl border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/60 text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
         >
-          <Icon icon="solar:import-linear" class="text-base" />
-          <span>Import</span>
-        </button>
+          Import
+        </AppButton>
 
         <!-- Import Shabloni Button -->
-        <button
-          type="button"
+        <AppButton
+          icon="solar:file-download-linear"
           @click="downloadImportTemplate"
-          class="py-2 px-3 rounded-xl border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/60 text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
         >
-          <Icon icon="solar:file-download-linear" class="text-base" />
-          <span>Import shabloni</span>
-        </button>
+          Import shabloni
+        </AppButton>
 
         <!-- Export Button -->
-        <button
-          type="button"
+        <AppButton
+          icon="solar:export-linear"
           @click="exportLeadsToExcel"
-          class="py-2 px-3 rounded-xl border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/60 text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
         >
-          <Icon icon="solar:export-linear" class="text-base" />
-          <span>Export</span>
-        </button>
+          Export
+        </AppButton>
 
         <!-- Sozlash Toggle Button -->
-        <button
-          type="button"
+        <AppButton
+          :variant="isCustomizing ? 'warning' : 'outline'"
+          icon="solar:settings-linear"
           @click="isCustomizing = !isCustomizing"
-          :class="[
-            'py-2 px-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs',
-            isCustomizing
-              ? 'bg-amber-500 text-white border-amber-600 ring-2 ring-amber-500/30'
-              : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60'
-          ]"
         >
-          <Icon icon="solar:settings-linear" class="text-base" />
-          <span>{{ isCustomizing ? 'Saqlash' : 'Sozlash' }}</span>
-        </button>
+          {{ isCustomizing ? 'Saqlash' : 'Sozlash' }}
+        </AppButton>
 
-        <!-- Yangi Lid Primary Button (Directly opens modal) -->
-        <button
-          type="button"
+        <!-- Yangi Lid Primary Button -->
+        <AppButton
+          variant="primary"
+          icon="ic:round-add"
+          icon-class="text-lg"
           @click="openAddLeadModal"
-          class="py-2 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs sm:text-sm font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
         >
-          <Icon icon="ic:round-add" class="text-lg" />
-          <span>Yangi Lid</span>
-        </button>
+          Yangi Lid
+        </AppButton>
       </div>
     </div>
 
     <!-- SEARCH & VIEW MODE BAR with Advanced Filters Toggle -->
-    <div class="bg-white dark:bg-gray-800 p-3.5 rounded-2xl border dark:border-gray-700 shadow-xs space-y-3">
+    <div class="bg-white dark:bg-gray-800 p-3.5 rounded-lg border dark:border-gray-700 shadow-xs space-y-3">
       <div class="flex items-center justify-between flex-wrap gap-3">
         <!-- Search Input (Compact Width) -->
         <div class="relative w-64 sm:w-72">
@@ -120,7 +108,7 @@
             type="text"
             v-model="searchQuery"
             :placeholder="searchPlaceholder"
-            class="w-full pl-9 pr-8 py-2 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-xl outline-none focus:border-primary focus:ring-1 focus:ring-primary text-gray-800 dark:text-gray-200 transition"
+            class="w-full pl-9 pr-8 py-2 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none focus:border-primary focus:ring-1 focus:ring-primary text-gray-800 dark:text-gray-200 transition"
           />
           <button
             v-if="searchQuery"
@@ -132,7 +120,7 @@
         </div>
 
         <!-- Center: View Switcher (Kanban doska | Jadval) -->
-        <div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-xl border dark:border-gray-700 text-xs">
+        <div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-md border dark:border-gray-700 text-xs">
           <button
             type="button"
             @click="viewMode = 'kanban'"
@@ -167,7 +155,7 @@
           type="button"
           @click="showAdvancedFilters = !showAdvancedFilters"
           :class="[
-            'py-2 px-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer',
+            'py-2 px-3.5 rounded-md border text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer',
             showAdvancedFilters
               ? 'bg-primary/10 text-primary border-primary/30'
               : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60'
@@ -190,7 +178,7 @@
             <button
               type="button"
               @click.stop="showStageDropdown = !showStageDropdown"
-              class="py-2 px-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 flex items-center gap-1.5 hover:border-primary cursor-pointer font-medium shadow-2xs"
+              class="py-2 px-3 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 flex items-center gap-1.5 hover:border-primary cursor-pointer font-medium shadow-2xs"
             >
               <Icon icon="solar:flag-2-bold" class="text-primary text-sm" />
               <span>Bosqichlar ({{ selectedStages.length || 'Barchasi' }})</span>
@@ -201,7 +189,7 @@
             <div
               v-if="showStageDropdown"
               @click.stop
-              class="absolute left-0 mt-1.5 w-56 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl shadow-lg p-2 z-50 space-y-1"
+              class="absolute left-0 mt-1.5 w-56 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg p-2 z-50 space-y-1"
             >
               <label
                 v-for="col in pipelineColumns"
@@ -281,7 +269,7 @@
           <button
             type="button"
             @click="resetAllFilters"
-            class="py-2 px-3 rounded-xl text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold flex items-center gap-1 transition cursor-pointer ml-auto"
+            class="py-2 px-3 rounded-md text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold flex items-center gap-1 transition cursor-pointer ml-auto"
           >
             <Icon icon="solar:restart-linear" class="text-sm" />
             <span>Tozalash</span>
@@ -307,7 +295,7 @@
           @dragleave="onDragLeave(col.id)"
           @drop="handleColumnOrItemDrop($event, col.id, colIndex)"
           :class="[
-            'kanban-column w-full flex flex-col bg-gray-50/95 dark:bg-gray-800/70 rounded-2xl border dark:border-gray-700 min-h-[520px] max-h-[780px] transition-all shadow-xs relative',
+            'kanban-column w-full flex flex-col bg-gray-50/95 dark:bg-gray-800/70 rounded-lg border dark:border-gray-700 min-h-[520px] max-h-[780px] transition-all shadow-xs relative',
             isCustomizing ? 'border-dashed border-primary/40 hover:border-primary cursor-grab active:cursor-grabbing' : '',
             dragOverColIndex === colIndex && isCustomizing ? 'ring-2 ring-primary border-primary scale-[1.01]' : '',
             dragOverColId === col.id ? 'ring-2 ring-primary border-primary bg-primary/5 dark:bg-primary/10' : ''
@@ -369,7 +357,7 @@
                 <div
                   v-if="activeColumnMenu === col.id"
                   @click.stop
-                  class="absolute right-0 mt-1 w-36 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl shadow-lg py-1 z-50 text-xs font-medium"
+                  class="absolute right-0 mt-1 w-36 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg py-1 z-50 text-xs font-medium"
                 >
                   <button
                     type="button"
@@ -410,7 +398,7 @@
               :key="item.id"
               draggable="true"
               @dragstart="onDragStart(item, col.id)"
-              class="kanban-card bg-white dark:bg-gray-800 rounded-2xl p-4 border dark:border-gray-700 shadow-2xs hover:shadow-md cursor-grab active:cursor-grabbing transition hover:border-primary/60 group select-none space-y-3"
+              class="kanban-card bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700 shadow-2xs hover:shadow-md cursor-grab active:cursor-grabbing transition hover:border-primary/60 group select-none space-y-3"
             >
               <!-- Top row: Name & Source Badge -->
               <div class="flex items-start justify-between gap-2">
@@ -456,7 +444,7 @@
                   <button
                     type="button"
                     @click.stop="openLeadDetails(item)"
-                    class="py-2 px-3 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center justify-center gap-1 cursor-pointer shrink-0"
+                    class="py-2 px-3 rounded-md text-xs font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center justify-center gap-1 cursor-pointer shrink-0"
                     title="Lidni tahrirlash"
                   >
                     <Icon icon="solar:pen-linear" class="text-sm" />
@@ -466,7 +454,7 @@
                   <button
                     type="button"
                     @click.stop="openConvertModal(item)"
-                    class="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary/90 transition shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer truncate"
+                    class="flex-1 py-2 px-3 rounded-md text-xs font-bold text-white bg-primary hover:bg-primary/90 transition shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer truncate"
                   >
                     <Icon icon="solar:user-plus-bold" class="text-sm shrink-0" />
                     <span class="truncate">{{ isKindergarten ? "Bog'chaga Qabul" : isSchool ? "Maktabga Qabul" : "O'quvchiga Aylantirish" }}</span>
@@ -477,7 +465,7 @@
                   v-else
                   to="/students"
                   @click.stop
-                  class="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center gap-1.5 transition truncate text-center"
+                  class="w-full py-2.5 px-3 rounded-md text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center gap-1.5 transition truncate text-center"
                 >
                   <Icon icon="solar:check-circle-bold" class="text-base text-emerald-600 shrink-0" />
                   <span>Qabul qilingan o'quvchi</span>
@@ -488,7 +476,7 @@
             <!-- Empty Drop Zone Placeholder -->
             <div
               v-if="getColumnItems(col.id).length === 0"
-              class="h-24 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl flex flex-col items-center justify-center text-gray-400 text-xs gap-1"
+              class="h-24 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-md flex flex-col items-center justify-center text-gray-400 text-xs gap-1"
             >
               <Icon icon="solar:box-minimalistic-linear" class="text-xl" />
               <span>Hozircha bo'sh</span>
@@ -507,7 +495,7 @@
         <!-- "+ Guruh yaratish" Card -->
         <div
           v-if="isCustomizing"
-          class="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl min-h-[220px] bg-white/50 dark:bg-gray-800/40 text-center space-y-3"
+          class="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg min-h-[220px] bg-white/50 dark:bg-gray-800/40 text-center space-y-3"
         >
           <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold">
             <Icon icon="ic:round-add" />
@@ -519,7 +507,7 @@
           <button
             type="button"
             @click="openAddColumnModal"
-            class="py-2 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-bold shadow-xs cursor-pointer"
+            class="py-2 px-4 rounded-md bg-primary hover:bg-primary/90 text-white text-xs font-bold shadow-xs cursor-pointer"
           >
             + Guruh yaratish
           </button>
@@ -528,7 +516,7 @@
     </div>
 
     <!-- 2. JADVAL (TABLE) VIEW -->
-    <div v-else class="bg-white dark:bg-gray-800 rounded-2xl border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div v-else class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
           <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
@@ -702,7 +690,7 @@
                 type="button"
                 @click="newLead.target = `${cNum}-sinf`"
                 :class="[
-                  'h-10 rounded-xl text-sm font-semibold transition flex items-center justify-center cursor-pointer border',
+                  'h-10 rounded-md text-sm font-semibold transition flex items-center justify-center cursor-pointer border',
                   newLead.target === `${cNum}-sinf` || newLead.target === cNum
                     ? 'bg-primary text-white border-primary shadow-xs ring-2 ring-primary/30'
                     : 'bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-gray-600/80 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -849,7 +837,7 @@
                 type="button"
                 @click="editForm.notes = `${cNum}-sinf`"
                 :class="[
-                  'h-10 rounded-xl text-sm font-semibold transition flex items-center justify-center cursor-pointer border',
+                  'h-10 rounded-md text-sm font-semibold transition flex items-center justify-center cursor-pointer border',
                   editForm.notes && (editForm.notes.includes(`${cNum}-sinf`) || editForm.notes === cNum)
                     ? 'bg-primary text-white border-primary shadow-xs ring-2 ring-primary/30'
                     : 'bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-gray-600/80 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -893,7 +881,7 @@
             <button
               type="button"
               @click="promptDeleteLead(editForm)"
-              class="px-3.5 py-2 rounded-xl text-red-600 dark:text-red-400 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition shadow-2xs"
+              class="px-3.5 py-2 rounded-md text-red-600 dark:text-red-400 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition shadow-2xs"
             >
               <Icon icon="solar:trash-bin-trash-bold" class="text-base" />
               <span>Lidni o'chirish</span>
@@ -993,7 +981,7 @@
         <Icon icon="solar:trash-bin-trash-bold" class="text-3xl text-red-500 mb-2" />
       </template>
       <template v-slot:body>
-        <div class="p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-700 dark:text-red-300 text-left">
+        <div class="p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-700 dark:text-red-300 text-left">
           <p class="font-bold">Diqqat!</p>
           <p class="mt-0.5">Ushbu bosqich o'chirilgandan so'ng qayta tiklanmaydi.</p>
         </div>
@@ -1018,7 +1006,7 @@
       <template v-slot:body>
         <div class="space-y-4 text-center">
           <label
-            class="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl cursor-pointer hover:border-primary hover:bg-primary/5 transition"
+            class="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition"
           >
             <Icon icon="solar:upload-track-2-bold" class="text-4xl text-primary mb-2" />
             <span class="text-sm font-bold text-gray-800 dark:text-gray-200">
@@ -1049,7 +1037,7 @@
         <Icon icon="solar:info-circle-bold" class="text-3xl text-primary mb-2" />
       </template>
       <template v-slot:body>
-        <div class="p-3.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-xs text-blue-900 dark:text-blue-200 text-left">
+        <div class="p-3.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-xs text-blue-900 dark:text-blue-200 text-left">
           <p class="font-bold text-sm leading-snug">{{ revertModalMessage }}</p>
           <p class="mt-1 text-gray-500 dark:text-gray-400">Uni boshqa voronka bosqichiga qaytarishni tasdiqlaysizmi?</p>
         </div>
@@ -1072,7 +1060,7 @@
       </template>
       <template v-slot:body>
         <div class="space-y-3.5 text-xs text-left">
-          <div class="p-3.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-200">
+          <div class="p-3.5 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-200">
             <p class="font-bold text-sm leading-snug">
               "{{ leadToDelete ? (leadToDelete.fullName || editForm.fullName || 'Ushbu lid') : 'Ushbu lid' }}" ni o'chirishni tasdiqlaysizmi?
             </p>
@@ -1093,6 +1081,7 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+import AppButton from "@/components/AppButton.vue";
 import { formatUZS, formatPhone } from "@/helper/formatters";
 import Breadcrumb from "@/components/Breadcrumb.vue";
 import Badge from "@/components/Badge.vue";
@@ -1122,6 +1111,7 @@ const DEFAULT_COURSES = [
 export default {
   name: "LeadsKanban",
   components: {
+    AppButton,
     Icon,
     Breadcrumb,
     Badge,

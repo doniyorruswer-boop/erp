@@ -1,15 +1,19 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { WorkflowService } from '../workflow/workflow.service';
 import { LeadStatus, AuditAction, ActivityType } from '@prisma/client';
 import { ConvertLeadDto } from '../crm/dto/convert-lead.dto';
 import { BranchContext, buildBranchWhere, assertBranchAccess } from '../auth/branch-access';
 
 @Injectable()
 export class LeadsService {
+  private readonly logger = new Logger(LeadsService.name);
+
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
+    @Optional() private workflowService?: WorkflowService,
   ) {}
 
   async ensureDefaultPipeline(orgId: string) {
@@ -264,6 +268,28 @@ export class LeadsService {
       entityId: lead.id,
       after: lead,
     });
+
+    if (this.workflowService) {
+      try {
+        await this.workflowService.processEvent(
+          'lead.created',
+          {
+            id: lead.id,
+            name: lead.fullName,
+            fullName: lead.fullName,
+            phone: lead.phone,
+            source: lead.source,
+            status: lead.status,
+            amount: lead.amount,
+            branchId: lead.branchId,
+            courseId: lead.courseId,
+          },
+          orgId,
+        );
+      } catch (err: any) {
+        this.logger.warn(`Workflow execution failed for lead.created: ${err.message}`);
+      }
+    }
 
     return lead;
   }

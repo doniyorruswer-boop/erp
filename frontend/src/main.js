@@ -5,7 +5,6 @@ import VueApexCharts from "vue3-apexcharts";
 import PerfectScrollbar from "vue3-perfect-scrollbar";
 import "vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css";
 import { createPinia } from "pinia";
-// import "flowbite";
 import "./assets/tailwind.css";
 import "./assets/animate.css";
 import "./assets/sass/css/eduhub.css";
@@ -14,14 +13,36 @@ import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
 import FormDatePicker from "@/components/FormDatePicker.vue";
 import FormCurrencyInput from "@/components/FormCurrencyInput.vue";
 import FormTimePicker from "@/components/FormTimePicker.vue";
+import modal from "@/components/modal.vue";
+import AppButton from "@/components/AppButton.vue";
+import AppConfirmModal from "@/components/AppConfirmModal.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
+import AppPagination from "@/components/AppPagination.vue";
+import AppFilterDropdown from "@/components/AppFilterDropdown.vue";
+import AppDateRangePicker from "@/components/AppDateRangePicker.vue";
+import AppUserCell from "@/components/AppUserCell.vue";
+import AppPhoneCell from "@/components/AppPhoneCell.vue";
+import AppGroupBadge from "@/components/AppGroupBadge.vue";
+import AppStatusBadge from "@/components/AppStatusBadge.vue";
+import AppMoneyCell from "@/components/AppMoneyCell.vue";
+import AppDateCell from "@/components/AppDateCell.vue";
+import AppCopyCell from "@/components/AppCopyCell.vue";
+import AppDocCell from "@/components/AppDocCell.vue";
+import AppActionButtons from "@/components/AppActionButtons.vue";
+import PageTitle from "@/components/common/PageTitle.vue";
+import FormFieldError from "@/components/common/FormFieldError.vue";
 import BRAND_CONFIG from "@/config/brand.config";
 import { APP_CONFIG, formatMoney, formatDateUz, formatPhone } from "@/config/app.config";
 import { loadPrimaryColor, loadDarkMode } from "@/helper/theme";
+import { validateForm, validateField, rules } from "@/utils/validators";
+import toast from "@/utils/toast";
 
 loadPrimaryColor();
 loadDarkMode();
 
 const app = createApp(App);
+
+// Universal Global Komponentlar
 app.component("LoadingSpinner", LoadingSpinner);
 app.component("Spinner", LoadingSpinner);
 app.component("FormDatePicker", FormDatePicker);
@@ -30,16 +51,49 @@ app.component("FormCurrencyInput", FormCurrencyInput);
 app.component("CurrencyInput", FormCurrencyInput);
 app.component("FormTimePicker", FormTimePicker);
 app.component("TimePicker", FormTimePicker);
+app.component("vmodal", modal);
+app.component("modal", modal);
+app.component("AppButton", AppButton);
+app.component("AppConfirmModal", AppConfirmModal);
+app.component("ConfirmModal", ConfirmModal);
+app.component("AppPagination", AppPagination);
+app.component("AppFilterDropdown", AppFilterDropdown);
+app.component("FilterDropdown", AppFilterDropdown);
+app.component("AppDateRangePicker", AppDateRangePicker);
+app.component("DateRangePicker", AppDateRangePicker);
+app.component("Pagination", AppPagination);
+app.component("PageTitle", PageTitle);
+app.component("CrmButton", AppButton);
+app.component("AppUserCell", AppUserCell);
+app.component("UserCell", AppUserCell);
+app.component("AppPhoneCell", AppPhoneCell);
+app.component("PhoneCell", AppPhoneCell);
+app.component("AppGroupBadge", AppGroupBadge);
+app.component("GroupBadge", AppGroupBadge);
+app.component("AppStatusBadge", AppStatusBadge);
+app.component("StatusBadge", AppStatusBadge);
+app.component("AppMoneyCell", AppMoneyCell);
+app.component("MoneyCell", AppMoneyCell);
+app.component("AppDateCell", AppDateCell);
+app.component("DateCell", AppDateCell);
+app.component("AppCopyCell", AppCopyCell);
+app.component("CopyCell", AppCopyCell);
+app.component("AppDocCell", AppDocCell);
+app.component("DocCell", AppDocCell);
+app.component("AppActionButtons", AppActionButtons);
+app.component("ActionButtons", AppActionButtons);
+app.component("FormFieldError", FormFieldError);
 
-import toast from "@/utils/toast";
-
-// Global properties
+// Universal Global Yordamchilar va Validatsiya
 app.config.globalProperties.$toast = toast;
 app.config.globalProperties.$brand = BRAND_CONFIG;
 app.config.globalProperties.$appConfig = APP_CONFIG;
 app.config.globalProperties.$formatMoney = formatMoney;
 app.config.globalProperties.$formatDate = formatDateUz;
 app.config.globalProperties.$formatPhone = formatPhone;
+app.config.globalProperties.$validateForm = validateForm;
+app.config.globalProperties.$validateField = validateField;
+app.config.globalProperties.$rules = rules;
 
 app.use(router);
 app.use(createPinia());

@@ -54,7 +54,7 @@
     </div>
 
     <!-- Error / Hint Message -->
-    <p v-if="error" class="text-xs text-red-500 mt-1">{{ error }}</p>
+    <FormFieldError :error="error" />
 
     <!-- Teleported Floating Dropdown Menu Popup (Renders above modals without clipping) -->
     <Teleport to="body">

@@ -21,7 +21,7 @@ export class RolesService implements OnModuleInit {
       { code: 'students.create', module: 'STUDENTS', description: "Yangi o'quvchi qo'shish" },
       { code: 'students.update', module: 'STUDENTS', description: "O'quvchi ma'lumotlarini tahrirlash" },
       { code: 'students.delete', module: 'STUDENTS', description: "O'quvchini o'chirish" },
-      { code: 'students.export', module: 'STUDENTS', description: "O'quvchilar ro'yxatini eksport qilish" },
+      { code: 'students.export', module: 'STUDENTS', description: "O'quvchilar ro'yxatini export qilish" },
 
       // Groups
       { code: 'groups.view', module: 'GROUPS', description: "Guruhlar ro'yxatini ko'rish" },

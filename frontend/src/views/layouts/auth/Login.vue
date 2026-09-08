@@ -51,7 +51,7 @@
               <div class="relative z-0 w-full mb-6 group">
                 <input
                   v-model="email"
-                  type="email"
+                  type="text"
                   name="floating_email"
                   id="floating_email"
                   class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
@@ -61,7 +61,7 @@
                 <label
                   for="floating_email"
                   class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-primary peer-focus:dark:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                  >Email manzil</label
+                  >Email, login yoki telefon</label
                 >
               </div>
               <div class="relative z-0 w-full mb-6 group">
@@ -136,6 +136,7 @@ import { Icon } from "@iconify/vue";
 import { authApi } from "@/api/services";
 import api from "@/api/client";
 import BRAND_CONFIG from "@/config/brand.config";
+import { authenticateParent } from "@/api/schoolParentsData";
 
 export default {
   name: "Login",
@@ -155,7 +156,35 @@ export default {
       this.loading = true;
       this.errorMessage = "";
       try {
-        const res = await authApi.login(this.email, this.password);
+        const cleanEmail = (this.email || "").trim();
+        const cleanPassword = (this.password || "").trim();
+
+        // 1. Ota-onalar hisobi orqali kirish tekshiruvi (Faollik/blok holati)
+        const parentAuth = authenticateParent(cleanEmail, cleanPassword);
+        if (parentAuth && parentAuth.found) {
+          if (parentAuth.isBlocked) {
+            this.errorMessage = parentAuth.message;
+            if (this.$toast) {
+              this.$toast.error(parentAuth.message, "Kirish rad etildi");
+            }
+            return;
+          }
+
+          // Faol ota-ona profiliga muvaffaqiyatli kirish
+          localStorage.setItem("userRole", "PARENT");
+          localStorage.setItem("parentUser", JSON.stringify(parentAuth.parent));
+          if (this.$toast) {
+            this.$toast.success(
+              `Xush kelibsiz, ${parentAuth.parent.fullName}!`,
+              "Shaxsiy kabinet"
+            );
+          }
+          this.$router.push("/school/parents");
+          return;
+        }
+
+        // 2. Tizim xodimlari va administratorlar kirishi
+        const res = await authApi.login(cleanEmail, cleanPassword);
         if (res && res.accessToken) {
           localStorage.setItem("token", res.accessToken);
           if (res.refreshToken) {
@@ -174,6 +203,7 @@ export default {
       } catch (err) {
         const msg = err.response?.data?.message || err.message || "Email yoki parol noto'g'ri";
         this.errorMessage = msg;
+        this.$toast.error(msg, "Kirish rad etildi");
       } finally {
         this.loading = false;
       }

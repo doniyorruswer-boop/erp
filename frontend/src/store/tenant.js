@@ -51,6 +51,31 @@ export const useTenantStore = defineStore("tenant", {
       return state.enabledModules.includes(moduleName);
     },
     orgName: (state) => state.organization?.name || BRAND_CONFIG.name,
+    classLabel: (state) => {
+      if (state.businessType === "SCHOOL") return "Sinf";
+      if (state.businessType === "KINDERGARTEN") return "Guruh";
+      return "Guruh";
+    },
+    classesLabel: (state) => {
+      if (state.businessType === "SCHOOL") return "Sinflar";
+      if (state.businessType === "KINDERGARTEN") return "Guruhlar";
+      return "Guruhlar";
+    },
+    teacherRoleLabel: (state) => {
+      if (state.businessType === "SCHOOL") return "Sinf rahbari";
+      if (state.businessType === "KINDERGARTEN") return "Tarbiyachi";
+      return "Mentor";
+    },
+    promoteActionLabel: (state) => {
+      if (state.businessType === "SCHOOL") return "Sinfni keyingi yilga o'tkazish";
+      if (state.businessType === "KINDERGARTEN") return "Katta guruhga o'tkazish";
+      return "Guruhni keyingi bosqichga o'tkazish";
+    },
+    newClassButtonLabel: (state) => {
+      if (state.businessType === "SCHOOL") return "Yangi sinf";
+      if (state.businessType === "KINDERGARTEN") return "Yangi guruh";
+      return "Yangi guruh";
+    },
   },
 
   actions: {

@@ -86,3 +86,19 @@ body {
   transform: translateX(20px);
   opacity: 0;
 }
+
+/* Standardized Typography System */
+@layer components {
+  .title-sm {
+    @apply text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight;
+  }
+  .title-base {
+    @apply text-lg sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight;
+  }
+  .title-md, .title-medium {
+    @apply text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight;
+  }
+  .title-lg, .title-large {
+    @apply text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight;
+  }
+}

@@ -8,212 +8,229 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Tizim Xavfsizlik Jurnali (Audit Log)</h1>
         <p class="text-sm text-gray-400 mt-0.5">
-          Barcha muhim harakatlar, to'lovlar, o'quvchilar va sozlamalar o'zgarishlari xronologiyasi.
+          Barcha muhim harakatlar, to'lovlar, o'quvchilar va sozlamalar o'zgarishlari xronologiyasi
         </p>
       </div>
       <div class="flex items-center gap-2.5">
         <button
+          type="button"
           @click="fetchData"
-          class="inline-flex items-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-650 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-xl transition cursor-pointer"
+          class="border flex items-center text-sm gap-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-700 rounded-md py-2 px-4 font-medium shadow-sm transition cursor-pointer"
         >
-          <Icon icon="solar:restart-bold" class="w-4 h-4 mr-1.5" />
-          Yangilash
+          <Icon icon="solar:restart-bold" class="text-base" />
+          <span>Yangilash</span>
         </button>
       </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Jami Yozuvlar</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ totalLogs }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Yaratish (CREATE)</p>
-        <p class="text-2xl font-bold text-emerald-600 mt-2">{{ createCount }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">O'zgartirish (UPDATE)</p>
-        <p class="text-2xl font-bold text-blue-600 mt-2">{{ updateCount }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">O'chirish (DELETE)</p>
-        <p class="text-2xl font-bold text-rose-600 mt-2">{{ deleteCount }} ta</p>
-      </div>
+    <!-- Alert Message -->
+    <Alert v-if="alertMessage" :message="alertMessage" :type="alertType" @close="alertMessage = ''" />
+
+    <!-- 4 Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <StatsCard
+        title="Jami Yozuvlar"
+        :value="`${totalLogs} ta`"
+        icon="solar:history-bold"
+        variant="primary"
+      />
+      <StatsCard
+        title="Yaratish (CREATE)"
+        :value="`${createCount} ta`"
+        icon="solar:add-circle-bold"
+        variant="success"
+        valueClass="text-green-600 dark:text-green-400"
+      />
+      <StatsCard
+        title="O'zgartirish (UPDATE)"
+        :value="`${updateCount} ta`"
+        icon="solar:pen-new-square-bold"
+        variant="info"
+        valueClass="text-blue-600 dark:text-blue-400"
+      />
+      <StatsCard
+        title="O'chirish (DELETE)"
+        :value="`${deleteCount} ta`"
+        icon="solar:trash-bin-trash-bold"
+        variant="danger"
+        valueClass="text-red-600 dark:text-red-400"
+      />
     </div>
 
-    <!-- Filters & Search -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="relative w-full sm:w-80">
-        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-          <Icon icon="solar:magnifer-linear" class="w-5 h-5" />
-        </span>
-        <input
-          v-model="searchQuery"
-          @input="debounceSearch"
-          type="text"
-          placeholder="Modul, ID yoki harakat..."
-          class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
+    <!-- Data Table Component -->
+    <DataTable
+      title="Audit Yozuvlari"
+      subtitle="Foydalanuvchilar tomonidan bajarilgan amallar jurnali"
+      :columns="columns"
+      :data="filteredLogs"
+      :loading="loading"
+      :searchable="true"
+      :showIndex="true"
+      :showPerPage="true"
+      searchPlaceholder="Modul, ID yoki harakat..."
+      rowKey="id"
+    >
+      <!-- Header Actions: Action & Entity Filters -->
+      <template #headerActions>
+        <div class="flex items-center gap-2">
+          <select
+            v-model="selectedAction"
+            @change="fetchData"
+            class="py-1.5 px-3 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none text-gray-800 dark:text-gray-200"
+          >
+            <option value="">Barcha amallar</option>
+            <option value="CREATE">CREATE (Yaratish)</option>
+            <option value="UPDATE">UPDATE (Tahrirlash)</option>
+            <option value="DELETE">DELETE (O'chirish)</option>
+            <option value="PAYMENT">PAYMENT (To'lov)</option>
+            <option value="REFUND">REFUND (Qaytarish)</option>
+            <option value="LOGIN">LOGIN (Kirish)</option>
+          </select>
+        </div>
+      </template>
 
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <select
-          v-model="selectedAction"
-          @change="fetchData"
-          class="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+      <!-- Custom Action Cell -->
+      <template #cell(action)="{ row }">
+        <Badge :variant="getActionBadgeVariant(row.action)" :dot="true" size="sm">
+          {{ row.action }}
+        </Badge>
+      </template>
+
+      <!-- Custom Entity Cell -->
+      <template #cell(entity)="{ row }">
+        <div>
+          <span class="font-semibold text-gray-800 dark:text-gray-100 uppercase text-xs">
+            {{ row.entityType || 'TIZIM' }}
+          </span>
+          <div class="text-[11px] font-mono text-gray-400 truncate max-w-[140px]">
+            ID: {{ row.entityId ? row.entityId.slice(0, 12) + '...' : '-' }}
+          </div>
+        </div>
+      </template>
+
+      <!-- Custom User Cell -->
+      <template #cell(user)="{ row }">
+        <div v-if="row.user">
+          <div class="text-xs font-medium text-gray-800 dark:text-gray-200">
+            {{ row.user.firstName }} {{ row.user.lastName }}
+          </div>
+          <div class="text-[11px] text-gray-400 font-mono">{{ row.user.phone || row.user.role }}</div>
+        </div>
+        <div v-else class="text-xs text-gray-400 italic">
+          Tizim (Avtomatik)
+        </div>
+      </template>
+
+      <!-- Custom Date Cell -->
+      <template #cell(date)="{ row }">
+        <div class="text-xs text-gray-600 dark:text-gray-300">
+          {{ formatDateTime(row.createdAt) }}
+        </div>
+        <div v-if="row.ip" class="text-[10px] text-gray-400 font-mono">
+          IP: {{ row.ip }}
+        </div>
+      </template>
+
+      <!-- Actions Slot: View JSON Details -->
+      <template #actions="{ row }">
+        <button
+          type="button"
+          @click="openDetailsModal(row)"
+          title="Tafsilotlar (JSON)"
+          class="p-1.5 text-xs text-primary hover:bg-primary/10 rounded transition cursor-pointer flex items-center gap-1 font-medium"
         >
-          <option value="">Barcha amallar</option>
-          <option value="CREATE">Yaratish (CREATE)</option>
-          <option value="UPDATE">Tahrirlash (UPDATE)</option>
-          <option value="DELETE">O'chirish (DELETE)</option>
-          <option value="LOGIN">Tizimga kirish (LOGIN)</option>
-        </select>
-
-        <select
-          v-model="selectedEntity"
-          @change="fetchData"
-          class="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        >
-          <option value="">Barcha modullar</option>
-          <option value="Student">O'quvchilar (Student)</option>
-          <option value="Payment">To'lovlar (Payment)</option>
-          <option value="Invoice">Hisob-fakturalar (Invoice)</option>
-          <option value="Contract">Shartnomalar (Contract)</option>
-          <option value="Group">Guruhlar (Group)</option>
-          <option value="Course">Kurslar (Course)</option>
-          <option value="User">Foydalanuvchilar (User)</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Table -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-      <div v-if="loading" class="p-8 text-center text-gray-500">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent mb-2"></div>
-        <p>Yuklanmoqda...</p>
-      </div>
-
-      <div v-else-if="logs.length === 0" class="p-12 text-center text-gray-400">
-        <Icon icon="solar:document-text-bold" class="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-        <p class="text-base font-medium">Hech qanday audit yozuvi topilmadi</p>
-      </div>
-
-      <div v-else class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-gray-600 dark:text-gray-300">
-          <thead class="bg-gray-50 dark:bg-gray-700/50 text-xs uppercase font-semibold text-gray-500 dark:text-gray-400">
-            <tr>
-              <th class="px-6 py-4">Sana & Vaqt</th>
-              <th class="px-6 py-4">Bajaruvchi (Actor)</th>
-              <th class="px-6 py-4">Amal</th>
-              <th class="px-6 py-4">Modul / Obyekt</th>
-              <th class="px-6 py-4">IP Manzil</th>
-              <th class="px-6 py-4 text-right">Tafsilot</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-gray-700 font-mono text-xs">
-            <tr v-for="log in logs" :key="log.id" class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-              <td class="px-6 py-4 font-sans text-gray-900 dark:text-white">
-                {{ formatDateTime(log.createdAt) }}
-              </td>
-              <td class="px-6 py-4 font-sans">
-                <div v-if="log.user" class="font-medium text-gray-800 dark:text-gray-200">
-                  {{ log.user.firstName }} {{ log.user.lastName }}
-                </div>
-                <div class="text-xs text-gray-400 font-normal">
-                  {{ log.user?.phone || log.userId || "Tizim (Cron/System)" }}
-                </div>
-              </td>
-              <td class="px-6 py-4 font-sans">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                  :class="getActionBadgeClass(log.action)"
-                >
-                  {{ log.action }}
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="font-semibold text-gray-800 dark:text-gray-200 font-sans">
-                  {{ log.entityType }}
-                </div>
-                <div class="text-gray-400 text-2xs truncate max-w-xs">
-                  ID: {{ log.entityId }}
-                </div>
-              </td>
-              <td class="px-6 py-4 text-gray-500">
-                {{ log.ipAddress || '127.0.0.1' }}
-              </td>
-              <td class="px-6 py-4 text-right font-sans">
-                <button
-                  @click="viewDetails(log)"
-                  class="px-2.5 py-1 text-xs text-primary hover:bg-primary/10 rounded-lg transition"
-                >
-                  Ko'rish
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+          <Icon icon="solar:eye-linear" class="text-base" />
+          <span>Ko'rish</span>
+        </button>
+      </template>
+    </DataTable>
 
     <!-- Details Modal -->
-    <div v-if="selectedLog" class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-xl w-full p-6 shadow-xl border border-gray-100 dark:border-gray-700 max-h-[85vh] flex flex-col">
-        <div class="flex items-center justify-between pb-4 border-b dark:border-gray-700">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white">
-            Audit Yozuvi Tafsiloti
-          </h3>
-          <button @click="selectedLog = null" class="text-gray-400 hover:text-gray-600">
-            <Icon icon="solar:close-circle-bold" class="w-6 h-6" />
-          </button>
-        </div>
-
-        <div class="mt-4 space-y-3 overflow-y-auto flex-1 pr-1 text-xs">
-          <div class="grid grid-cols-2 gap-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-            <div><span class="text-gray-400">Modul:</span> <strong class="text-gray-800 dark:text-white">{{ selectedLog.entityType }}</strong></div>
-            <div><span class="text-gray-400">Harakat:</span> <strong class="text-gray-800 dark:text-white">{{ selectedLog.action }}</strong></div>
-            <div><span class="text-gray-400">Sana:</span> <span class="text-gray-800 dark:text-white">{{ formatDateTime(selectedLog.createdAt) }}</span></div>
-            <div><span class="text-gray-400">IP Manzil:</span> <span class="text-gray-800 dark:text-white">{{ selectedLog.ipAddress || '127.0.0.1' }}</span></div>
-          </div>
-
+    <vmodal
+      :model-value="showDetailsModal"
+      @update:model-value="showDetailsModal = $event"
+      title="Audit Tafsilotlari"
+      :subtitle="selectedLog ? `${selectedLog.action} - ${selectedLog.entityType} (${formatDateTime(selectedLog.createdAt)})` : ''"
+      width="max-w-xl"
+      :hide-button="true"
+    >
+      <div v-if="selectedLog" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-md border dark:border-gray-700">
           <div>
-            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">O'zgarishlar (Payload / Diff)</label>
-            <pre class="p-3 bg-gray-900 text-emerald-400 rounded-xl overflow-x-auto text-2xs font-mono">{{ JSON.stringify(selectedLog.details || selectedLog.changes || {}, null, 2) }}</pre>
+            <span class="text-gray-400">Bajaruvchi:</span>
+            <div class="font-semibold text-gray-800 dark:text-gray-200 mt-0.5">
+              {{ selectedLog.user ? `${selectedLog.user.firstName} ${selectedLog.user.lastName} (${selectedLog.user.role})` : 'Tizim' }}
+            </div>
+          </div>
+          <div>
+            <span class="text-gray-400">IP & User Agent:</span>
+            <div class="font-mono text-gray-800 dark:text-gray-200 mt-0.5 truncate" :title="selectedLog.userAgent">
+              {{ selectedLog.ip || 'Lokal' }}
+            </div>
           </div>
         </div>
 
-        <div class="pt-4 border-t dark:border-gray-700 flex justify-end">
+        <div v-if="selectedLog.before">
+          <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Oldingi Holat (Before):</p>
+          <pre class="p-3 bg-gray-900 text-emerald-400 rounded-md font-mono text-[11px] overflow-x-auto max-h-44">{{ JSON.stringify(selectedLog.before, null, 2) }}</pre>
+        </div>
+
+        <div v-if="selectedLog.after">
+          <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Keyingi Holat (After):</p>
+          <pre class="p-3 bg-gray-900 text-sky-400 rounded-md font-mono text-[11px] overflow-x-auto max-h-44">{{ JSON.stringify(selectedLog.after, null, 2) }}</pre>
+        </div>
+
+        <div class="flex justify-end pt-2">
           <button
-            @click="selectedLog = null"
-            class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm"
+            type="button"
+            @click="showDetailsModal = false"
+            class="px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition cursor-pointer"
           >
             Yopish
           </button>
         </div>
       </div>
-    </div>
+    </vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
 import Breadcrumb from "@/components/Breadcrumb.vue";
+import StatsCard from "@/components/StatsCard.vue";
+import DataTable from "@/components/DataTable.vue";
+import Badge from "@/components/Badge.vue";
+import Alert from "@/components/Alert.vue";
+import vmodal from "@/components/modal.vue";
 import { auditApi } from "@/api/services";
 
 export default {
   name: "AuditLogsList",
-  components: { Icon, Breadcrumb },
+  components: {
+    Icon,
+    Breadcrumb,
+    StatsCard,
+    DataTable,
+    Badge,
+    Alert,
+    vmodal,
+  },
   data() {
     return {
       logs: [],
       totalLogs: 0,
-      loading: true,
-      searchQuery: "",
+      loading: false,
       selectedAction: "",
-      selectedEntity: "",
+      alertMessage: "",
+      alertType: "success",
+      showDetailsModal: false,
       selectedLog: null,
-      searchTimeout: null,
+      columns: [
+        { key: "action", label: "Amal" },
+        { key: "entity", label: "Modul & ID" },
+        { key: "user", label: "Foydalanuvchi" },
+        { key: "date", label: "Sana & Vaqt" },
+      ],
     };
   },
   computed: {
@@ -226,6 +243,10 @@ export default {
     deleteCount() {
       return this.logs.filter((l) => l.action === "DELETE").length;
     },
+    filteredLogs() {
+      if (!this.selectedAction) return this.logs;
+      return this.logs.filter((l) => l.action === this.selectedAction);
+    },
   },
   mounted() {
     this.fetchData();
@@ -234,57 +255,59 @@ export default {
     async fetchData() {
       this.loading = true;
       try {
-        const params = {
-          limit: 100,
-        };
+        const params = { limit: 100 };
         if (this.selectedAction) params.action = this.selectedAction;
-        if (this.selectedEntity) params.entityType = this.selectedEntity;
-        if (this.searchQuery) params.search = this.searchQuery;
-
         const res = await auditApi.getAll(params);
-        if (Array.isArray(res)) {
+        if (res && res.items) {
+          this.logs = res.items;
+          this.totalLogs = res.total || res.items.length;
+        } else if (Array.isArray(res)) {
           this.logs = res;
           this.totalLogs = res.length;
-        } else if (res?.items) {
-          this.logs = res.items;
-          this.totalLogs = res.meta?.total || res.items.length;
         } else {
           this.logs = [];
+          this.totalLogs = 0;
         }
       } catch (err) {
-        console.error("Error loading audit logs:", err);
+        console.error("Audit loglarini yuklashda xatolik:", err);
+        this.alertType = "danger";
+        this.alertMessage = "Audit loglarini yuklashda xatolik yuz berdi.";
       } finally {
         this.loading = false;
       }
     },
-    debounceSearch() {
-      clearTimeout(this.searchTimeout);
-      this.searchTimeout = setTimeout(() => {
-        this.fetchData();
-      }, 300);
+    getActionBadgeVariant(action) {
+      switch (action) {
+        case "CREATE":
+          return "success";
+        case "UPDATE":
+          return "info";
+        case "DELETE":
+          return "danger";
+        case "PAYMENT":
+          return "primary";
+        case "REFUND":
+          return "warning";
+        case "LOGIN":
+          return "purple";
+        default:
+          return "gray";
+      }
+    },
+    openDetailsModal(log) {
+      this.selectedLog = log;
+      this.showDetailsModal = true;
     },
     formatDateTime(dateStr) {
       if (!dateStr) return "-";
       const d = new Date(dateStr);
       return d.toLocaleString("uz-UZ", {
         year: "numeric",
-        month: "short",
-        day: "numeric",
+        month: "2-digit",
+        day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
       });
-    },
-    getActionBadgeClass(action) {
-      const map = {
-        CREATE: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
-        UPDATE: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-        DELETE: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400",
-        LOGIN: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-      };
-      return map[action] || "bg-gray-100 text-gray-800";
-    },
-    viewDetails(log) {
-      this.selectedLog = log;
     },
   },
 };

@@ -6,7 +6,11 @@ export const CurrentBranch = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): BranchContext => {
     const request = ctx.switchToHttp().getRequest();
     const user = request.user;
-    const orgId = user?.organizationId || (request.headers['x-organization-id'] as string) || (request.headers['x-tenant-id'] as string);
+    const orgId =
+      (request.headers['x-organization-id'] as string) ||
+      (request.headers['x-tenant-id'] as string) ||
+      request.query?.orgId ||
+      user?.organizationId;
 
     if (!orgId) {
       throw new UnauthorizedException('Organization context missing');

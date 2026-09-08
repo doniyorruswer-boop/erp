@@ -154,57 +154,68 @@
           <transition name="fade">
             <div
               v-show="notification"
-              class="block absolute right-0 mt-2 z-50 w-80 sm:w-88 border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md divide-y dark:divide-gray-700 shadow-xl text-xs"
+              class="block absolute right-0 mt-2.5 z-50 w-80 sm:w-92 bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden font-lexend text-xs transition-all"
             >
               <!-- Top Header -->
-              <div class="flex justify-between items-center px-4 py-3 text-gray-800 dark:text-gray-200">
-                <h2 class="font-bold text-sm">Bildirishnomalar</h2>
+              <div class="flex justify-between items-center px-4 py-3.5 bg-slate-50/70 dark:bg-gray-800/50 border-b border-slate-100 dark:border-gray-800">
+                <div class="flex items-center gap-2">
+                  <h2 class="font-bold text-sm text-slate-800 dark:text-gray-100">Bildirishnomalar</h2>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
+                    {{ notifList.length }} ta
+                  </span>
+                </div>
                 <button
                   @click="markAllRead"
-                  class="text-primary text-xs font-semibold hover:underline cursor-pointer"
+                  class="text-primary hover:text-primary/80 text-xs font-semibold cursor-pointer transition hover:underline"
                 >
                   Barchasini o'qildi qilish
                 </button>
               </div>
 
-              <!-- Notifications List with clean icons -->
-              <div class="divide-y dark:divide-gray-700 max-h-72 overflow-y-auto">
+              <!-- Notifications List matching Image 4 -->
+              <div class="divide-y divide-slate-100 dark:divide-gray-800/70 max-h-88 overflow-y-auto">
                 <div
                   v-if="notifList.length === 0"
-                  class="py-8 text-center text-gray-400 text-xs"
+                  class="py-10 text-center text-slate-400 text-xs"
                 >
+                  <Icon icon="solar:bell-linear" class="text-3xl mx-auto mb-2 text-slate-300 dark:text-gray-600" />
                   Yangi bildirishnomalar mavjud emas
                 </div>
 
                 <div
                   v-for="(item, index) in notifList"
                   :key="index"
-                  class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition cursor-pointer"
+                  @click="notification = false; $router.push('/notifications')"
+                  class="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-gray-800/60 transition cursor-pointer group"
                 >
                   <div
-                    class="w-9 h-9 rounded-full flex items-center justify-center text-base shrink-0"
-                    :class="item.bgClass || 'bg-blue-50 dark:bg-blue-900/30 text-primary'"
+                    class="w-8 h-8 rounded-full bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-primary/10 group-hover:text-primary transition"
                   >
-                    <Icon :icon="item.icon" />
+                    <Icon :icon="item.icon || 'solar:bell-linear'" class="text-base" />
                   </div>
                   <div class="min-w-0 flex-1">
-                    <div class="flex items-center justify-between gap-1">
-                      <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-100 truncate">{{ item.name }}</h3>
-                      <span class="text-xs text-gray-400 shrink-0">{{ item.hours }}</span>
-                    </div>
-                    <p class="text-xs text-gray-400 truncate mt-0.5">{{ item.message }}</p>
+                    <h3 class="font-semibold text-xs text-slate-800 dark:text-gray-100 leading-tight">
+                      {{ item.name }}
+                    </h3>
+                    <p class="text-[11px] text-slate-500 dark:text-gray-400 leading-snug mt-0.5">
+                      {{ item.message }}
+                    </p>
+                    <span class="text-[10px] text-slate-400 dark:text-gray-500 mt-1 block">
+                      {{ item.hours }}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <!-- Bottom Footer -->
-              <div class="py-2.5 px-4 text-center">
-                <button
+              <!-- Bottom Footer matching Image 4 -->
+              <div class="p-2.5 bg-slate-50/70 dark:bg-gray-800/50 border-t border-slate-100 dark:border-gray-800 text-center">
+                <router-link
+                  to="/notifications"
                   @click="notification = false"
-                  class="text-xs font-semibold text-gray-700 dark:text-gray-200 hover:text-primary transition cursor-pointer"
+                  class="block w-full py-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition cursor-pointer text-center"
                 >
-                  Barchasini ko'rish
-                </button>
+                  Barcha bildirishnomalar
+                </router-link>
               </div>
             </div>
           </transition>
@@ -319,25 +330,52 @@ export default {
       branchMenu: false,
       notifList: [
         {
-          name: "Yangi O'quvchi Qo'shildi",
-          icon: "ph:student-fill",
-          bgClass: "bg-blue-50 dark:bg-blue-900/30 text-primary",
-          message: "Bobur Mirzayev IELTS 7.0 guruhiga muvaffaqiyatli qabul qilindi",
-          hours: "10 daqiqa oldin",
+          name: "Yangi lid qo'shildi",
+          icon: "solar:bell-linear",
+          message: "Tizimga yangi lid qo'shildi.",
+          hours: "16/06/2026 05:00",
         },
         {
-          name: "To'lov Qabul Qilindi",
+          name: "To'lov qabul qilindi",
           icon: "solar:wallet-money-bold",
-          bgClass: "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600",
-          message: "Payme orqali 650,000 UZS to'lov kassa hisobiga tushdi",
-          hours: "45 daqiqa oldin",
+          message: "Yangi to'lov muvaffaqiyatli qabul qilindi.",
+          hours: "16/06/2026 05:00",
         },
         {
-          name: "Yangi Lid Murojaati",
-          icon: "solar:tuning-square-bold",
-          bgClass: "bg-purple-50 dark:bg-purple-900/30 text-purple-600",
-          message: "Telegram orqali yangi o'quvchi kursga qiziqish bildirdi",
-          hours: "2 soat oldin",
+          name: "Yangi taklif keldi",
+          icon: "solar:letter-bold",
+          message: "Ota-onadan yangi taklif keldi.",
+          hours: "16/06/2026 05:00",
+        },
+        {
+          name: "Sinov darsi eslatmasi",
+          icon: "solar:calendar-mark-bold",
+          message: "Yangi sinov darsi rejalashtirildi.",
+          hours: "16/06/2026 05:00",
+        },
+        {
+          name: "Yangilik e'lon qilindi",
+          icon: "solar:chat-round-dots-bold",
+          message: "Yangi maktab yangiligi joylandi.",
+          hours: "16/06/2026 05:00",
+        },
+        {
+          name: "Umumiy xabar",
+          icon: "solar:document-text-bold",
+          message: "Oylik hisobot tayyor bo'ldi.",
+          hours: "16/06/2026 05:00",
+        },
+        {
+          name: "Yangi lid qo'shildi",
+          icon: "solar:bell-linear",
+          message: "Tizimga yangi lid qo'shildi.",
+          hours: "16/06/2026 05:00",
+        },
+        {
+          name: "To'lov qabul qilindi",
+          icon: "solar:wallet-money-bold",
+          message: "Yangi to'lov muvaffaqiyatli qabul qilindi.",
+          hours: "16/06/2026 05:00",
         },
       ],
     };
@@ -361,8 +399,9 @@ export default {
       this.branchMenu = false;
       try {
         await this.tenantStore.switchOrganization(org.id);
+        window.location.reload();
       } catch (err) {
-        alert("Filialni almashtirishda xatolik: " + err.message);
+        alert("Muassasani almashtirishda xatolik: " + err.message);
       }
     },
     getBusinessTypeLabel(type) {

@@ -8,7 +8,7 @@ import { RequireModule } from '../auth/module.decorator';
 import { CurrentTenant } from '../auth/tenant.decorator';
 import { CurrentBranch } from '../auth/branch.decorator';
 import { BranchContext } from '../auth/branch-access';
-import { CreateGroupDto, UpdateGroupDto, QueryGroupDto } from './dto/group.dto';
+import { CreateGroupDto, UpdateGroupDto, QueryGroupDto, GenerateLessonsDto } from './dto/group.dto';
 
 @UseGuards(JwtAuthGuard, ModuleGuard, PermissionsGuard)
 @RequireModule('GROUPS')
@@ -139,4 +139,17 @@ export class GroupsController {
   ) {
     return this.groupsService.removeStudent(groupId, studentId, orgId, req.user?.id, reason, branchCtx);
   }
+
+  @Post(':id/generate-lessons')
+  @RequirePermissions('groups.update')
+  generateLessons(
+    @Param('id') id: string,
+    @CurrentTenant() orgId: string,
+    @CurrentBranch() branchCtx: BranchContext,
+    @Body() body: GenerateLessonsDto,
+    @Request() req: any,
+  ) {
+    return this.groupsService.generateLessonsForGroup(id, orgId, req.user?.id, branchCtx, body);
+  }
 }
+

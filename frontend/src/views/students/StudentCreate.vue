@@ -68,12 +68,16 @@
             label="Familiya"
             required
             placeholder="Aliyev"
+            :error="formErrors.lastName"
+            @input="clearFieldError('lastName')"
           />
           <FormInput
             v-model="form.firstName"
             label="Ism"
             required
             placeholder="Sardor"
+            :error="formErrors.firstName"
+            @input="clearFieldError('firstName')"
           />
           <FormSelect
             v-model="form.gender"
@@ -112,15 +116,18 @@
             v-model="form.phone"
             label="Mobil raqam"
             required
-            placeholder="+998901234567"
+            placeholder="+998 (90) 123-45-67"
             icon="solar:phone-calling-linear"
+            :error="formErrors.phone"
+            @input="onPhoneInput('phone')"
           />
           <FormInput
             v-model="form.email"
             label="Email"
-            type="email"
-            placeholder="misol@gmail.com"
+            placeholder="user@example.com"
             icon="solar:letter-linear"
+            :error="formErrors.email"
+            @input="clearFieldError('email')"
           />
           <FormSelect
             v-model="form.status"
@@ -276,8 +283,10 @@
           <FormInput
             v-model="form.parentPhone"
             label="Ota-ona telefoni"
-            placeholder="+998901234567"
+            placeholder="+998 (90) 123-45-67"
             icon="solar:phone-calling-linear"
+            :error="formErrors.parentPhone"
+            @input="onPhoneInput('parentPhone')"
           />
           <FormInput
             v-model="form.parentEmail"
@@ -285,6 +294,8 @@
             type="email"
             placeholder="otaona@gmail.com"
             icon="solar:letter-linear"
+            :error="formErrors.parentEmail"
+            @input="clearFieldError('parentEmail')"
           />
         </div>
       </div>
@@ -349,6 +360,7 @@ import FormInput from "@/components/FormInput.vue";
 import FormSelect from "@/components/FormSelect.vue";
 import FormDatePicker from "@/components/FormDatePicker.vue";
 import { studentsApi, coursesApi, groupsApi, usersApi } from "@/api/services";
+import { validateForm, rules, formatPhone } from "@/utils/validators";
 
 export default {
   name: "StudentCreate",
@@ -367,11 +379,12 @@ export default {
     return {
       saving: false,
       alertMessage: "",
-      alertType: "success",
+      alertType: "info",
       photoPreview: null,
       courses: [],
       groups: [],
       teachers: [],
+      formErrors: {},
       regionOptions: [
         { value: "Toshkent shahri", label: "Toshkent shahri" },
         { value: "Toshkent viloyati", label: "Toshkent viloyati" },
@@ -476,12 +489,37 @@ export default {
         this.photoPreview = URL.createObjectURL(file);
       }
     },
+    clearFieldError(field) {
+      if (this.formErrors && this.formErrors[field]) {
+        delete this.formErrors[field];
+      }
+    },
+    onPhoneInput(field) {
+      this.form[field] = formatPhone(this.form[field]);
+      this.clearFieldError(field);
+    },
     async submitStudentForm() {
-      if (!this.form.firstName || !this.form.phone) {
+      const validation = validateForm(this.form, {
+        firstName: [rules.required("Ism"), rules.name("Ism", 2)],
+        lastName: [rules.required("Familiya"), rules.name("Familiya", 2)],
+        phone: [rules.required("Telefon raqami"), rules.phone("Telefon raqami")],
+        email: this.form.email ? [rules.email("Email")] : [],
+        parentPhone:
+          this.form.parentPhone &&
+          this.form.parentPhone.trim() !== "+998" &&
+          this.form.parentPhone.trim() !== "+998 "
+            ? [rules.phone("Ota-ona telefoni")]
+            : [],
+        parentEmail: this.form.parentEmail ? [rules.email("Ota-ona emaili")] : [],
+      });
+
+      if (!validation.isValid) {
+        this.formErrors = validation.errors;
         this.alertType = "danger";
-        this.alertMessage = "Iltimos, Ism va Telefon raqamini kiriting!";
+        this.alertMessage = validation.firstError || "Iltimos, maydonlarni to'g'ri to'ldiring!";
         return;
       }
+      this.formErrors = {};
 
       this.saving = true;
       try {

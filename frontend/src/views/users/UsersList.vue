@@ -8,312 +8,311 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Foydalanuvchilar & Xodimlar</h1>
         <p class="text-sm text-gray-400 mt-0.5">
-          Tizimga kirish huquqiga ega foydalanuvchilar, ularning rollari va filial birikmalari boshqaruvi.
+          Tizimga kirish huquqiga ega foydalanuvchilar, ularning rollari va filial birikmalari
         </p>
       </div>
       <div class="flex items-center gap-2.5">
         <button
+          type="button"
           @click="openCreateModal"
-          class="inline-flex items-center px-4 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-xl shadow-sm transition duration-150 ease-in-out cursor-pointer"
+          class="border flex items-center text-sm gap-2 text-white bg-primary hover:bg-primary/90 dark:border-gray-700 rounded-md py-2 px-4 font-medium shadow-sm transition cursor-pointer"
         >
-          <Icon icon="solar:user-plus-bold" class="w-5 h-5 mr-1.5" />
-          Yangi Foydalanuvchi
+          <Icon icon="solar:user-plus-bold" class="text-lg" />
+          <span>Yangi Foydalanuvchi</span>
         </button>
       </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Jami Foydalanuvchilar</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ users.length }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Administratorlar</p>
-        <p class="text-2xl font-bold text-primary mt-2">{{ adminCount }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">O'qituvchilar</p>
-        <p class="text-2xl font-bold text-emerald-600 mt-2">{{ teacherCount }} ta</p>
-      </div>
-      <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Faol Akkauntlar</p>
-        <p class="text-2xl font-bold text-blue-600 mt-2">{{ activeCount }} ta</p>
-      </div>
+    <!-- Alert Message -->
+    <Alert v-if="alertMessage" :message="alertMessage" :type="alertType" @close="alertMessage = ''" />
+
+    <!-- 4 Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <StatsCard
+        title="Jami Foydalanuvchilar"
+        :value="`${users.length} ta`"
+        icon="solar:users-group-two-rounded-bold"
+        variant="primary"
+      />
+      <StatsCard
+        title="Administratorlar"
+        :value="`${adminCount} ta`"
+        icon="solar:shield-user-bold"
+        variant="purple"
+        valueClass="text-primary"
+      />
+      <StatsCard
+        title="O'qituvchilar"
+        :value="`${teacherCount} ta`"
+        icon="solar:diploma-bold"
+        variant="success"
+        valueClass="text-green-600 dark:text-green-400"
+      />
+      <StatsCard
+        title="Faol Akkauntlar"
+        :value="`${activeCount} ta`"
+        icon="solar:user-check-bold"
+        variant="info"
+        valueClass="text-blue-600 dark:text-blue-400"
+      />
     </div>
 
-    <!-- Filters & Search -->
-    <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="relative w-full sm:w-80">
-        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-          <Icon icon="solar:magnifer-linear" class="w-5 h-5" />
+    <!-- Data Table Component -->
+    <DataTable
+      title="Barcha Foydalanuvchilar"
+      subtitle="Tizim a'zolari va ularga berilgan kirish ruxsatlari"
+      :columns="columns"
+      :data="filteredUsers"
+      :loading="loading"
+      :searchable="true"
+      :showIndex="true"
+      :showPerPage="true"
+      searchPlaceholder="Ism, telefon, email yoki rol..."
+      rowKey="id"
+    >
+      <!-- Header Actions: Role & Status Filters -->
+      <template #headerActions>
+        <div class="flex items-center gap-2">
+          <select
+            v-model="selectedRole"
+            class="py-1.5 px-3 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none text-gray-800 dark:text-gray-200"
+          >
+            <option value="">Barcha rollar</option>
+            <option value="SUPER_ADMIN">Super Admin</option>
+            <option value="ADMIN">Administrator</option>
+            <option value="TEACHER">O'qituvchi</option>
+            <option value="RECEPTIONIST">Qabulxona (Reception)</option>
+            <option value="ACCOUNTANT">Buxgalter</option>
+            <option value="STUDENT">Talaba</option>
+          </select>
+
+          <select
+            v-model="selectedStatus"
+            class="py-1.5 px-3 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none text-gray-800 dark:text-gray-200"
+          >
+            <option value="">Barcha holatlar</option>
+            <option value="active">Faol</option>
+            <option value="inactive">Nofaol</option>
+          </select>
+        </div>
+      </template>
+
+      <!-- Custom User Cell -->
+      <template #cell(user)="{ row }">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center shrink-0">
+            {{ (row.firstName?.[0] || 'U') + (row.lastName?.[0] || '') }}
+          </div>
+          <div>
+            <div class="font-semibold text-gray-800 dark:text-gray-100">
+              {{ row.firstName }} {{ row.lastName }}
+            </div>
+            <div class="text-xs text-gray-400 flex items-center gap-1.5">
+              <span>{{ row.phone || '-' }}</span>
+              <span v-if="row.email" class="text-gray-300 dark:text-gray-600">•</span>
+              <span v-if="row.email">{{ row.email }}</span>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Custom Role Cell -->
+      <template #cell(role)="{ row }">
+        <Badge :variant="getRoleBadgeVariant(row.role)" size="sm">
+          {{ formatRole(row.role) }}
+        </Badge>
+      </template>
+
+      <!-- Custom Branch Cell -->
+      <template #cell(branch)="{ row }">
+        <span class="text-xs text-gray-700 dark:text-gray-300">
+          {{ getBranchName(row) }}
         </span>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Ism, telefon yoki email bo'yicha..."
-          class="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
+      </template>
 
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <select
-          v-model="selectedRole"
-          class="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        >
-          <option value="">Barcha rollar</option>
-          <option value="SUPER_ADMIN">Super Admin</option>
-          <option value="ADMIN">Administrator</option>
-          <option value="TEACHER">O'qituvchi</option>
-          <option value="RECEPTIONIST">Qabulxona (Reception)</option>
-          <option value="ACCOUNTANT">Buxgalter</option>
-          <option value="STUDENT">Talaba</option>
-        </select>
+      <!-- Custom Status Cell -->
+      <template #cell(status)="{ row }">
+        <Badge :variant="row.isActive !== false ? 'success' : 'danger'" :dot="true" size="sm">
+          {{ row.isActive !== false ? 'Faol' : 'Nofaol' }}
+        </Badge>
+      </template>
 
-        <select
-          v-model="selectedStatus"
-          class="px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-        >
-          <option value="">Barcha holatlar</option>
-          <option value="active">Faol</option>
-          <option value="inactive">Nofaol</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Table -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-      <div v-if="loading" class="p-8 text-center text-gray-500">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent mb-2"></div>
-        <p>Yuklanmoqda...</p>
-      </div>
-
-      <div v-else-if="filteredUsers.length === 0" class="p-12 text-center text-gray-400">
-        <Icon icon="solar:user-block-bold" class="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-        <p class="text-base font-medium">Hech qanday foydalanuvchi topilmadi</p>
-        <p class="text-sm mt-1">Yangi foydalanuvchi qo'shish uchun yuqoridagi tugmani bosing.</p>
-      </div>
-
-      <div v-else class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-gray-600 dark:text-gray-300">
-          <thead class="bg-gray-50 dark:bg-gray-700/50 text-xs uppercase font-semibold text-gray-500 dark:text-gray-400">
-            <tr>
-              <th class="px-6 py-4">Foydalanuvchi</th>
-              <th class="px-6 py-4">Aloqa</th>
-              <th class="px-6 py-4">Roli</th>
-              <th class="px-6 py-4">Filiallar</th>
-              <th class="px-6 py-4">Holat</th>
-              <th class="px-6 py-4 text-right">Amallar</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-            <tr v-for="u in filteredUsers" :key="u.id" class="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
-              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-                    {{ (u.firstName?.[0] || 'U').toUpperCase() }}
-                  </div>
-                  <div>
-                    <div>{{ u.firstName }} {{ u.lastName }}</div>
-                    <div class="text-xs text-gray-400 font-normal">@{{ u.phone || u.email }}</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="text-sm">{{ u.phone || '-' }}</div>
-                <div class="text-xs text-gray-400">{{ u.email || '-' }}</div>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  :class="getRoleBadgeClass(u.role)"
-                >
-                  {{ formatRole(u.role) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-xs text-gray-500">
-                <span v-if="u.userBranches && u.userBranches.length > 0">
-                  {{ u.userBranches.map(b => b.branch?.name).filter(Boolean).join(', ') || 'Asosiy filial' }}
-                </span>
-                <span v-else class="text-gray-400">Barcha filiallar</span>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  :class="u.isActive !== false ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400'"
-                >
-                  {{ u.isActive !== false ? 'Faol' : 'Bloklangan' }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right space-x-2">
-                <button
-                  v-if="u.lockedUntil && new Date(u.lockedUntil) > new Date()"
-                  @click="unlockUser(u)"
-                  class="p-1.5 text-amber-500 hover:text-amber-600 transition rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/30"
-                  title="Blokdan chiqarish"
-                >
-                  <Icon icon="solar:lock-unlocked-bold" class="w-4 h-4" />
-                </button>
-                <button
-                  @click="openEditModal(u)"
-                  class="p-1.5 text-gray-500 hover:text-primary transition rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                  title="Tahrirlash"
-                >
-                  <Icon icon="solar:pen-bold" class="w-4 h-4" />
-                </button>
-                <button
-                  @click="deleteUser(u)"
-                  class="p-1.5 text-gray-500 hover:text-rose-600 transition rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                  title="O'chirish"
-                >
-                  <Icon icon="solar:trash-bin-trash-bold" class="w-4 h-4" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Create/Edit Modal -->
-    <div v-if="showModal" class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-xl border border-gray-100 dark:border-gray-700">
-        <div class="flex items-center justify-between pb-4 border-b dark:border-gray-700">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white">
-            {{ isEditing ? "Foydalanuvchini Tahrirlash" : "Yangi Foydalanuvchi Qo'shish" }}
-          </h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-            <Icon icon="solar:close-circle-bold" class="w-6 h-6" />
+      <!-- Actions Slot -->
+      <template #actions="{ row }">
+        <div class="flex items-center justify-end gap-1.5">
+          <button
+            type="button"
+            @click="openEditModal(row)"
+            title="Tahrirlash"
+            class="p-1.5 text-xs text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded transition cursor-pointer"
+          >
+            <Icon icon="solar:pen-linear" class="text-base" />
+          </button>
+          <button
+            type="button"
+            @click="deleteUser(row)"
+            title="O'chirish"
+            class="p-1.5 text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition cursor-pointer"
+          >
+            <Icon icon="solar:trash-bin-trash-linear" class="text-base" />
           </button>
         </div>
+      </template>
+    </DataTable>
 
-        <form @submit.prevent="saveUser" class="mt-4 space-y-4">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Ism *</label>
-              <input
-                v-model="form.firstName"
-                required
-                type="text"
-                class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Familiya *</label>
-              <input
-                v-model="form.lastName"
-                required
-                type="text"
-                class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm"
-              />
-            </div>
-          </div>
+    <!-- Create / Edit User Modal -->
+    <vmodal
+      :model-value="showModal"
+      @update:model-value="showModal = $event"
+      :title="isEditing ? 'Foydalanuvchini Tahrirlash' : 'Yangi Foydalanuvchi Qo\'shish'"
+      subtitle="Tizimga kirish akkaunti va rol biriktirish"
+      width="max-w-lg"
+      :hide-button="true"
+    >
+      <form @submit.prevent="saveUser" class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <FormInput
+            v-model="form.firstName"
+            label="Ism"
+            required
+            placeholder="Ali"
+            icon="solar:user-linear"
+          />
+          <FormInput
+            v-model="form.lastName"
+            label="Familiya"
+            required
+            placeholder="Valiyev"
+            icon="solar:user-linear"
+          />
+        </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Telefon *</label>
-              <input
-                v-model="form.phone"
-                required
-                type="text"
-                placeholder="+998901234567"
-                class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Email</label>
-              <input
-                v-model="form.email"
-                type="email"
-                placeholder="user@eduhub.uz"
-                class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm"
-              />
-            </div>
-          </div>
+        <div class="grid grid-cols-2 gap-3">
+          <FormInput
+            v-model="form.phone"
+            label="Telefon"
+            required
+            placeholder="+998901234567"
+            icon="solar:phone-linear"
+          />
+          <FormInput
+            v-model="form.email"
+            label="Email"
+            type="email"
+            placeholder="user@eduhub.uz"
+            icon="solar:letter-linear"
+          />
+        </div>
 
-          <div v-if="!isEditing">
-            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Parol *</label>
-            <input
-              v-model="form.password"
-              required
-              type="password"
-              minlength="6"
-              placeholder="Kamida 6 ta belgi"
-              class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm"
-            />
-          </div>
+        <div v-if="!isEditing">
+          <FormInput
+            v-model="form.password"
+            label="Parol"
+            type="password"
+            required
+            placeholder="Kamida 6 ta belgi"
+            icon="solar:lock-password-linear"
+          />
+        </div>
+        <div v-else>
+          <FormInput
+            v-model="form.password"
+            label="Yangi Parol (ixtiyoriy)"
+            type="password"
+            placeholder="O'zgartirish uchun yangi parol kiriting"
+            icon="solar:lock-password-linear"
+          />
+        </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Tizimdagi Roli *</label>
-              <select
-                v-model="form.role"
-                required
-                class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm"
-              >
-                <option value="ADMIN">Administrator</option>
-                <option value="TEACHER">O'qituvchi</option>
-                <option value="RECEPTIONIST">Qabulxona (Reception)</option>
-                <option value="ACCOUNTANT">Buxgalter</option>
-                <option value="STUDENT">Talaba</option>
-                <option value="SUPER_ADMIN">Super Admin</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Asosiy Filial</label>
-              <select
-                v-model="form.branchId"
-                class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm"
-              >
-                <option value="">Barcha filiallar</option>
-                <option v-for="b in branches" :key="b.id" :value="b.id">{{ b.name }}</option>
-              </select>
-            </div>
-          </div>
+        <div class="grid grid-cols-2 gap-3">
+          <FormSelect
+            v-model="form.role"
+            label="Tizimdagi Roli"
+            required
+            :options="[
+              { value: 'SUPER_ADMIN', label: 'Super Admin' },
+              { value: 'ADMIN', label: 'Administrator' },
+              { value: 'TEACHER', label: 'O\'qituvchi' },
+              { value: 'RECEPTIONIST', label: 'Qabulxona (Reception)' },
+              { value: 'ACCOUNTANT', label: 'Buxgalter' },
+              { value: 'STUDENT', label: 'Talaba' }
+            ]"
+          />
 
-          <div class="pt-4 border-t dark:border-gray-700 flex justify-end gap-3">
-            <button
-              type="button"
-              @click="closeModal"
-              class="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              Bekor qilish
-            </button>
-            <button
-              type="submit"
-              :disabled="saving"
-              class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition disabled:opacity-50"
-            >
-              {{ saving ? "Saqlanmoqda..." : "Saqlash" }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          <FormSelect
+            v-model="form.branchId"
+            label="Filial"
+            :options="branchOptions"
+          />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t dark:border-gray-700">
+          <button
+            type="button"
+            @click="showModal = false"
+            class="px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition cursor-pointer"
+          >
+            Bekor qilish
+          </button>
+          <button
+            type="submit"
+            :disabled="saving"
+            class="px-5 py-2 text-xs font-semibold bg-primary hover:bg-primary/90 text-white rounded-md shadow-sm transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+          >
+            <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-sm" />
+            <span>{{ saving ? 'Saqlanmoqda...' : 'Saqlash' }}</span>
+          </button>
+        </div>
+      </form>
+    </vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
 import Breadcrumb from "@/components/Breadcrumb.vue";
-import { usersApi, branchesApi } from "@/api/services";
-import api from "@/api/client";
+import StatsCard from "@/components/StatsCard.vue";
+import DataTable from "@/components/DataTable.vue";
+import Badge from "@/components/Badge.vue";
+import Alert from "@/components/Alert.vue";
+import vmodal from "@/components/modal.vue";
+import FormInput from "@/components/FormInput.vue";
+import FormSelect from "@/components/FormSelect.vue";
+import { usersApi, branchesApi, rolesApi } from "@/api/services";
 
 export default {
   name: "UsersList",
-  components: { Icon, Breadcrumb },
+  components: {
+    Icon,
+    Breadcrumb,
+    StatsCard,
+    DataTable,
+    Badge,
+    Alert,
+    vmodal,
+    FormInput,
+    FormSelect,
+  },
   data() {
     return {
       users: [],
       branches: [],
-      loading: true,
+      roles: [],
+      loading: false,
       saving: false,
-      searchQuery: "",
       selectedRole: "",
       selectedStatus: "",
+      alertMessage: "",
+      alertType: "success",
       showModal: false,
       isEditing: false,
       currentUserId: null,
+      columns: [
+        { key: "user", label: "Foydalanuvchi" },
+        { key: "role", label: "Roli" },
+        { key: "branch", label: "Filial" },
+        { key: "status", label: "Holat" },
+      ],
       form: {
         firstName: "",
         lastName: "",
@@ -335,18 +334,21 @@ export default {
     activeCount() {
       return this.users.filter((u) => u.isActive !== false).length;
     },
+    branchOptions() {
+      const opts = [{ value: "", label: "Barcha filiallar (Umumiy)" }];
+      this.branches.forEach((b) => {
+        opts.push({ value: b.id, label: b.name });
+      });
+      return opts;
+    },
     filteredUsers() {
-      return this.users.filter((u) => {
-        const matchesQuery =
-          !this.searchQuery ||
-          `${u.firstName} ${u.lastName} ${u.phone} ${u.email}`
-            .toLowerCase()
-            .includes(this.searchQuery.toLowerCase());
-        const matchesRole = !this.selectedRole || u.role === this.selectedRole;
+      return this.users.filter((user) => {
+        const matchesRole = !this.selectedRole || user.role === this.selectedRole;
         const matchesStatus =
           !this.selectedStatus ||
-          (this.selectedStatus === "active" ? u.isActive !== false : u.isActive === false);
-        return matchesQuery && matchesRole && matchesStatus;
+          (this.selectedStatus === "active" && user.isActive !== false) ||
+          (this.selectedStatus === "inactive" && user.isActive === false);
+        return matchesRole && matchesStatus;
       });
     },
   },
@@ -357,18 +359,27 @@ export default {
     async fetchData() {
       this.loading = true;
       try {
-        const [usersRes, branchesRes] = await Promise.allSettled([
+        const [usersRes, branchesRes, rolesRes] = await Promise.allSettled([
           usersApi.getAll(),
           branchesApi.getAll(),
+          rolesApi.getAll(),
         ]);
         if (usersRes.status === "fulfilled") {
-          this.users = Array.isArray(usersRes.value) ? usersRes.value : (usersRes.value?.items || []);
+          const val = usersRes.value;
+          this.users = Array.isArray(val) ? val : (val?.data || val?.items || []);
         }
         if (branchesRes.status === "fulfilled") {
-          this.branches = Array.isArray(branchesRes.value) ? branchesRes.value : (branchesRes.value?.items || []);
+          const val = branchesRes.value;
+          this.branches = Array.isArray(val) ? val : (val?.data || val?.items || []);
+        }
+        if (rolesRes.status === "fulfilled") {
+          const val = rolesRes.value;
+          this.roles = Array.isArray(val) ? val : (val?.data || val?.items || []);
         }
       } catch (err) {
-        console.error("Error loading users:", err);
+        console.error("Foydalanuvchilarni yuklashda xatolik:", err);
+        this.alertType = "danger";
+        this.alertMessage = "Foydalanuvchilarni yuklashda xatolik yuz berdi.";
       } finally {
         this.loading = false;
       }
@@ -376,7 +387,7 @@ export default {
     formatRole(role) {
       const map = {
         SUPER_ADMIN: "Super Admin",
-        ADMIN: "Admin",
+        ADMIN: "Administrator",
         TEACHER: "O'qituvchi",
         RECEPTIONIST: "Qabulxona",
         ACCOUNTANT: "Buxgalter",
@@ -384,16 +395,28 @@ export default {
       };
       return map[role] || role;
     },
-    getRoleBadgeClass(role) {
-      const map = {
-        SUPER_ADMIN: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-        ADMIN: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-        TEACHER: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
-        RECEPTIONIST: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-        ACCOUNTANT: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
-        STUDENT: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
-      };
-      return map[role] || "bg-gray-100 text-gray-800";
+    getRoleBadgeVariant(role) {
+      switch (role) {
+        case "SUPER_ADMIN":
+          return "purple";
+        case "ADMIN":
+          return "primary";
+        case "TEACHER":
+          return "success";
+        case "RECEPTIONIST":
+          return "warning";
+        case "ACCOUNTANT":
+          return "info";
+        default:
+          return "gray";
+      }
+    },
+    getBranchName(row) {
+      if (row.branch?.name) return row.branch.name;
+      if (row.userBranches && row.userBranches.length > 0) {
+        return row.userBranches[0].branch?.name || "Filial";
+      }
+      return "Umumiy";
     },
     openCreateModal() {
       this.isEditing = false;
@@ -401,7 +424,7 @@ export default {
       this.form = {
         firstName: "",
         lastName: "",
-        phone: "",
+        phone: "+998",
         email: "",
         password: "",
         role: "TEACHER",
@@ -423,50 +446,44 @@ export default {
       };
       this.showModal = true;
     },
-    closeModal() {
-      this.showModal = false;
-    },
     async saveUser() {
+      if (!this.form.firstName || !this.form.lastName || !this.form.phone) {
+        this.alertType = "danger";
+        this.alertMessage = "Iltimos, ism, familiya va telefon raqamini kiriting!";
+        return;
+      }
       this.saving = true;
       try {
         if (this.isEditing) {
-          const updateData = {
-            firstName: this.form.firstName,
-            lastName: this.form.lastName,
-            phone: this.form.phone,
-            email: this.form.email,
-            role: this.form.role,
-          };
-          await usersApi.update(this.currentUserId, updateData);
+          const payload = { ...this.form };
+          if (!payload.password) delete payload.password;
+          await usersApi.update(this.currentUserId, payload);
+          this.alertType = "success";
+          this.alertMessage = "Foydalanuvchi ma'lumotlari muvaffaqiyatli yangilandi!";
         } else {
           await usersApi.create(this.form);
+          this.alertType = "success";
+          this.alertMessage = "Yangi foydalanuvchi muvaffaqiyatli yaratildi!";
         }
-        this.$toast.success(this.isEditing ? "Foydalanuvchi ma'lumotlari yangilandi!" : "Yangi foydalanuvchi qo'shildi!");
-        this.closeModal();
+        this.showModal = false;
         await this.fetchData();
       } catch (err) {
-        this.$toast.error(err.response?.data?.message || "Foydalanuvchini saqlashda xatolik yuz berdi");
+        this.alertType = "danger";
+        this.alertMessage = "Xatolik: " + (err.response?.data?.message || err.message);
       } finally {
         this.saving = false;
       }
     },
-    async unlockUser(user) {
-      try {
-        await api.post("/auth/unlock", { identifier: user.id });
-        this.$toast.success(`${user.firstName} ${user.lastName} muvaffaqiyatli blokdan chiqarildi!`);
-        await this.fetchData();
-      } catch (err) {
-        this.$toast.error(err.response?.data?.message || "Blokdan chiqarishda xatolik");
-      }
-    },
     async deleteUser(user) {
-      if (!confirm(`${user.firstName} ${user.lastName} foydalanuvchisini o'chirishni tasdiqlaysizmi?`)) return;
+      if (!confirm(`${user.firstName} ${user.lastName} akkauntini o'chirmoqchimisiz?`)) return;
       try {
         await usersApi.delete(user.id);
-        this.$toast.success("Foydalanuvchi o'chirildi");
+        this.alertType = "success";
+        this.alertMessage = "Foydalanuvchi muvaffaqiyatli o'chirildi!";
         await this.fetchData();
       } catch (err) {
-        this.$toast.error(err.response?.data?.message || "O'chirishda xatolik");
+        this.alertType = "danger";
+        this.alertMessage = "O'chirishda xatolik: " + (err.response?.data?.message || err.message);
       }
     },
   },

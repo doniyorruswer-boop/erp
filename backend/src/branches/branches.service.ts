@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { AuditAction } from '@prisma/client';
 import { BranchContext } from '../auth/branch-access';
 
@@ -9,6 +10,7 @@ export class BranchesService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
+    @Optional() private subscriptionsService?: SubscriptionsService,
   ) {}
 
   async findAll(params: { orgId: string; search?: string }, branchCtx?: BranchContext) {
@@ -78,6 +80,10 @@ export class BranchesService {
     phone?: string;
     address?: string;
   }, orgId: string, userId?: string) {
+    if (this.subscriptionsService) {
+      await this.subscriptionsService.checkLimit('MAX_BRANCHES', 1, orgId);
+    }
+
     const branch = await this.prisma.branch.create({
       data: {
         organizationId: orgId,

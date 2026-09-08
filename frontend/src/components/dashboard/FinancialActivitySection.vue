@@ -315,15 +315,17 @@
       </div>
     </div>
 
-    <!-- FULL MODAL WINDOW: Barcha Moliyaviy Faollik Ro'yxati using Reusable AppModal -->
-    <AppModal
-      v-model="isModalOpen"
+    <!-- FULL MODAL WINDOW: Barcha Moliyaviy Faollik Ro'yxati using Windzo vmodal -->
+    <vmodal
+      :model-value="isModalOpen"
+      @update:model-value="isModalOpen = $event"
       title="Moliyaviy Faollik — To'liq Ro'yxat"
       subtitle="Barcha qarzdorlar, sinflar va qabul qilingan to'lovlar reestri"
       icon="solar:bill-list-bold"
       icon-bg-class="bg-primary/10 text-primary"
-      max-width="max-w-4xl"
+      width="max-w-4xl"
       body-class="p-0"
+      :hide-button="true"
     >
       <!-- Modal Search & Filter Bar -->
       <div class="p-4 border-b dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between flex-wrap gap-3">
@@ -454,13 +456,13 @@
           Yopish
         </button>
       </template>
-    </AppModal>
+    </vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import AppModal from "@/components/AppModal.vue";
+import vmodal from "@/components/modal.vue";
 import FilterSelect from "@/components/FilterSelect.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import { dashboardApi, paymentsApi, studentsApi } from "@/api";
@@ -469,7 +471,7 @@ export default {
   name: "FinancialActivitySection",
   components: {
     Icon,
-    AppModal,
+    vmodal,
     FilterSelect,
     EmptyState,
   },

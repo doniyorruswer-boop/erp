@@ -33,7 +33,10 @@ export class ModuleGuard implements CanActivate {
       return true;
     }
 
-    const orgId = user.organizationId;
+    const orgId =
+      (request.headers['x-organization-id'] as string) ||
+      (request.headers['x-tenant-id'] as string) ||
+      user.organizationId;
     if (!orgId) {
       throw new ForbiddenException('Tashkilot aniqlanmadi');
     }

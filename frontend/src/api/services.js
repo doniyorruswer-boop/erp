@@ -25,6 +25,10 @@ export const dashboardApi = {
     return api.get(`/dashboard/stats${query ? '?' + query : ''}`);
   },
   getWidgets: (role) => api.get(`/dashboard/widgets${role ? '?role=' + role : ''}`),
+  getPaymentStats: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return api.get(`/dashboard/payment-stats${query ? '?' + query : ''}`);
+  },
 };
 
 export const studentsApi = {
@@ -60,6 +64,7 @@ export const groupsApi = {
   restore: (id) => api.post(`/groups/${id}/restore`),
   addStudent: (groupId, studentId) => api.post(`/groups/${groupId}/students`, { studentId }),
   removeStudent: (groupId, studentId) => api.delete(`/groups/${groupId}/students/${studentId}`),
+  generateLessons: (groupId, options = {}) => api.post(`/groups/${groupId}/generate-lessons`, options),
 };
 
 export const attendanceApi = {

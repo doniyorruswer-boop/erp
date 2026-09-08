@@ -101,6 +101,7 @@ export class GroupsService {
     startTime: string;
     endTime: string;
     startDate?: string;
+    endDate?: string;
   }, orgId: string, userId?: string, branchCtx?: BranchContext) {
     let targetBranchId = data.branchId;
     if (branchCtx) {
@@ -153,6 +154,7 @@ export class GroupsService {
         startTime: data.startTime,
         endTime: data.endTime,
         startDate: data.startDate ? new Date(data.startDate) : null,
+        endDate: data.endDate ? new Date(data.endDate) : null,
         status: GroupStatus.PLANNING,
       },
       include: {
@@ -222,8 +224,18 @@ export class GroupsService {
       data: {
         ...updateFields,
         startDate: updateFields.startDate ? new Date(updateFields.startDate) : undefined,
+        endDate: updateFields.endDate ? new Date(updateFields.endDate) : undefined,
       },
     });
+
+    // When group transitions to ACTIVE for the first time, auto-generate lessons
+    if (updateFields.status === GroupStatus.ACTIVE && group.status !== GroupStatus.ACTIVE) {
+      try {
+        await this.generateLessonsForGroup(id, orgId, userId, branchCtx);
+      } catch (err) {
+        // Safe fail: do not interrupt status update
+      }
+    }
 
     await this.auditService.log({
       organizationId: orgId,
@@ -556,4 +568,193 @@ export class GroupsService {
       };
     });
   }
+
+  async generateLessonsForGroup(
+    groupId: string,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext,
+    options?: { startDate?: string; endDate?: string; count?: number },
+  ) {
+    const branchFilter = branchCtx ? buildBranchWhere(branchCtx) : {};
+    const group = await this.prisma.group.findFirst({
+      where: { id: groupId, organizationId: orgId, deletedAt: null, ...branchFilter },
+      include: {
+        course: true,
+        room: true,
+        lessons: {
+          where: { deletedAt: null },
+          select: { id: true, date: true, title: true },
+          orderBy: { date: 'asc' },
+        },
+      },
+    });
+
+    if (!group) {
+      throw new NotFoundException("Guruh topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    }
+
+    // Determine target days of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    let targetDays: number[] = [];
+    switch (group.days) {
+      case LessonDays.ODD_DAYS:
+        // Dushanba, Chorshanba, Juma
+        targetDays = [1, 3, 5];
+        break;
+      case LessonDays.EVEN_DAYS:
+        // Seshanba, Payshanba, Shanba
+        targetDays = [2, 4, 6];
+        break;
+      case LessonDays.EVERYDAY:
+        // Dushanba - Shanba
+        targetDays = [1, 2, 3, 4, 5, 6];
+        break;
+      case LessonDays.WEEKEND:
+        // Shanba, Yakshanba
+        targetDays = [6, 0];
+        break;
+      case LessonDays.CUSTOM:
+      default:
+        targetDays = [1, 3, 5];
+        break;
+    }
+
+    // Helper for timezone-independent date parsing
+    const parseDateOnly = (val: string | Date): Date => {
+      if (typeof val === 'string') {
+        const match = val.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (match) {
+          return new Date(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10), 0, 0, 0, 0);
+        }
+        return new Date(val);
+      }
+      if (val instanceof Date) {
+        const iso = val.toISOString();
+        const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (match) {
+          return new Date(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10), 0, 0, 0, 0);
+        }
+        return new Date(val.getFullYear(), val.getMonth(), val.getDate(), 0, 0, 0, 0);
+      }
+      return new Date();
+    };
+
+    // Start date resolution
+    const rawStartDate = options?.startDate || group.startDate || group.createdAt || new Date();
+    const startDate = parseDateOnly(rawStartDate);
+    startDate.setHours(0, 0, 0, 0);
+
+    // End date resolution
+    const rawEndDate = options?.endDate || group.endDate;
+    let endDate: Date | null = null;
+    if (rawEndDate) {
+      endDate = parseDateOnly(rawEndDate);
+      endDate.setHours(23, 59, 59, 999);
+    }
+
+    // Maximum lesson count (if endDate is not provided)
+    const targetLessonCount = options?.count && options.count > 0
+      ? options.count
+      : (group.course?.lessonCount && group.course.lessonCount > 0
+          ? group.course.lessonCount
+          : (group.course?.duration && group.course.duration > 0 ? group.course.duration * 12 : 12));
+
+    // Parse start time (HH:mm)
+    let startHours = 9;
+    let startMinutes = 0;
+    if (group.startTime) {
+      const parts = group.startTime.split(':');
+      if (parts.length >= 2) {
+        startHours = parseInt(parts[0], 10) || 0;
+        startMinutes = parseInt(parts[1], 10) || 0;
+      }
+    }
+
+    // Existing lessons for idempotency check (keyed by YYYY-MM-DD)
+    const existingDateKeys = new Set(
+      group.lessons.map((l) => {
+        const d = new Date(l.date);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      }),
+    );
+
+    const candidateDates: Date[] = [];
+    const currentDate = new Date(startDate);
+    let dayCount = 0;
+    const maxDays = 366; // Prevent infinite loop safety ceiling
+
+    while (dayCount < maxDays) {
+      if (endDate && currentDate > endDate) {
+        break;
+      }
+      if (!endDate && (candidateDates.length + group.lessons.length) >= targetLessonCount) {
+        break;
+      }
+
+      const dayOfWeek = currentDate.getDay();
+      if (targetDays.includes(dayOfWeek)) {
+        const dateKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+        
+        // Idempotent: only add if no lesson exists for this day
+        if (!existingDateKeys.has(dateKey)) {
+          const lessonDate = new Date(currentDate);
+          lessonDate.setHours(startHours, startMinutes, 0, 0);
+          candidateDates.push(lessonDate);
+        }
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1);
+      dayCount++;
+    }
+
+    if (candidateDates.length === 0) {
+      return {
+        message: 'Yangi generatsiya qilinadigan darslar mavjud emas (barcha darslar allaqachon yaratilgan)',
+        createdCount: 0,
+        totalLessons: group.lessons.length,
+        lessons: [],
+      };
+    }
+
+    let lessonNum = group.lessons.length + 1;
+    const lessonsData = candidateDates.map((date) => ({
+      groupId: group.id,
+      title: `${lessonNum++}-dars`,
+      date,
+      resourceId: group.roomId || null,
+    }));
+
+    const createdLessons = await this.prisma.$transaction(
+      lessonsData.map((data) =>
+        this.prisma.lesson.create({
+          data,
+          include: {
+            group: { select: { id: true, name: true } },
+          },
+        }),
+      ),
+    );
+
+    await this.auditService.log({
+      organizationId: orgId,
+      branchId: group.branchId || undefined,
+      userId,
+      action: AuditAction.CREATE,
+      entityType: 'Lesson',
+      entityId: group.id,
+      after: {
+        groupId: group.id,
+        createdCount: createdLessons.length,
+        totalLessons: group.lessons.length + createdLessons.length,
+      },
+    });
+
+    return {
+      message: `${createdLessons.length} ta dars muvaffaqiyatli generatsiya qilindi`,
+      createdCount: createdLessons.length,
+      totalLessons: group.lessons.length + createdLessons.length,
+      lessons: createdLessons,
+    };
+  }
 }
+
