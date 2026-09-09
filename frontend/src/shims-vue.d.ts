@@ -18,3 +18,18 @@ declare module "@/config/brand.config" {
   const BRAND_CONFIG: BrandConfig;
   export default BRAND_CONFIG;
 }
+
+declare module "@/store/tenant" {
+  export interface TenantStoreState {
+    businessType: string;
+    terminology: Record<string, string>;
+    enabledModules: string[];
+    [key: string]: unknown;
+  }
+  export function useTenantStore(): {
+    businessType: string;
+    terminology: Record<string, string>;
+    enabledModules: string[];
+    [key: string]: unknown;
+  };
+}

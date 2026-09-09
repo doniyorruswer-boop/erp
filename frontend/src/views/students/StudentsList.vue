@@ -1,6 +1,6 @@
 <script setup>
 import { Icon } from "@iconify/vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
 
 import Alert from "@/components/Alert.vue";
@@ -14,9 +14,11 @@ import StudentPaymentModal from "@/components/students/StudentPaymentModal.vue";
 import StudentStatsCards from "@/components/students/StudentStatsCards.vue";
 import StudentWizardModal from "@/components/students/StudentWizardModal.vue";
 import { useStudents } from "@/composables/useStudents";
+import { useTerminology } from "@/composables/useTerminology";
 import { usePermission } from "@/core/security";
 
 const { hasPermission } = usePermission();
+const { term, termLower } = useTerminology();
 
 const {
   loading,
@@ -39,14 +41,14 @@ const studentWizard = ref(null);
 const paymentModal = ref(null);
 const confirmDeleteModal = ref(null);
 
-const columns = [
-  { key: "firstName", label: "O'quvchi", sortable: true },
+const columns = computed(() => [
+  { key: "firstName", label: term("client", "singular"), sortable: true },
   { key: "phone", label: "Telefon", sortable: false },
   { key: "parentName", label: "Ota-onasi", sortable: false },
-  { key: "enrollments", label: "Guruhlar", sortable: false },
+  { key: "enrollments", label: term("group", "plural"), sortable: false },
   { key: "balance", label: "Balans", sortable: true },
   { key: "status", label: "Holat", sortable: true },
-];
+]);
 
 const formatUZS = (val) => {
   if (val === undefined || val === null) return "0 so'm";
@@ -73,7 +75,7 @@ const handlePaymentSaved = async () => {
 <template>
   <div class="students-page p-4 font-lexend">
     <!-- Breadcrumb -->
-    <Breadcrumb :items="[{ title: 'O\'quvchilar' }]" />
+    <Breadcrumb :items="[{ title: term('client', 'plural') }]" />
 
     <!-- Header Section -->
     <StudentFilterBar v-model:status-filter="statusFilter" @open-wizard="studentWizard?.open()" />
@@ -214,8 +216,8 @@ const handlePaymentSaved = async () => {
     <!-- Confirm Delete Modal -->
     <ConfirmModal
       ref="confirmDeleteModal"
-      title="O'quvchini o'chirish"
-      :message="`Haqiqatan ham ${studentToDelete?.firstName} ${studentToDelete?.lastName} o'quvchini o'chirmoqchimisiz?`"
+      :title="`${term('client', 'singular')}ni o'chirish`"
+      :message="`Haqiqatan ham ${studentToDelete?.firstName} ${studentToDelete?.lastName} ${termLower('client', 'singular')}ni o'chirmoqchimisiz?`"
       confirm-text="Ha, o'chirish"
       @confirm="executeDeleteStudent"
     />

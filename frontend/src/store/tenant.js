@@ -1,20 +1,24 @@
 import { defineStore } from "pinia";
+
 import { setupApi } from "@/api/services";
-import { setPrimaryColor } from "@/helper/theme";
 import BRAND_CONFIG from "@/config/brand.config";
+import { THEME_COLORS } from "@/constants/colors.constants";
+import { STORAGE_KEYS } from "@/constants/storage.constants";
+import { setPrimaryColor } from "@/helper/theme";
+import { safeJsonParse } from "@/utils/storage";
 
 export const useTenantStore = defineStore("tenant", {
   state: () => ({
-    isSetupCompleted: localStorage.getItem("isSetupCompleted") === "true",
-    businessType: localStorage.getItem("businessType") || "COURSE_CENTER",
-    organization: JSON.parse(localStorage.getItem("organization") || "null") || {
+    isSetupCompleted: localStorage.getItem(STORAGE_KEYS.IS_SETUP_COMPLETED) === "true",
+    businessType: localStorage.getItem(STORAGE_KEYS.BUSINESS_TYPE) || "COURSE_CENTER",
+    organization: safeJsonParse(localStorage.getItem(STORAGE_KEYS.ORGANIZATION), {
       name: `${BRAND_CONFIG.name} Markazi`,
       slug: "main",
-      primaryColor: "#4F46E5",
+      primaryColor: THEME_COLORS.PRIMARY,
       currency: "UZS",
-    },
-    organizations: JSON.parse(localStorage.getItem("organizations") || "[]"),
-    enabledModules: JSON.parse(localStorage.getItem("enabledModules") || "null") || [
+    }),
+    organizations: safeJsonParse(localStorage.getItem(STORAGE_KEYS.ORGANIZATIONS), []),
+    enabledModules: safeJsonParse(localStorage.getItem(STORAGE_KEYS.ENABLED_MODULES), [
       "LEADS",
       "STUDENTS",
       "GROUPS",
@@ -24,7 +28,7 @@ export const useTenantStore = defineStore("tenant", {
       "SMS",
       "PAYMENTS",
       "CONTRACTS",
-    ],
+    ]),
     features: {
       gradingSystem: false,
       canteenService: false,
@@ -32,12 +36,12 @@ export const useTenantStore = defineStore("tenant", {
       contracts: true,
       trialLessons: true,
     },
-    terminology: {
+    terminology: safeJsonParse(localStorage.getItem(STORAGE_KEYS.TERMINOLOGY), {
       studentLabel: "O'quvchi",
       teacherLabel: "O'qituvchi",
       groupLabel: "Guruh",
       courseLabel: "Kurs",
-    },
+    }),
     integrations: {},
     loading: false,
   }),
@@ -84,7 +88,7 @@ export const useTenantStore = defineStore("tenant", {
         const res = await setupApi.getOrganizations();
         if (Array.isArray(res)) {
           this.organizations = res;
-          localStorage.setItem("organizations", JSON.stringify(res));
+          localStorage.setItem(STORAGE_KEYS.ORGANIZATIONS, JSON.stringify(res));
         }
       } catch (err) {
         console.warn("Tashkilotlarni yuklashda xatolik:", err.message);
@@ -101,12 +105,12 @@ export const useTenantStore = defineStore("tenant", {
 
         if (orgsRes.status === "fulfilled" && Array.isArray(orgsRes.value)) {
           this.organizations = orgsRes.value;
-          localStorage.setItem("organizations", JSON.stringify(orgsRes.value));
+          localStorage.setItem(STORAGE_KEYS.ORGANIZATIONS, JSON.stringify(orgsRes.value));
         }
 
         // Check if user already explicitly selected a businessType / organization in localStorage
-        const savedBusinessType = localStorage.getItem("businessType");
-        const savedOrg = JSON.parse(localStorage.getItem("organization") || "null");
+        const savedBusinessType = localStorage.getItem(STORAGE_KEYS.BUSINESS_TYPE);
+        const savedOrg = safeJsonParse(localStorage.getItem(STORAGE_KEYS.ORGANIZATION), null);
 
         if (statusRes.status === "fulfilled" && statusRes.value) {
           const res = statusRes.value;
@@ -142,10 +146,11 @@ export const useTenantStore = defineStore("tenant", {
             this.integrations = res.integrations;
           }
 
-          localStorage.setItem("isSetupCompleted", String(this.isSetupCompleted));
-          localStorage.setItem("businessType", this.businessType);
-          localStorage.setItem("organization", JSON.stringify(this.organization));
-          localStorage.setItem("enabledModules", JSON.stringify(this.enabledModules));
+          localStorage.setItem(STORAGE_KEYS.IS_SETUP_COMPLETED, String(this.isSetupCompleted));
+          localStorage.setItem(STORAGE_KEYS.BUSINESS_TYPE, this.businessType);
+          localStorage.setItem(STORAGE_KEYS.ORGANIZATION, JSON.stringify(this.organization));
+          localStorage.setItem(STORAGE_KEYS.ENABLED_MODULES, JSON.stringify(this.enabledModules));
+          localStorage.setItem(STORAGE_KEYS.TERMINOLOGY, JSON.stringify(this.terminology));
         }
       } catch (err) {
         console.warn("Tenant konfiguratsiyasini yuklashda xatolik:", err.message);
@@ -164,8 +169,8 @@ export const useTenantStore = defineStore("tenant", {
           if (matched.primaryColor) {
             setPrimaryColor(matched.primaryColor);
           }
-          localStorage.setItem("businessType", this.businessType);
-          localStorage.setItem("organization", JSON.stringify(this.organization));
+          localStorage.setItem(STORAGE_KEYS.BUSINESS_TYPE, this.businessType);
+          localStorage.setItem(STORAGE_KEYS.ORGANIZATION, JSON.stringify(this.organization));
         }
 
         const res = await setupApi.switchOrganization(orgId).catch(() => null);
@@ -181,9 +186,10 @@ export const useTenantStore = defineStore("tenant", {
             setPrimaryColor(res.organization.primaryColor);
           }
 
-          localStorage.setItem("businessType", this.businessType);
-          localStorage.setItem("organization", JSON.stringify(this.organization));
-          localStorage.setItem("enabledModules", JSON.stringify(this.enabledModules));
+          localStorage.setItem(STORAGE_KEYS.BUSINESS_TYPE, this.businessType);
+          localStorage.setItem(STORAGE_KEYS.ORGANIZATION, JSON.stringify(this.organization));
+          localStorage.setItem(STORAGE_KEYS.ENABLED_MODULES, JSON.stringify(this.enabledModules));
+          localStorage.setItem(STORAGE_KEYS.TERMINOLOGY, JSON.stringify(this.terminology));
 
           return res;
         }
@@ -201,7 +207,7 @@ export const useTenantStore = defineStore("tenant", {
         const res = await setupApi.initialize(setupData);
         if (res && res.success) {
           if (res.accessToken) {
-            localStorage.setItem("token", res.accessToken);
+            localStorage.setItem(STORAGE_KEYS.TOKEN, res.accessToken);
           }
           this.isSetupCompleted = true;
           this.businessType = setupData.businessType;
@@ -215,10 +221,10 @@ export const useTenantStore = defineStore("tenant", {
             setPrimaryColor(setupData.primaryColor);
           }
 
-          localStorage.setItem("isSetupCompleted", "true");
-          localStorage.setItem("businessType", this.businessType);
-          localStorage.setItem("organization", JSON.stringify(this.organization));
-          localStorage.setItem("enabledModules", JSON.stringify(this.enabledModules));
+          localStorage.setItem(STORAGE_KEYS.IS_SETUP_COMPLETED, "true");
+          localStorage.setItem(STORAGE_KEYS.BUSINESS_TYPE, this.businessType);
+          localStorage.setItem(STORAGE_KEYS.ORGANIZATION, JSON.stringify(this.organization));
+          localStorage.setItem(STORAGE_KEYS.ENABLED_MODULES, JSON.stringify(this.enabledModules));
 
           await this.fetchOrganizations();
           return res;
@@ -256,7 +262,7 @@ export const useTenantStore = defineStore("tenant", {
           courseLabel: "Kurs",
         };
       }
+      localStorage.setItem(STORAGE_KEYS.TERMINOLOGY, JSON.stringify(this.terminology));
     },
   },
 });
-
