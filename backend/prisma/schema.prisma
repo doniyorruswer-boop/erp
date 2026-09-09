@@ -85,6 +85,19 @@ enum RecurrenceType {
   CUSTOM
 }
 
+enum ScheduleKind {
+  GROUP_CLASS
+  APPOINTMENT
+}
+
+enum ScheduleStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
 enum InvoiceStatus {
   DRAFT
   ISSUED
@@ -926,6 +939,9 @@ model Schedule {
   student        Student?       @relation(fields: [studentId], references: [id], onDelete: SetNull)
   recurrence     RecurrenceType @default(NONE)
   recurrenceRule Json?
+  kind           ScheduleKind   @default(GROUP_CLASS)
+  status         ScheduleStatus @default(SCHEDULED)
+  cancelReason   String?
   customFields   Json?
   deletedAt      DateTime?
   createdAt      DateTime       @default(now())

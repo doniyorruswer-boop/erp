@@ -1,15 +1,34 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AuditService } from '../../audit/audit.service';
-import { AuditAction, RecurrenceType } from '@prisma/client';
-import { CreateScheduleDto, UpdateScheduleDto, QueryScheduleDto, CheckConflictDto } from '../dto/schedule.dto';
-import { BranchContext, buildBranchWhere, assertBranchAccess } from '../../auth/branch-access';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { AuditService } from "../../audit/audit.service";
+import {
+  AuditAction,
+  RecurrenceType,
+  Schedule,
+  ScheduleKind,
+  ScheduleStatus,
+} from "@prisma/client";
+import {
+  CreateScheduleDto,
+  UpdateScheduleDto,
+  QueryScheduleDto,
+  CheckConflictDto,
+  CancelScheduleDto,
+  RescheduleDto,
+} from "../dto/schedule.dto";
+import { BranchContext, buildBranchWhere, assertBranchAccess } from "../../auth/branch-access";
 
 @Injectable()
 export class ScheduleService {
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
   async detectConflicts(params: CheckConflictDto & { orgId: string }, branchCtx?: BranchContext) {
@@ -17,11 +36,14 @@ export class ScheduleService {
     const endAt = new Date(params.endAt);
     const excludeWhere = params.excludeScheduleId ? { id: { not: params.excludeScheduleId } } : {};
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
+    const activeStatusWhere = {
+      status: { not: ScheduleStatus.CANCELLED },
+    };
 
     const conflicts: Array<{
-      type: 'RESOURCE' | 'INSTRUCTOR';
+      type: "RESOURCE" | "INSTRUCTOR" | "WORKING_HOURS";
       message: string;
-      existingSchedule: any;
+      existingSchedule?: Schedule | null;
     }> = [];
 
     // 1. Check Resource overlap
@@ -33,6 +55,7 @@ export class ScheduleService {
           resourceId: params.resourceId,
           startAt: { lt: endAt },
           endAt: { gt: startAt },
+          ...activeStatusWhere,
           ...excludeWhere,
           ...branchWhere,
         },
@@ -45,7 +68,7 @@ export class ScheduleService {
 
       if (resourceConflict) {
         conflicts.push({
-          type: 'RESOURCE',
+          type: "RESOURCE",
           message: `Resurs "${resourceConflict.resource?.name}" ushbu vaqt oralig'ida (${resourceConflict.startAt.toLocaleTimeString()} - ${resourceConflict.endAt.toLocaleTimeString()}) band: "${resourceConflict.title}"`,
           existingSchedule: resourceConflict,
         });
@@ -61,6 +84,7 @@ export class ScheduleService {
           instructorId: params.instructorId,
           startAt: { lt: endAt },
           endAt: { gt: startAt },
+          ...activeStatusWhere,
           ...excludeWhere,
           ...branchWhere,
         },
@@ -73,10 +97,46 @@ export class ScheduleService {
 
       if (instructorConflict) {
         conflicts.push({
-          type: 'INSTRUCTOR',
-          message: `O'qituvchi "${instructorConflict.instructor?.firstName} ${instructorConflict.instructor?.lastName}" ushbu vaqt oralig'ida band: "${instructorConflict.title}"`,
+          type: "INSTRUCTOR",
+          message: `Mutaxassis "${instructorConflict.instructor?.firstName} ${instructorConflict.instructor?.lastName}" ushbu vaqt oralig'ida band: "${instructorConflict.title}"`,
           existingSchedule: instructorConflict,
         });
+      }
+
+      // 3. Check Instructor Working Hours (policy validation)
+      const instructor = await this.prisma.user.findFirst({
+        where: { id: params.instructorId, organizationId: params.orgId, deletedAt: null },
+        select: { id: true, firstName: true, lastName: true, customFields: true },
+      });
+
+      if (instructor && instructor.customFields && typeof instructor.customFields === "object") {
+        const cf = instructor.customFields as Record<string, unknown>;
+        const wh = cf.workingHours as { start?: string; end?: string; days?: number[] } | undefined;
+        if (wh && wh.start && wh.end) {
+          const dayOfWeek = startAt.getDay();
+          if (Array.isArray(wh.days) && wh.days.length > 0 && !wh.days.includes(dayOfWeek)) {
+            conflicts.push({
+              type: "WORKING_HOURS",
+              message: `Mutaxassis "${instructor.firstName} ${instructor.lastName}" ushbu kunda ishlamaydi`,
+              existingSchedule: null,
+            });
+          } else {
+            const [sh, sm] = wh.start.split(":").map(Number);
+            const [eh, em] = wh.end.split(":").map(Number);
+            const startMinutes = startAt.getHours() * 60 + startAt.getMinutes();
+            const endMinutes = endAt.getHours() * 60 + endAt.getMinutes();
+            const whStartMin = sh * 60 + sm;
+            const whEndMin = eh * 60 + em;
+
+            if (startMinutes < whStartMin || endMinutes > whEndMin) {
+              conflicts.push({
+                type: "WORKING_HOURS",
+                message: `Mutaxassis "${instructor.firstName} ${instructor.lastName}" ish vaqtidan tashqarida (${wh.start} - ${wh.end})`,
+                existingSchedule: null,
+              });
+            }
+          }
+        }
       }
     }
 
@@ -89,13 +149,17 @@ export class ScheduleService {
   async findAll(params: QueryScheduleDto & { orgId: string }, branchCtx?: BranchContext) {
     const branchWhere = branchCtx
       ? buildBranchWhere(branchCtx, params.branchId)
-      : (params.branchId ? { branchId: params.branchId } : {});
+      : params.branchId
+        ? { branchId: params.branchId }
+        : {};
     const resourceWhere = params.resourceId ? { resourceId: params.resourceId } : {};
     const instructorWhere = params.instructorId ? { instructorId: params.instructorId } : {};
     const groupWhere = params.groupId ? { groupId: params.groupId } : {};
     const studentWhere = params.studentId ? { studentId: params.studentId } : {};
+    const kindWhere = params.kind ? { kind: params.kind } : {};
+    const statusWhere = params.status ? { status: params.status } : {};
 
-    const dateWhere: any = {};
+    const dateWhere: { endAt?: { gte: Date }; startAt?: { lte: Date } } = {};
     if (params.startDate) {
       dateWhere.endAt = { gte: new Date(params.startDate) };
     }
@@ -112,6 +176,8 @@ export class ScheduleService {
         ...instructorWhere,
         ...groupWhere,
         ...studentWhere,
+        ...kindWhere,
+        ...statusWhere,
         ...dateWhere,
       },
       include: {
@@ -129,7 +195,7 @@ export class ScheduleService {
           select: { id: true, name: true, code: true },
         },
       },
-      orderBy: { startAt: 'asc' },
+      orderBy: { startAt: "asc" },
     });
   }
 
@@ -155,7 +221,7 @@ export class ScheduleService {
         branch: true,
       },
     });
-    if (!schedule) throw new NotFoundException('Jadval yozuvi topilmadi');
+    if (!schedule) throw new NotFoundException("Jadval yozuvi topilmadi");
     return schedule;
   }
 
@@ -177,32 +243,37 @@ export class ScheduleService {
       resource = await this.prisma.resource.findFirst({
         where: { id: data.resourceId, organizationId: orgId, deletedAt: null },
       });
-      if (!resource) throw new BadRequestException('Resurs topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!resource)
+        throw new BadRequestException("Resurs topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     if (data.instructorId) {
       instructor = await this.prisma.user.findFirst({
         where: { id: data.instructorId, organizationId: orgId, deletedAt: null },
       });
-      if (!instructor) throw new BadRequestException('O\'qituvchi topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!instructor)
+        throw new BadRequestException("O'qituvchi topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     if (data.groupId) {
       group = await this.prisma.group.findFirst({
         where: { id: data.groupId, organizationId: orgId, deletedAt: null },
       });
-      if (!group) throw new BadRequestException('Guruh topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!group)
+        throw new BadRequestException("Guruh topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     if (data.studentId) {
       student = await this.prisma.student.findFirst({
         where: { id: data.studentId, organizationId: orgId, deletedAt: null },
       });
-      if (!student) throw new BadRequestException('O\'quvchi topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!student)
+        throw new BadRequestException("O'quvchi topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     // Resolve and assert branch access
-    let targetBranchId = data.branchId || group?.branchId || resource?.branchId || student?.branchId || undefined;
+    let targetBranchId =
+      data.branchId || group?.branchId || resource?.branchId || student?.branchId || undefined;
     if (branchCtx) {
       targetBranchId = assertBranchAccess(branchCtx, targetBranchId);
       data.branchId = targetBranchId;
@@ -221,22 +292,34 @@ export class ScheduleService {
 
     // Conflict Check
     if (!data.force) {
-      const conflictCheck = await this.detectConflicts({
-        startAt: data.startAt,
-        endAt: data.endAt,
-        resourceId: data.resourceId,
-        instructorId: data.instructorId,
-        orgId,
-      }, branchCtx);
+      const conflictCheck = await this.detectConflicts(
+        {
+          startAt: data.startAt,
+          endAt: data.endAt,
+          resourceId: data.resourceId,
+          instructorId: data.instructorId,
+          orgId,
+        },
+        branchCtx
+      );
 
       if (conflictCheck.hasConflict) {
-        const errorMessages = conflictCheck.conflicts.map((c) => c.message).join(' | ');
+        const errorMessages = conflictCheck.conflicts.map((c) => c.message).join(" | ");
         throw new ConflictException({
           message: `Jadvalda to'qnashuv (Conflict) aniqlandi: ${errorMessages}`,
           conflicts: conflictCheck.conflicts,
         });
       }
     }
+
+    const resolvedKind =
+      data.kind ||
+      (data.groupId
+        ? ScheduleKind.GROUP_CLASS
+        : data.studentId
+          ? ScheduleKind.APPOINTMENT
+          : ScheduleKind.GROUP_CLASS);
+    const resolvedStatus = data.status || ScheduleStatus.SCHEDULED;
 
     const schedule = await this.prisma.schedule.create({
       data: {
@@ -251,13 +334,19 @@ export class ScheduleService {
         groupId: data.groupId || null,
         studentId: data.studentId || null,
         recurrence: data.recurrence || RecurrenceType.NONE,
-        recurrenceRule: data.recurrenceRule ? JSON.parse(JSON.stringify(data.recurrenceRule)) : undefined,
+        recurrenceRule: data.recurrenceRule
+          ? JSON.parse(JSON.stringify(data.recurrenceRule))
+          : undefined,
+        kind: resolvedKind,
+        status: resolvedStatus,
+        cancelReason: data.cancelReason || null,
         customFields: data.customFields ? JSON.parse(JSON.stringify(data.customFields)) : undefined,
       },
       include: {
         resource: true,
         instructor: { select: { id: true, firstName: true, lastName: true } },
         group: true,
+        student: true,
       },
     });
 
@@ -266,7 +355,7 @@ export class ScheduleService {
       branchId: data.branchId,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Schedule',
+      entityType: "Schedule",
       entityId: schedule.id,
       after: schedule,
     });
@@ -274,10 +363,19 @@ export class ScheduleService {
     return schedule;
   }
 
-  async update(id: string, data: UpdateScheduleDto, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async update(
+    id: string,
+    data: UpdateScheduleDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const existing = await this.prisma.schedule.findFirst({ where: { id, organizationId: orgId, deletedAt: null, ...branchWhere } });
-    if (!existing) throw new NotFoundException('Jadval topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    const existing = await this.prisma.schedule.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Jadval topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     if (data.branchId && branchCtx) {
       assertBranchAccess(branchCtx, data.branchId);
@@ -291,17 +389,24 @@ export class ScheduleService {
     }
 
     if (!data.force) {
-      const conflictCheck = await this.detectConflicts({
-        startAt: startAt.toISOString(),
-        endAt: endAt.toISOString(),
-        resourceId: data.resourceId !== undefined ? data.resourceId : (existing.resourceId || undefined),
-        instructorId: data.instructorId !== undefined ? data.instructorId : (existing.instructorId || undefined),
-        excludeScheduleId: id,
-        orgId,
-      }, branchCtx);
+      const conflictCheck = await this.detectConflicts(
+        {
+          startAt: startAt.toISOString(),
+          endAt: endAt.toISOString(),
+          resourceId:
+            data.resourceId !== undefined ? data.resourceId : existing.resourceId || undefined,
+          instructorId:
+            data.instructorId !== undefined
+              ? data.instructorId
+              : existing.instructorId || undefined,
+          excludeScheduleId: id,
+          orgId,
+        },
+        branchCtx
+      );
 
       if (conflictCheck.hasConflict) {
-        const errorMessages = conflictCheck.conflicts.map((c) => c.message).join(' | ');
+        const errorMessages = conflictCheck.conflicts.map((c) => c.message).join(" | ");
         throw new ConflictException({
           message: `Jadvalda to'qnashuv aniqlandi: ${errorMessages}`,
           conflicts: conflictCheck.conflicts,
@@ -315,7 +420,9 @@ export class ScheduleService {
         ...data,
         startAt,
         endAt,
-        recurrenceRule: data.recurrenceRule ? JSON.parse(JSON.stringify(data.recurrenceRule)) : undefined,
+        recurrenceRule: data.recurrenceRule
+          ? JSON.parse(JSON.stringify(data.recurrenceRule))
+          : undefined,
         customFields: data.customFields ? JSON.parse(JSON.stringify(data.customFields)) : undefined,
       },
       include: {
@@ -330,7 +437,7 @@ export class ScheduleService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Schedule',
+      entityType: "Schedule",
       entityId: id,
       before: existing,
       after: updated,
@@ -341,8 +448,11 @@ export class ScheduleService {
 
   async remove(id: string, orgId: string, userId?: string, branchCtx?: BranchContext) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const existing = await this.prisma.schedule.findFirst({ where: { id, organizationId: orgId, deletedAt: null, ...branchWhere } });
-    if (!existing) throw new NotFoundException('Jadval topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    const existing = await this.prisma.schedule.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Jadval topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const deleted = await this.prisma.schedule.update({
       where: { id },
@@ -354,7 +464,7 @@ export class ScheduleService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Schedule',
+      entityType: "Schedule",
       entityId: id,
       before: existing,
       after: deleted,
@@ -365,8 +475,11 @@ export class ScheduleService {
 
   async restore(id: string, orgId: string, userId?: string, branchCtx?: BranchContext) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const existing = await this.prisma.schedule.findFirst({ where: { id, organizationId: orgId, ...branchWhere } });
-    if (!existing) throw new NotFoundException('Jadval topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    const existing = await this.prisma.schedule.findFirst({
+      where: { id, organizationId: orgId, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Jadval topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const restored = await this.prisma.schedule.update({
       where: { id },
@@ -378,12 +491,118 @@ export class ScheduleService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.RESTORE,
-      entityType: 'Schedule',
+      entityType: "Schedule",
       entityId: id,
       before: existing,
       after: restored,
     });
 
     return restored;
+  }
+
+  async cancel(
+    id: string,
+    dto: CancelScheduleDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
+    const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
+    const existing = await this.prisma.schedule.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Jadval topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (existing.status === ScheduleStatus.CANCELLED) {
+      throw new BadRequestException("Ushbu jadval allaqachon bekor qilingan");
+    }
+
+    const cancelled = await this.prisma.schedule.update({
+      where: { id },
+      data: { status: ScheduleStatus.CANCELLED, cancelReason: dto.cancelReason },
+      include: {
+        resource: true,
+        instructor: { select: { id: true, firstName: true, lastName: true } },
+        group: true,
+        student: true,
+      },
+    });
+
+    await this.auditService.log({
+      organizationId: orgId,
+      branchId: existing.branchId || undefined,
+      userId,
+      action: AuditAction.UPDATE,
+      entityType: "Schedule",
+      entityId: id,
+      before: existing,
+      after: cancelled,
+    });
+    return cancelled;
+  }
+
+  async reschedule(
+    id: string,
+    dto: RescheduleDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
+    const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
+    const existing = await this.prisma.schedule.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Jadval topilmadi yoki ushbu filialga kirish huquqi yo'q");
+
+    const startAt = new Date(dto.startAt);
+    const endAt = new Date(dto.endAt);
+    if (endAt <= startAt)
+      throw new BadRequestException("Tugash vaqti boshlanish vaqtidan keyin bo'lishi kerak");
+
+    if (!dto.force) {
+      const conflictCheck = await this.detectConflicts(
+        {
+          startAt: startAt.toISOString(),
+          endAt: endAt.toISOString(),
+          resourceId: existing.resourceId || undefined,
+          instructorId: existing.instructorId || undefined,
+          excludeScheduleId: id,
+          orgId,
+        },
+        branchCtx
+      );
+
+      if (conflictCheck.hasConflict) {
+        const errorMsgs = conflictCheck.conflicts.map((c) => c.message).join(" | ");
+        throw new ConflictException({
+          message: `Qayta rejalashtirishda to'qnashuv: ${errorMsgs}`,
+          conflicts: conflictCheck.conflicts,
+        });
+      }
+    }
+
+    const rescheduled = await this.prisma.schedule.update({
+      where: { id },
+      data: { startAt, endAt, status: ScheduleStatus.SCHEDULED, cancelReason: null },
+      include: {
+        resource: true,
+        instructor: { select: { id: true, firstName: true, lastName: true } },
+        group: true,
+        student: true,
+      },
+    });
+
+    await this.auditService.log({
+      organizationId: orgId,
+      branchId: existing.branchId || undefined,
+      userId,
+      action: AuditAction.UPDATE,
+      entityType: "Schedule",
+      entityId: id,
+      before: existing,
+      after: rescheduled,
+    });
+    return rescheduled;
   }
 }

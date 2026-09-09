@@ -1,5 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber } from 'class-validator';
-import { ResourceType, ResourceStatus } from '@prisma/client';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber } from "class-validator";
+import { ResourceType, ResourceStatus } from "@prisma/client";
 
 export class CreateResourceDto {
   @IsString()
@@ -23,10 +23,10 @@ export class CreateResourceDto {
   status?: ResourceStatus;
 
   @IsOptional()
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 
   @IsOptional()
-  customFields?: any;
+  customFields?: Record<string, unknown>;
 
   @IsString()
   @IsOptional()
@@ -55,10 +55,10 @@ export class UpdateResourceDto {
   status?: ResourceStatus;
 
   @IsOptional()
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 
   @IsOptional()
-  customFields?: any;
+  customFields?: Record<string, unknown>;
 
   @IsString()
   @IsOptional()

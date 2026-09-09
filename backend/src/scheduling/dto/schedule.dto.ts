@@ -1,5 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString, IsBoolean } from 'class-validator';
-import { RecurrenceType } from '@prisma/client';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString, IsBoolean } from "class-validator";
+import { RecurrenceType, ScheduleKind, ScheduleStatus } from "@prisma/client";
 
 export class CreateScheduleDto {
   @IsString()
@@ -39,10 +39,22 @@ export class CreateScheduleDto {
   recurrence?: RecurrenceType;
 
   @IsOptional()
-  recurrenceRule?: any;
+  recurrenceRule?: Record<string, unknown>;
+
+  @IsEnum(ScheduleKind)
+  @IsOptional()
+  kind?: ScheduleKind;
+
+  @IsEnum(ScheduleStatus)
+  @IsOptional()
+  status?: ScheduleStatus;
+
+  @IsString()
+  @IsOptional()
+  cancelReason?: string;
 
   @IsOptional()
-  customFields?: any;
+  customFields?: Record<string, unknown>;
 
   @IsString()
   @IsOptional()
@@ -91,10 +103,22 @@ export class UpdateScheduleDto {
   recurrence?: RecurrenceType;
 
   @IsOptional()
-  recurrenceRule?: any;
+  recurrenceRule?: Record<string, unknown>;
+
+  @IsEnum(ScheduleKind)
+  @IsOptional()
+  kind?: ScheduleKind;
+
+  @IsEnum(ScheduleStatus)
+  @IsOptional()
+  status?: ScheduleStatus;
+
+  @IsString()
+  @IsOptional()
+  cancelReason?: string;
 
   @IsOptional()
-  customFields?: any;
+  customFields?: Record<string, unknown>;
 
   @IsString()
   @IsOptional()
@@ -130,6 +154,14 @@ export class QueryScheduleDto {
   @IsOptional()
   studentId?: string;
 
+  @IsEnum(ScheduleKind)
+  @IsOptional()
+  kind?: ScheduleKind;
+
+  @IsEnum(ScheduleStatus)
+  @IsOptional()
+  status?: ScheduleStatus;
+
   @IsString()
   @IsOptional()
   branchId?: string;
@@ -152,6 +184,10 @@ export class CheckConflictDto {
   @IsOptional()
   instructorId?: string;
 
+  @IsEnum(ScheduleKind)
+  @IsOptional()
+  kind?: ScheduleKind;
+
   @IsString()
   @IsOptional()
   excludeScheduleId?: string;
@@ -159,4 +195,24 @@ export class CheckConflictDto {
   @IsString()
   @IsOptional()
   branchId?: string;
+}
+
+export class CancelScheduleDto {
+  @IsString()
+  @IsNotEmpty()
+  cancelReason: string;
+}
+
+export class RescheduleDto {
+  @IsDateString()
+  @IsNotEmpty()
+  startAt: string;
+
+  @IsDateString()
+  @IsNotEmpty()
+  endAt: string;
+
+  @IsBoolean()
+  @IsOptional()
+  force?: boolean;
 }
