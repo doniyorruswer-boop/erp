@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import BRAND_CONFIG from "@/config/brand.config";
 import { STORAGE_KEYS } from "@/constants/storage.constants";
 import { loadModuleRoutes, routerRegistry } from "@/core/router";
+import { isRoutePermitted } from "@/core/security";
 import { safeJsonParse } from "@/utils/storage";
 
 const appname = ` - ${BRAND_CONFIG.name}`;
@@ -294,6 +295,11 @@ router.beforeEach((to, from, next) => {
     null
   );
   if (!routerRegistry.isRouteAllowed(to, savedEnabledModules)) {
+    return next({ path: "/403" });
+  }
+
+  // Check RBAC permission for route (synced with backend PermissionsGuard)
+  if (!isRoutePermitted(to)) {
     return next({ path: "/403" });
   }
 

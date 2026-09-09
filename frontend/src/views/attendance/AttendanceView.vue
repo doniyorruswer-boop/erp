@@ -7,24 +7,36 @@
     <div class="flex items-center justify-between flex-wrap gap-4 mb-5">
       <div>
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Davomat Jurnali</h1>
-        <p class="text-sm text-gray-400">Guruhlar bo'yicha interaktiv dars davomati va oylik elektron jurnal</p>
+        <p class="text-sm text-gray-400">
+          Guruhlar bo'yicha interaktiv dars davomati va oylik elektron jurnal
+        </p>
       </div>
 
       <div class="flex items-center gap-2">
         <!-- View Mode Switcher: Daily / Monthly Journal -->
-        <div class="bg-gray-100 dark:bg-gray-700/80 p-1 rounded-md flex items-center gap-1 border dark:border-gray-600">
+        <div
+          class="bg-gray-100 dark:bg-gray-700/80 p-1 rounded-md flex items-center gap-1 border dark:border-gray-600"
+        >
           <button
-            @click="switchMode('daily')"
-            :class="viewMode === 'daily' ? 'bg-white dark:bg-gray-800 text-primary font-bold shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+            :class="
+              viewMode === 'daily'
+                ? 'bg-white dark:bg-gray-800 text-primary font-bold shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
+            "
             class="px-3 py-1.5 text-xs rounded transition flex items-center gap-1.5"
+            @click="switchMode('daily')"
           >
             <Icon icon="solar:calendar-date-bold" class="text-base" />
             <span>Kunlik Davomat</span>
           </button>
           <button
-            @click="switchMode('monthly')"
-            :class="viewMode === 'monthly' ? 'bg-white dark:bg-gray-800 text-primary font-bold shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+            :class="
+              viewMode === 'monthly'
+                ? 'bg-white dark:bg-gray-800 text-primary font-bold shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
+            "
             class="px-3 py-1.5 text-xs rounded transition flex items-center gap-1.5"
+            @click="switchMode('monthly')"
           >
             <Icon icon="solar:notebook-bookmark-bold" class="text-base" />
             <span>Oylik Jurnal</span>
@@ -33,6 +45,7 @@
 
         <AppButton
           v-if="viewMode === 'daily' && attendanceList.length > 0"
+          v-permission="'attendance.create'"
           variant="success"
           size="md"
           icon="fluent:checkmark-12-filled"
@@ -50,16 +63,20 @@
     </Alert>
 
     <!-- Filters Bar (Group & Date / Month selection) -->
-    <div class="card bg-white dark:bg-gray-800 p-4 rounded-md border dark:border-gray-700 shadow-sm mb-5">
+    <div
+      class="card bg-white dark:bg-gray-800 p-4 rounded-md border dark:border-gray-700 shadow-sm mb-5"
+    >
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <!-- Left: Group & Date Selectors -->
         <div class="flex flex-wrap items-center gap-3">
           <div class="w-full sm:w-64">
-            <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Guruhni tanlang</label>
+            <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"
+              >Guruhni tanlang</label
+            >
             <select
               v-model="selectedGroupId"
-              @change="onFilterChange"
               class="w-full p-2.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none focus:border-primary text-gray-800 dark:text-gray-200"
+              @change="onFilterChange"
             >
               <option value="" disabled>Guruhni tanlang...</option>
               <option v-for="g in groups" :key="g.id" :value="g.id">
@@ -69,38 +86,45 @@
           </div>
 
           <div v-if="viewMode === 'daily'" class="w-full sm:w-48">
-            <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Dars sanasi</label>
+            <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"
+              >Dars sanasi</label
+            >
             <input
               v-model="selectedDate"
-              @change="onFilterChange"
               type="date"
               class="w-full p-2.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none focus:border-primary text-gray-800 dark:text-gray-200"
+              @change="onFilterChange"
             />
           </div>
 
           <div v-if="viewMode === 'monthly'" class="w-full sm:w-48">
-            <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Oy</label>
+            <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"
+              >Oy</label
+            >
             <input
               v-model="selectedMonth"
-              @change="onFilterChange"
               type="month"
               class="w-full p-2.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none focus:border-primary text-gray-800 dark:text-gray-200"
+              @change="onFilterChange"
             />
           </div>
         </div>
 
         <!-- Right Quick Actions (Daily View) -->
-        <div v-if="viewMode === 'daily' && attendanceList.length > 0" class="flex flex-wrap items-center gap-2">
+        <div
+          v-if="viewMode === 'daily' && attendanceList.length > 0"
+          class="flex flex-wrap items-center gap-2"
+        >
           <button
-            @click="markAll('PRESENT')"
             class="px-3 py-1.5 text-xs font-medium rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800 transition flex items-center gap-1"
+            @click="markAll('PRESENT')"
           >
             <Icon icon="fluent:checkmark-12-filled" />
             <span>Barchasi keldi</span>
           </button>
           <button
-            @click="markAll('ABSENT_UNEXCUSED')"
             class="px-3 py-1.5 text-xs font-medium rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800 transition flex items-center gap-1"
+            @click="markAll('ABSENT_UNEXCUSED')"
           >
             <Icon icon="fluent:dismiss-12-filled" />
             <span>Barchasi kelmadi</span>
@@ -115,34 +139,56 @@
       >
         <div class="p-2.5 rounded-md bg-gray-50 dark:bg-gray-700/50">
           <div class="text-xs text-gray-400">Jami O'quvchi</div>
-          <div class="text-lg font-bold text-gray-800 dark:text-gray-100">{{ attendanceList.length }}</div>
+          <div class="text-lg font-bold text-gray-800 dark:text-gray-100">
+            {{ attendanceList.length }}
+          </div>
         </div>
-        <div class="p-2.5 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+        <div
+          class="p-2.5 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+        >
           <div class="text-xs text-green-600 dark:text-green-400">Kelganlar</div>
-          <div class="text-lg font-bold text-green-700 dark:text-green-300">{{ stats.present }} ta</div>
+          <div class="text-lg font-bold text-green-700 dark:text-green-300">
+            {{ stats.present }} ta
+          </div>
         </div>
-        <div class="p-2.5 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+        <div
+          class="p-2.5 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
+        >
           <div class="text-xs text-amber-600 dark:text-amber-400">Sabablilar</div>
-          <div class="text-lg font-bold text-amber-700 dark:text-amber-300">{{ stats.excused }} ta</div>
+          <div class="text-lg font-bold text-amber-700 dark:text-amber-300">
+            {{ stats.excused }} ta
+          </div>
         </div>
-        <div class="p-2.5 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+        <div
+          class="p-2.5 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+        >
           <div class="text-xs text-red-600 dark:text-red-400">Sababsizlar</div>
           <div class="text-lg font-bold text-red-700 dark:text-red-300">{{ stats.absent }} ta</div>
         </div>
-        <div class="p-2.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+        <div
+          class="p-2.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+        >
           <div class="text-xs text-blue-600 dark:text-blue-400">Davomat %</div>
-          <div class="text-lg font-bold text-blue-700 dark:text-blue-300">{{ stats.percentage }}%</div>
+          <div class="text-lg font-bold text-blue-700 dark:text-blue-300">
+            {{ stats.percentage }}%
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="card bg-white dark:bg-gray-800 p-8 text-center rounded-md border dark:border-gray-700">
+    <div
+      v-if="loading"
+      class="card bg-white dark:bg-gray-800 p-8 text-center rounded-md border dark:border-gray-700"
+    >
       <LoadingSpinner size="md" text="Davomat ma'lumotlari yuklanmoqda..." />
     </div>
 
     <!-- No Group Selected -->
-    <div v-else-if="!selectedGroupId" class="card bg-white dark:bg-gray-800 p-12 text-center text-gray-400 rounded-md border dark:border-gray-700">
+    <div
+      v-else-if="!selectedGroupId"
+      class="card bg-white dark:bg-gray-800 p-12 text-center text-gray-400 rounded-md border dark:border-gray-700"
+    >
       <div class="flex flex-col items-center justify-center gap-2">
         <Icon icon="solar:calendar-linear" class="text-4xl text-gray-300" />
         <p class="text-sm">Davomatni ko'rish yoki belgilash uchun yuqoridan guruhni tanlang.</p>
@@ -151,7 +197,10 @@
 
     <!-- MAIN BODY: Daily Attendance Cards List -->
     <div v-else-if="viewMode === 'daily'">
-      <div v-if="attendanceList.length === 0" class="card bg-white dark:bg-gray-800 p-12 text-center text-gray-400 rounded-md border dark:border-gray-700">
+      <div
+        v-if="attendanceList.length === 0"
+        class="card bg-white dark:bg-gray-800 p-12 text-center text-gray-400 rounded-md border dark:border-gray-700"
+      >
         Ushbu guruhda o'quvchilar mavjud emas.
       </div>
 
@@ -163,7 +212,9 @@
         >
           <!-- Student Info & Avatar -->
           <div class="flex items-center gap-3.5 min-w-[240px]">
-            <div class="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm shrink-0">
+            <div
+              class="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm shrink-0"
+            >
               {{ item.student.firstName?.[0] }}{{ item.student.lastName?.[0] }}
             </div>
             <div>
@@ -186,13 +237,19 @@
           </div>
 
           <!-- Modern Segmented Pill Selector for Status -->
-          <div class="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-900 p-1 rounded-lg border dark:border-gray-700">
+          <div
+            class="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-900 p-1 rounded-lg border dark:border-gray-700"
+          >
             <!-- Present -->
             <button
               type="button"
-              @click="item.status = 'PRESENT'"
-              :class="item.status === 'PRESENT' ? 'bg-green-600 text-white font-bold shadow' : 'text-gray-600 dark:text-gray-300 hover:bg-white/50'"
+              :class="
+                item.status === 'PRESENT'
+                  ? 'bg-green-600 text-white font-bold shadow'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-white/50'
+              "
               class="px-3.5 py-1.5 text-xs rounded-md transition flex items-center gap-1"
+              @click="item.status = 'PRESENT'"
             >
               <Icon icon="solar:check-circle-bold" class="text-sm" />
               <span>Keldi</span>
@@ -201,9 +258,13 @@
             <!-- Late -->
             <button
               type="button"
-              @click="item.status = 'LATE'"
-              :class="item.status === 'LATE' ? 'bg-blue-600 text-white font-bold shadow' : 'text-gray-600 dark:text-gray-300 hover:bg-white/50'"
+              :class="
+                item.status === 'LATE'
+                  ? 'bg-blue-600 text-white font-bold shadow'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-white/50'
+              "
               class="px-3.5 py-1.5 text-xs rounded-md transition flex items-center gap-1"
+              @click="item.status = 'LATE'"
             >
               <Icon icon="solar:clock-circle-bold" class="text-sm" />
               <span>Kechikdi</span>
@@ -212,9 +273,13 @@
             <!-- Excused -->
             <button
               type="button"
-              @click="item.status = 'ABSENT_EXCUSED'"
-              :class="item.status === 'ABSENT_EXCUSED' ? 'bg-amber-500 text-white font-bold shadow' : 'text-gray-600 dark:text-gray-300 hover:bg-white/50'"
+              :class="
+                item.status === 'ABSENT_EXCUSED'
+                  ? 'bg-amber-500 text-white font-bold shadow'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-white/50'
+              "
               class="px-3.5 py-1.5 text-xs rounded-md transition flex items-center gap-1"
+              @click="item.status = 'ABSENT_EXCUSED'"
             >
               <Icon icon="solar:info-circle-bold" class="text-sm" />
               <span>Sababli</span>
@@ -223,9 +288,13 @@
             <!-- Absent -->
             <button
               type="button"
-              @click="item.status = 'ABSENT_UNEXCUSED'"
-              :class="item.status === 'ABSENT_UNEXCUSED' ? 'bg-red-600 text-white font-bold shadow' : 'text-gray-600 dark:text-gray-300 hover:bg-white/50'"
+              :class="
+                item.status === 'ABSENT_UNEXCUSED'
+                  ? 'bg-red-600 text-white font-bold shadow'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-white/50'
+              "
               class="px-3.5 py-1.5 text-xs rounded-md transition flex items-center gap-1"
+              @click="item.status = 'ABSENT_UNEXCUSED'"
             >
               <Icon icon="solar:close-circle-bold" class="text-sm" />
               <span>Kelmadi</span>
@@ -246,17 +315,30 @@
     </div>
 
     <!-- MAIN BODY: Real Monthly Matrix Journal View -->
-    <div v-else-if="viewMode === 'monthly'" class="card bg-white dark:bg-gray-800 rounded-md border dark:border-gray-700 shadow-sm overflow-hidden">
-      <div class="p-4 border-b dark:border-gray-700 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+    <div
+      v-else-if="viewMode === 'monthly'"
+      class="card bg-white dark:bg-gray-800 rounded-md border dark:border-gray-700 shadow-sm overflow-hidden"
+    >
+      <div
+        class="p-4 border-b dark:border-gray-700 flex flex-col sm:flex-row justify-between sm:items-center gap-2"
+      >
         <h3 class="font-bold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
           <Icon icon="solar:notebook-bookmark-bold" class="text-primary text-lg" />
           <span>{{ currentGroup?.name }} — {{ selectedMonth }} Oylik Elektron Jurnal</span>
         </h3>
         <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Keldi (✓)</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Kechikdi (K)</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Sababli (S)</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Kelmadi (✕)</span>
+          <span class="flex items-center gap-1"
+            ><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Keldi (✓)</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Kechikdi (K)</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Sababli (S)</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Kelmadi (✕)</span
+          >
         </div>
       </div>
 
@@ -267,9 +349,13 @@
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left text-xs border-collapse">
           <thead>
-            <tr class="bg-gray-50 dark:bg-gray-700/60 border-b dark:border-gray-600 text-gray-500 dark:text-gray-300 uppercase font-semibold">
+            <tr
+              class="bg-gray-50 dark:bg-gray-700/60 border-b dark:border-gray-600 text-gray-500 dark:text-gray-300 uppercase font-semibold"
+            >
               <th class="p-3 w-10 text-center sticky left-0 bg-gray-50 dark:bg-gray-700 z-10">№</th>
-              <th class="p-3 min-w-[180px] sticky left-10 bg-gray-50 dark:bg-gray-700 z-10">O'quvchi</th>
+              <th class="p-3 min-w-[180px] sticky left-10 bg-gray-50 dark:bg-gray-700 z-10">
+                O'quvchi
+              </th>
               <th
                 v-for="d in daysInMonth"
                 :key="d"
@@ -287,8 +373,14 @@
               :key="row.student.id"
               class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition"
             >
-              <td class="p-3 text-center text-gray-400 sticky left-0 bg-white dark:bg-gray-800 z-10">{{ idx + 1 }}</td>
-              <td class="p-3 font-medium text-gray-800 dark:text-gray-100 sticky left-10 bg-white dark:bg-gray-800 z-10">
+              <td
+                class="p-3 text-center text-gray-400 sticky left-0 bg-white dark:bg-gray-800 z-10"
+              >
+                {{ idx + 1 }}
+              </td>
+              <td
+                class="p-3 font-medium text-gray-800 dark:text-gray-100 sticky left-10 bg-white dark:bg-gray-800 z-10"
+              >
                 {{ row.student.firstName }} {{ row.student.lastName }}
               </td>
               <td
@@ -338,10 +430,11 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
+import { attendanceApi, groupsApi } from "@/api/services";
 import Alert from "@/components/Alert.vue";
 import Breadcrumb from "@/components/Breadcrumb.vue";
-import AppButton from "@/components/AppButton.vue";
-import { groupsApi, attendanceApi } from "@/api/services";
+import AppButton from "@/components/common/AppButton.vue";
 
 export default {
   name: "AttendanceView",
@@ -377,7 +470,9 @@ export default {
     stats() {
       const total = this.attendanceList.length;
       if (!total) return { present: 0, excused: 0, absent: 0, percentage: 0 };
-      const present = this.attendanceList.filter((s) => s.status === "PRESENT" || s.status === "LATE").length;
+      const present = this.attendanceList.filter(
+        (s) => s.status === "PRESENT" || s.status === "LATE"
+      ).length;
       const excused = this.attendanceList.filter((s) => s.status === "ABSENT_EXCUSED").length;
       const absent = this.attendanceList.filter((s) => s.status === "ABSENT_UNEXCUSED").length;
       const percentage = Math.round((present / total) * 100);
@@ -421,7 +516,10 @@ export default {
           this.attendanceList = res.students || [];
         } else {
           if (!this.selectedMonth) return;
-          const res = await attendanceApi.getMonthlyAttendance(this.selectedGroupId, this.selectedMonth);
+          const res = await attendanceApi.getMonthlyAttendance(
+            this.selectedGroupId,
+            this.selectedMonth
+          );
           this.monthlyStudents = res.students || [];
         }
       } catch (err) {

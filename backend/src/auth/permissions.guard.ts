@@ -1,14 +1,15 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { PERMISSIONS_KEY } from './permissions.decorator';
-import { PrismaService } from '../prisma/prisma.service';
-import { Role, PermissionScope } from '@prisma/client';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { PERMISSIONS_KEY } from "./permissions.decorator";
+import { PrismaService } from "../prisma/prisma.service";
+import { Role, PermissionScope } from "@prisma/client";
+import { DEFAULT_ROLE_PERMISSIONS } from "../constants/roles.constants";
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private prisma: PrismaService,
+    private prisma: PrismaService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -75,63 +76,7 @@ export class PermissionsGuard implements CanActivate {
         scope: p.scope,
       }));
     } else {
-      // Fallback for default built-in roles
-      const defaultRolePerms: Record<Role, string[]> = {
-        SUPER_ADMIN: ['*'],
-        ADMIN: ['*'],
-        BRANCH_MANAGER: [
-          'students.*',
-          'groups.*',
-          'courses.*',
-          'attendance.*',
-          'payments.*',
-          'leads.*',
-          'crm.*',
-          'rooms.*',
-          'reports.view',
-          'branches.view',
-          'notifications.view',
-        ],
-        MANAGER: [
-          'students.view',
-          'students.create',
-          'students.update',
-          'groups.view',
-          'courses.view',
-          'attendance.view',
-          'leads.view',
-          'leads.create',
-          'leads.update',
-          'crm.view',
-          'crm.create',
-          'crm.update',
-          'crm.convert',
-          'payments.view',
-          'payments.create',
-          'reports.view',
-          'rooms.manage',
-          'notifications.view',
-        ],
-        TEACHER: [
-          'groups.view',
-          'attendance.view',
-          'attendance.create',
-          'students.view',
-          'courses.view',
-          'notifications.view',
-        ],
-        CASHIER: [
-          'payments.view',
-          'payments.create',
-          'students.view',
-          'groups.view',
-          'reports.view',
-          'notifications.view',
-        ],
-        STUDENT: ['students.view', 'groups.view', 'attendance.view', 'notifications.view'],
-      };
-
-      const rolePerms = defaultRolePerms[user.role as Role] || [];
+      const rolePerms = DEFAULT_ROLE_PERMISSIONS[user.role] || [];
       const defaultScope =
         user.role === Role.BRANCH_MANAGER || user.role === Role.TEACHER
           ? PermissionScope.BRANCH
@@ -146,9 +91,9 @@ export class PermissionsGuard implements CanActivate {
     const checkPermission = (required: string) => {
       const match = grantedCodes.find(
         (g) =>
-          g.code === '*' ||
+          g.code === "*" ||
           g.code === required ||
-          (g.code.endsWith('.*') && required.startsWith(g.code.replace('.*', ''))),
+          (g.code.endsWith(".*") && required.startsWith(g.code.replace(".*", "")))
       );
       return match || null;
     };
@@ -158,9 +103,7 @@ export class PermissionsGuard implements CanActivate {
     for (const reqPerm of requiredPermissions) {
       const match = checkPermission(reqPerm);
       if (!match) {
-        throw new ForbiddenException(
-          `Sizda ushbu amalni bajarish uchun ruxsat yo'q: (${reqPerm})`,
-        );
+        throw new ForbiddenException(`Sizda ushbu amalni bajarish uchun ruxsat yo'q: (${reqPerm})`);
       }
       dominantScope = match.scope;
     }
