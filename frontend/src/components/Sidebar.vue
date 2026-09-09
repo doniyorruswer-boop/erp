@@ -290,14 +290,14 @@
             </RouterLink>
           </div>
 
-          <!-- Attendance -->
-          <div class="item mt-2">
+          <!-- Attendance (Dynamic Module) -->
+          <div v-for="item in attendanceNavItems" :key="item.id" class="item mt-2">
             <RouterLink
-              to="/attendance"
+              :to="item.path"
               class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700"
             >
-              <span class="mr-3 text-xl"><Icon icon="fluent:calendar-checkmark-24-filled" /></span>
-              <span class="w-full"> Davomat </span>
+              <span class="mr-3 text-xl"><Icon :icon="item.icon" /></span>
+              <span class="w-full"> {{ item.label }} </span>
             </RouterLink>
           </div>
 
@@ -438,6 +438,9 @@ export default {
   computed: {
     studentNavItems() {
       return navigationService.getNavItemsForModule("STUDENTS", this.tenantStore.enabledModules);
+    },
+    attendanceNavItems() {
+      return navigationService.getNavItemsForModule("ATTENDANCE", this.tenantStore.enabledModules);
     },
     isEducationRouteActive() {
       return (
