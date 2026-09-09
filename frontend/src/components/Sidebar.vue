@@ -301,14 +301,14 @@
             </RouterLink>
           </div>
 
-          <!-- Finance -->
-          <div class="item mt-2">
+          <!-- Finance (Dynamic Module) -->
+          <div v-for="item in financeNavItems" :key="item.id" class="item mt-2">
             <RouterLink
-              to="/finance"
+              :to="item.path"
               class="w-full flex text-left rounded-md box-border p-3 hover:bg-gray-200 dark:hover:bg-gray-700"
             >
-              <span class="mr-3 text-xl"><Icon icon="solar:wallet-money-bold" /></span>
-              <span class="w-full"> Moliya & Kassa </span>
+              <span class="mr-3 text-xl"><Icon :icon="item.icon" /></span>
+              <span class="w-full"> {{ item.label }} </span>
             </RouterLink>
           </div>
 
@@ -441,6 +441,9 @@ export default {
     },
     attendanceNavItems() {
       return navigationService.getNavItemsForModule("ATTENDANCE", this.tenantStore.enabledModules);
+    },
+    financeNavItems() {
+      return navigationService.getNavItemsForModule("FINANCE", this.tenantStore.enabledModules);
     },
     isEducationRouteActive() {
       return (
