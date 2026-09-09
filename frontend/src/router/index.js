@@ -1,88 +1,34 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-// EduHub Pages
-import Dashboard from "../views/Dashboard.vue";
-import StudentsList from "../views/students/StudentsList.vue";
-import StudentCreate from "../views/students/StudentCreate.vue";
-import StudentProfile from "../views/students/StudentProfile.vue";
-import LeadsKanban from "../views/leads/LeadsKanban.vue";
-import GroupsList from "../views/groups/GroupsList.vue";
-import CoursesList from "../views/courses/CoursesList.vue";
-import AttendanceView from "../views/attendance/AttendanceView.vue";
-import FinanceView from "../views/finance/FinanceView.vue";
-import PaymentStatsView from "../views/finance/PaymentStatsView.vue";
-import PaymentMonthDetailView from "../views/finance/PaymentMonthDetailView.vue";
-import CalendarView from "../views/calendar/CalendarView.vue";
-import SetupWizard from "../views/setup/SetupWizard.vue";
-import SchoolClassesView from "../views/school/SchoolClassesView.vue";
-import SchoolClassDetailView from "../views/school/SchoolClassDetailView.vue";
-import SchoolLevelsView from "../views/school/SchoolLevelsView.vue";
-import SchoolStudentsView from "../views/school/SchoolStudentsView.vue";
-import SchoolParentsView from "../views/school/SchoolParentsView.vue";
-import SchoolDroppedView from "../views/school/SchoolDroppedView.vue";
-import ContractsList from "../views/contracts/ContractsList.vue";
-import EmployeesList from "../views/hr/EmployeesList.vue";
-import CrmSettings from "../views/settings/CrmSettings.vue";
-import UsersList from "../views/users/UsersList.vue";
-import RolesList from "../views/roles/RolesList.vue";
-import AuditLogsList from "../views/audit/AuditLogsList.vue";
-import NotificationsList from "../views/notifications/NotificationsList.vue";
-import SubscriptionsView from "../views/subscriptions/SubscriptionsView.vue";
-import ScheduleView from "../views/education/ScheduleView.vue";
-import ClassScheduleView from "../views/education/ClassScheduleView.vue";
-import ReplaceTeacherView from "../views/education/ReplaceTeacherView.vue";
-import GradebookView from "../views/education/GradebookView.vue";
-import FinalGradesView from "../views/education/FinalGradesView.vue";
-import AcademicActionsView from "../views/education/AcademicActionsView.vue";
-
-// Auth & Error Pages
-import Login from "../views/layouts/auth/Login.vue";
-import Register from "../views/layouts/auth/Register.vue";
-import ForgotPassword from "../views/layouts/auth/forgot-password.vue";
-import Page404 from "../views/layouts/error/404.vue";
-import Page500 from "../views/layouts/error/500.vue";
-import PageMaintenance from "../views/layouts/error/maintenance.vue";
-
 import BRAND_CONFIG from "@/config/brand.config";
+import { STORAGE_KEYS } from "@/constants/storage.constants";
+import { loadModuleRoutes, routerRegistry } from "@/core/router";
+import { safeJsonParse } from "@/utils/storage";
 
 const appname = ` - ${BRAND_CONFIG.name}`;
+
+// Dynamically load pilot module routes (Students, Attendance, Finance)
+const moduleRoutes = loadModuleRoutes();
 
 const routes = [
   // EduHub Core Routes
   {
     path: "/",
     name: "Dashboard",
-    component: Dashboard,
+    component: () => import(/* webpackChunkName: "dashboard" */ "../views/Dashboard.vue"),
     meta: { title: "Dashboard" + appname },
   },
-  {
-    path: "/students",
-    name: "Students",
-    component: StudentsList,
-    meta: { title: "O'quvchilar" + appname },
-  },
-  {
-    path: "/students/create",
-    name: "StudentCreate",
-    component: StudentCreate,
-    meta: { title: "O'quvchini qo'shish" + appname },
-  },
-  {
-    path: "/students/:id",
-    name: "StudentProfile",
-    component: StudentProfile,
-    meta: { title: "O'quvchi Profili" + appname },
-  },
+  ...moduleRoutes,
   {
     path: "/leads",
     name: "Leads",
-    component: LeadsKanban,
+    component: () => import(/* webpackChunkName: "leads" */ "../views/leads/LeadsKanban.vue"),
     meta: { title: "Lidlar & Kanban" + appname },
   },
   {
     path: "/crm/settings",
     name: "CrmSettings",
-    component: CrmSettings,
+    component: () => import(/* webpackChunkName: "settings" */ "../views/settings/CrmSettings.vue"),
     meta: { title: "CRM Sozlamalari" + appname },
   },
   {
@@ -92,98 +38,82 @@ const routes = [
   {
     path: "/groups",
     name: "Groups",
-    component: GroupsList,
+    component: () => import(/* webpackChunkName: "groups" */ "../views/groups/GroupsList.vue"),
     meta: { title: "Guruhlar" + appname },
   },
   {
     path: "/courses",
     name: "Courses",
-    component: CoursesList,
+    component: () => import(/* webpackChunkName: "courses" */ "../views/courses/CoursesList.vue"),
     meta: { title: "Kurslar" + appname },
-  },
-  {
-    path: "/attendance",
-    name: "Attendance",
-    component: AttendanceView,
-    meta: { title: "Davomat" + appname },
-  },
-  {
-    path: "/finance",
-    name: "Finance",
-    component: FinanceView,
-    meta: { title: "Moliya & Kassa" + appname },
-  },
-  {
-    path: "/payment-stats",
-    name: "PaymentStats",
-    component: PaymentStatsView,
-    meta: { title: "To'lovlar statistikasi" + appname },
-  },
-  {
-    path: "/payment-stats/month/:monthKey",
-    name: "PaymentMonthDetail",
-    component: PaymentMonthDetailView,
-    meta: { title: "Oylik To'lovlar Tahlili" + appname },
   },
   {
     path: "/employees",
     name: "Employees",
-    component: EmployeesList,
+    component: () => import(/* webpackChunkName: "employees" */ "../views/hr/EmployeesList.vue"),
     meta: { title: "Xodimlar & Oylik" + appname },
   },
   {
     path: "/contracts",
     name: "Contracts",
-    component: ContractsList,
+    component: () =>
+      import(/* webpackChunkName: "contracts" */ "../views/contracts/ContractsList.vue"),
     meta: { title: "O'quv Shartnomalari" + appname },
   },
   {
     path: "/school/classes",
     alias: ["/education/classes"],
     name: "SchoolClasses",
-    component: SchoolClassesView,
+    component: () =>
+      import(/* webpackChunkName: "school" */ "../views/school/SchoolClassesView.vue"),
     meta: { title: "Sinflar" + appname },
   },
   {
     path: "/school/classes/:id",
     alias: ["/education/classes/:id"],
     name: "SchoolClassDetail",
-    component: SchoolClassDetailView,
+    component: () =>
+      import(/* webpackChunkName: "school" */ "../views/school/SchoolClassDetailView.vue"),
     meta: { title: "O'quvchilar ro'yxati" + appname },
   },
   {
     path: "/school/levels",
     alias: ["/levels", "/education/levels", "/school/groups"],
     name: "SchoolLevels",
-    component: SchoolLevelsView,
+    component: () =>
+      import(/* webpackChunkName: "school" */ "../views/school/SchoolLevelsView.vue"),
     meta: { title: "Darajalar va to'garaklar" + appname },
   },
   {
     path: "/school/students",
     alias: ["/education/students"],
     name: "SchoolStudents",
-    component: SchoolStudentsView,
+    component: () =>
+      import(/* webpackChunkName: "school" */ "../views/school/SchoolStudentsView.vue"),
     meta: { title: "O'quvchilar" + appname },
   },
   {
     path: "/school/parents",
     alias: ["/parents", "/education/parents"],
     name: "SchoolParents",
-    component: SchoolParentsView,
+    component: () =>
+      import(/* webpackChunkName: "school" */ "../views/school/SchoolParentsView.vue"),
     meta: { title: "Ota-onalar" + appname },
   },
   {
     path: "/school/dropped",
     alias: ["/dropped", "/school/withdrawn", "/education/dropped", "/school/chetlatilganlar"],
     name: "SchoolDroppedStudents",
-    component: SchoolDroppedView,
+    component: () =>
+      import(/* webpackChunkName: "school" */ "../views/school/SchoolDroppedView.vue"),
     meta: { title: "Chetlatilganlar" + appname },
   },
   {
     path: "/education/schedule",
     alias: ["/school/schedule", "/schedule"],
     name: "EducationSchedule",
-    component: ScheduleView,
+    component: () =>
+      import(/* webpackChunkName: "education" */ "../views/education/ScheduleView.vue"),
     meta: { title: "Dars jadvali" + appname },
   },
   {
@@ -193,71 +123,83 @@ const routes = [
       "/education/class-schedule/:quarter/:dates/:classId",
     ],
     name: "EducationClassScheduleDetail",
-    component: ClassScheduleView,
+    component: () =>
+      import(/* webpackChunkName: "education" */ "../views/education/ClassScheduleView.vue"),
     meta: { title: "Dars jadvali - Sinf ko'rinishi" + appname },
   },
   {
     path: "/education/replace-teacher",
     alias: ["/school/replace-teacher"],
     name: "EducationReplaceTeacher",
-    component: ReplaceTeacherView,
+    component: () =>
+      import(/* webpackChunkName: "education" */ "../views/education/ReplaceTeacherView.vue"),
     meta: { title: "O'qituvchini almashtirish" + appname },
   },
   {
     path: "/education/gradebook",
     alias: ["/school/gradebook"],
     name: "EducationGradebook",
-    component: GradebookView,
+    component: () =>
+      import(/* webpackChunkName: "education" */ "../views/education/GradebookView.vue"),
     meta: { title: "Baholar jurnali" + appname },
   },
   {
     path: "/education/final-grades",
     alias: ["/school/final-grades"],
     name: "EducationFinalGrades",
-    component: FinalGradesView,
+    component: () =>
+      import(/* webpackChunkName: "education" */ "../views/education/FinalGradesView.vue"),
     meta: { title: "Yakuniy baholar" + appname },
   },
   {
     path: "/education/academic-actions",
     alias: ["/school/academic-actions"],
     name: "EducationAcademicActions",
-    component: AcademicActionsView,
+    component: () =>
+      import(/* webpackChunkName: "education" */ "../views/education/AcademicActionsView.vue"),
     meta: { title: "Akademik harakatlar" + appname },
   },
   {
     path: "/calendar",
     name: "Calendar",
-    component: CalendarView,
+    component: () =>
+      import(/* webpackChunkName: "calendar" */ "../views/calendar/CalendarView.vue"),
     meta: { title: "Taqvim va Topshiriqlar" + appname },
   },
   {
     path: "/users",
     name: "Users",
-    component: UsersList,
+    component: () => import(/* webpackChunkName: "users" */ "../views/users/UsersList.vue"),
     meta: { title: "Foydalanuvchilar" + appname },
   },
   {
     path: "/roles",
     name: "Roles",
-    component: RolesList,
+    component: () => import(/* webpackChunkName: "roles" */ "../views/roles/RolesList.vue"),
     meta: { title: "Rollar & Ruxsatlar" + appname },
   },
   {
     path: "/audit",
     name: "AuditLogs",
-    component: AuditLogsList,
+    component: () => import(/* webpackChunkName: "audit" */ "../views/audit/AuditLogsList.vue"),
     meta: { title: "Xavfsizlik Jurnali (Audit)" + appname },
   },
   {
     path: "/notifications",
     name: "Notifications",
-    component: NotificationsList,
+    component: () =>
+      import(
+        /* webpackChunkName: "notifications" */ "../views/notifications/NotificationsList.vue"
+      ),
     meta: { title: "Xabarnomalar Markazi" + appname },
   },
   {
     path: "/subscriptions",
     name: "Subscriptions",
-    component: SubscriptionsView,
+    component: () =>
+      import(
+        /* webpackChunkName: "subscriptions" */ "../views/subscriptions/SubscriptionsView.vue"
+      ),
     meta: { title: "Tariflar & Obuna" + appname },
   },
   {
@@ -267,7 +209,7 @@ const routes = [
   {
     path: "/setup",
     name: "SetupWizard",
-    component: SetupWizard,
+    component: () => import(/* webpackChunkName: "setup" */ "../views/setup/SetupWizard.vue"),
     meta: { title: "Setup Wizard" + appname, hideNav: true },
   },
 
@@ -275,39 +217,47 @@ const routes = [
   {
     path: "/auth/login",
     name: "Login",
-    component: Login,
+    component: () => import(/* webpackChunkName: "auth" */ "../views/layouts/auth/Login.vue"),
     meta: { title: "Login" + appname, hideNav: true },
   },
   {
     path: "/auth/register",
     name: "Register",
-    component: Register,
+    component: () => import(/* webpackChunkName: "auth" */ "../views/layouts/auth/Register.vue"),
     meta: { title: "Register" + appname, hideNav: true },
   },
   {
     path: "/auth/forgot-password",
     name: "ForgotPassword",
-    component: ForgotPassword,
+    component: () =>
+      import(/* webpackChunkName: "auth" */ "../views/layouts/auth/ForgotPassword.vue"),
     meta: { title: "Forgot Password" + appname, hideNav: true },
   },
 
   // Error pages
   {
+    path: "/403",
+    name: "Page403",
+    component: () => import(/* webpackChunkName: "error" */ "../views/layouts/error/403.vue"),
+    meta: { title: "Ruxsat Berilmagan" + appname, hideNav: true },
+  },
+  {
     path: "/500",
     name: "Page500",
-    component: Page500,
+    component: () => import(/* webpackChunkName: "error" */ "../views/layouts/error/500.vue"),
     meta: { title: "Server internal Error" + appname, hideNav: true },
   },
   {
     path: "/maintenance",
     name: "maintenance",
-    component: PageMaintenance,
+    component: () =>
+      import(/* webpackChunkName: "error" */ "../views/layouts/error/maintenance.vue"),
     meta: { title: "Maintenance" + appname, hideNav: true },
   },
   {
     path: "/:pathMatch(.*)*",
     name: "Page404",
-    component: Page404,
+    component: () => import(/* webpackChunkName: "error" */ "../views/layouts/error/404.vue"),
     meta: { title: "404" + appname, hideNav: true },
   },
 ];
@@ -321,8 +271,12 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || BRAND_CONFIG.name;
 
-  const token = localStorage.getItem("token");
-  const isAuthRoute = to.path.startsWith("/auth") || to.path === "/500" || to.path === "/maintenance";
+  const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+  const isAuthRoute =
+    to.path.startsWith("/auth") ||
+    to.path === "/403" ||
+    to.path === "/500" ||
+    to.path === "/maintenance";
 
   if (!token && !isAuthRoute) {
     // Unauthenticated user attempting to access protected route -> redirect to clean login url
@@ -332,6 +286,15 @@ router.beforeEach((to, from, next) => {
   if (token && (to.path === "/auth/login" || to.path === "/auth/register")) {
     // Already authenticated user visiting login/register -> redirect to dashboard
     return next({ path: "/" });
+  }
+
+  // Check if route belongs to a module that is disabled for this tenant
+  const savedEnabledModules = safeJsonParse(
+    localStorage.getItem(STORAGE_KEYS.ENABLED_MODULES),
+    null
+  );
+  if (!routerRegistry.isRouteAllowed(to, savedEnabledModules)) {
+    return next({ path: "/403" });
   }
 
   next();

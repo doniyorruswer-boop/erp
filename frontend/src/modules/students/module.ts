@@ -1,9 +1,6 @@
-/**
- * Students Module Definition
- * Canonical ID: STUDENTS
- */
-
 import type { ModuleDefinition } from "@/core/modules/types";
+
+import { studentsRoutes } from "./routes";
 
 export const studentsModule: ModuleDefinition = {
   id: "STUDENTS",
@@ -21,6 +18,7 @@ export const studentsModule: ModuleDefinition = {
   ],
   dependencies: [],
   applicableBusinessTypes: ["COURSE_CENTER", "SCHOOL", "KINDERGARTEN"],
+  routes: studentsRoutes,
   navigation: [
     {
       id: "nav-students",

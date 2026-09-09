@@ -1,9 +1,6 @@
-/**
- * Finance Module Definition
- * Canonical ID: FINANCE
- */
-
 import type { ModuleDefinition } from "@/core/modules/types";
+
+import { financeRoutes } from "./routes";
 
 export const financeModule: ModuleDefinition = {
   id: "FINANCE",
@@ -15,6 +12,7 @@ export const financeModule: ModuleDefinition = {
   permissions: ["payments.view", "payments.create", "payments.refund", "payments.delete"],
   dependencies: [],
   applicableBusinessTypes: ["COURSE_CENTER", "SCHOOL", "KINDERGARTEN"],
+  routes: financeRoutes,
   navigation: [
     {
       id: "nav-finance",

@@ -1,9 +1,6 @@
-/**
- * Attendance Module Definition
- * Canonical ID: ATTENDANCE
- */
-
 import type { ModuleDefinition } from "@/core/modules/types";
+
+import { attendanceRoutes } from "./routes";
 
 export const attendanceModule: ModuleDefinition = {
   id: "ATTENDANCE",
@@ -15,6 +12,7 @@ export const attendanceModule: ModuleDefinition = {
   permissions: ["attendance.view", "attendance.create", "attendance.update"],
   dependencies: ["STUDENTS"],
   applicableBusinessTypes: ["COURSE_CENTER", "SCHOOL", "KINDERGARTEN"],
+  routes: attendanceRoutes,
   navigation: [
     {
       id: "nav-attendance",
