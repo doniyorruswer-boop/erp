@@ -2,19 +2,10 @@
   <div class="w-full h-screen">
     <div class="flex shadow rounded-md h-screen">
       <div class="bg-white dark:bg-gray-900 w-full overflow-y-auto">
-        <form @submit.prevent="handleForgot" novalidate>
-          <div
-            class="form-body lg:max-w-xl mx-auto lg:p-20 p-8 lg:mt-20 mt-5 space-y-8"
-          >
-            <div
-              class="form-head cursor-pointer"
-              @click="$router.push('/')"
-            >
-              <img
-                src="../../../assets/logo/logo.svg"
-                :alt="$brand.name"
-                class="w-10"
-              />
+        <form novalidate @submit.prevent="handleForgot">
+          <div class="form-body lg:max-w-xl mx-auto lg:p-20 p-8 lg:mt-20 mt-5 space-y-8">
+            <div class="form-head cursor-pointer" @click="$router.push('/')">
+              <img src="../../../assets/logo/logo.svg" :alt="$brand.name" class="w-10" />
             </div>
             <div class="space-y-3">
               <h2 class="dark:text-white font-semibold text-gray-800 text-4xl">
@@ -36,16 +27,18 @@
             <div class="space-y-5">
               <div class="relative z-0 w-full mb-6 group">
                 <input
+                  id="floating_email"
                   v-model="email"
                   type="email"
                   name="floating_email"
-                  id="floating_email"
-                  @input="clearFieldError('email')"
                   :class="[
                     'block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-white focus:outline-none focus:ring-0 peer transition',
-                    formErrors.email ? 'border-rose-500 focus:border-rose-500' : 'border-gray-300 dark:border-gray-600 dark:focus:border-primary focus:border-primary'
+                    formErrors.email
+                      ? 'border-rose-500 focus:border-rose-500'
+                      : 'border-gray-300 dark:border-gray-600 dark:focus:border-primary focus:border-primary',
                   ]"
                   placeholder=" "
+                  @input="clearFieldError('email')"
                 />
                 <label
                   for="floating_email"
@@ -65,8 +58,8 @@
             <p class="dark:text-white text-center text-gray-700 text-sm">
               Profilingiz bormi?<button
                 type="button"
-                @click="$router.push('/auth/login')"
                 class="ml-2 text-primary font-bold hover:underline"
+                @click="$router.push('/auth/login')"
               >
                 Tizimga kirish
               </button>
@@ -79,7 +72,7 @@
 </template>
 
 <script>
-import { validateForm, forgotPasswordValidationRules } from "@/utils/validators";
+import { forgotPasswordValidationRules, validateForm } from "@/utils/validators";
 
 export default {
   name: "ForgotPassword",
@@ -111,4 +104,3 @@ export default {
   },
 };
 </script>
-
