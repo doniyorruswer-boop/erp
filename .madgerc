@@ -1,0 +1,15 @@
+{
+  "fileExtensions": ["js", "ts", "vue"],
+  "tsConfig": "tsconfig.json",
+  "webpackConfig": "node_modules/@vue/cli-service/webpack.config.js",
+  "baseDir": ".",
+  "excludeRegExp": [
+    "^node_modules",
+    "\\.(spec|test)\\.(ts|js)$",
+    "\\.storybook",
+    "storybook-static",
+    "e2e",
+    "reports",
+    "dist"
+  ]
+}

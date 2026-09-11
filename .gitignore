@@ -57,3 +57,10 @@ Thumbs.db
 # Database backups
 backups/
 */backups/
+
+# Reports & Test Artifacts
+reports/
+*/reports/
+test-results/
+*/test-results/
+scratch_claude_prompts.txt

@@ -20,6 +20,7 @@ module.exports = {
       },
       colors: {
         primary: "rgba(var(--color-primary-rgb, 79, 70, 229), <alpha-value>)",
+        "dark-surface": "#131b2e",
       },
       fontFamily: {
         lexend: "'Lexend', sans-serif",

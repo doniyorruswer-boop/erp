@@ -1,12 +1,13 @@
-import BRAND_CONFIG from "./brand.config";
+import { API_CONFIG } from "./api.config";
+import { BRAND_CONFIG } from "./brand.config";
 
 export const APP_CONFIG = {
   name: BRAND_CONFIG.name,
   brand: BRAND_CONFIG,
   version: "1.0.1",
   description: BRAND_CONFIG.description,
-  apiBaseUrl: process.env.VUE_APP_API_URL || "http://localhost:3000/api",
-  
+  apiBaseUrl: API_CONFIG.BASE_URL,
+
   // Filiallar ro'yxati
   branches: [
     { id: "central", name: "Markaziy", code: "CTR" },
@@ -21,7 +22,7 @@ export const APP_CONFIG = {
   currency: {
     code: "UZS",
     symbol: "so'm",
-    separator: " ", // Masalan: "45 000 so'm" yoki "," bilan "45,000"
+    separator: " ",
     decimals: 0,
   },
 
@@ -30,12 +31,32 @@ export const APP_CONFIG = {
     defaultFormat: "YYYY-MM-DD",
     displayFormat: "DD-MMMM, YYYY",
     months: [
-      "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
-      "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
+      "Yanvar",
+      "Fevral",
+      "Mart",
+      "Aprel",
+      "May",
+      "Iyun",
+      "Iyul",
+      "Avgust",
+      "Sentabr",
+      "Oktabr",
+      "Noyabr",
+      "Dekabr",
     ],
     monthsShort: [
-      "Yan", "Fev", "Mar", "Apr", "May", "Iyun",
-      "Iyul", "Avg", "Sen", "Okt", "Noy", "Dek"
+      "Yan",
+      "Fev",
+      "Mar",
+      "Apr",
+      "May",
+      "Iyun",
+      "Iyul",
+      "Avg",
+      "Sen",
+      "Okt",
+      "Noy",
+      "Dek",
     ],
     weekDays: ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba", "Yakshanba"],
     weekDaysShort: ["Du", "Se", "Ch", "Pa", "Ju", "Sh", "Ya"],
@@ -72,13 +93,9 @@ export const APP_CONFIG = {
 
 /**
  * Pul summasini chiroyli probel yoki vergul bilan formatlash
- * @param {number|string} amount - Summa (masalan: 45000)
- * @param {boolean} withSymbol - "so'm" qo'shimchasi bilan chiqarish
- * @param {string} separator - " " (probel) yoki "," (vergul)
- * @returns {string} Masalan: "45 000 so'm" yoki "45,000 UZS"
  */
 export function formatMoney(amount, withSymbol = true, separator = " ") {
-  if (amount === null || amount === undefined || isNaN(amount)) {
+  if (amount === null || amount === undefined || isNaN(Number(amount))) {
     return `0 ${withSymbol ? APP_CONFIG.currency.symbol : ""}`.trim();
   }
 
@@ -90,8 +107,6 @@ export function formatMoney(amount, withSymbol = true, separator = " ") {
 
 /**
  * Formatlangan summa satridan sof raqamni ajratib olish
- * @param {string} formattedStr - Masalan: "45 000", "45,000 so'm"
- * @returns {number} Masalan: 45000
  */
 export function parseMoney(formattedStr) {
   if (!formattedStr) return 0;
@@ -102,9 +117,6 @@ export function parseMoney(formattedStr) {
 
 /**
  * Sanani o'zbekcha chiroyli formatda ko'rsatish
- * @param {string|Date} dateVal - Masalan: "2026-08-29"
- * @param {boolean} includeYear - Yilni ham qo'shish
- * @returns {string} Masalan: "29-Avgust, 2026"
  */
 export function formatDateUz(dateVal, includeYear = true) {
   if (!dateVal) return "";
@@ -120,8 +132,6 @@ export function formatDateUz(dateVal, includeYear = true) {
 
 /**
  * Telefon raqamini O'zbekiston formati bo'yicha formatlash
- * @param {string} phone - Masalan: "998901234567"
- * @returns {string} Masalan: "+998 90 123 45 67"
  */
 export function formatPhone(phone) {
   if (!phone) return "";

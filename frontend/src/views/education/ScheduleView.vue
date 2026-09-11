@@ -2,14 +2,13 @@
   <div class="schedule-view-page p-4 font-lexend space-y-4">
     <!-- 1. Breadcrumb -->
     <Breadcrumb
-      :items="[
-        { title: 'O\'quv jarayoni', to: '/education/schedule' },
-        { title: 'Dars jadvali' }
-      ]"
+      :items="[{ title: 'O\'quv jarayoni', to: '/education/schedule' }, { title: 'Dars jadvali' }]"
     />
 
     <!-- 2. Header Section (Sarlavha, Asosiy tablar va Ko'rish rejimi tugmalari) -->
-    <div class="flex items-center justify-between flex-wrap gap-4 border-b border-gray-200 dark:border-gray-800 pb-3">
+    <div
+      class="flex items-center justify-between flex-wrap gap-4 border-b border-gray-200 dark:border-gray-800 pb-3"
+    >
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
           Dars jadvali
@@ -61,13 +60,13 @@
           v-for="q in quarterFilters"
           :key="q.key"
           type="button"
-          @click="selectedQuarter = q.key"
           :class="[
             'px-5 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer shadow-2xs',
             selectedQuarter === q.key
               ? 'border-2 border-primary text-primary bg-primary/5 dark:bg-primary/10 shadow-xs'
-              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131b2e] text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+              : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600',
           ]"
+          @click="selectedQuarter = q.key"
         >
           {{ q.label }}
         </button>
@@ -81,7 +80,7 @@
         <div
           v-for="cls in filteredClasses"
           :key="cls.id"
-          class="bg-white dark:bg-[#131b2e] rounded-2xl border border-gray-200 dark:border-gray-800/80 p-4 flex flex-col justify-between shadow-2xs hover:shadow-md transition-all relative overflow-hidden group hover:border-gray-300 dark:hover:border-gray-700"
+          class="bg-white dark:bg-dark-surface rounded-2xl border border-gray-200 dark:border-gray-800/80 p-4 flex flex-col justify-between shadow-2xs hover:shadow-md transition-all relative overflow-hidden group hover:border-gray-300 dark:hover:border-gray-700"
         >
           <!-- Yuqori rangli chegara (Sinf rangi bo'yicha) -->
           <div
@@ -102,7 +101,9 @@
 
               <!-- Parallel va Sinf rahbari -->
               <div class="min-w-0 flex-1">
-                <div class="text-[11px] text-gray-400 dark:text-gray-400 font-semibold leading-tight">
+                <div
+                  class="text-[11px] text-gray-400 dark:text-gray-400 font-semibold leading-tight"
+                >
                   {{ cls.parallel }}
                 </div>
                 <div class="truncate text-xs font-medium mt-0.5">
@@ -113,10 +114,7 @@
                   >
                     {{ cls.teacherName }}
                   </span>
-                  <span
-                    v-else
-                    class="text-gray-400 dark:text-gray-400 italic text-[11px]"
-                  >
+                  <span v-else class="text-gray-400 dark:text-gray-400 italic text-[11px]">
                     Sinf rahbari belgilanmagan
                   </span>
                 </div>
@@ -125,7 +123,10 @@
 
             <!-- O'rta qism: O'quvchilar sig'imi (👥 28 / 25) -->
             <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 my-2">
-              <Icon icon="solar:users-group-rounded-linear" class="text-base text-gray-400 dark:text-gray-400 shrink-0" />
+              <Icon
+                icon="solar:users-group-rounded-linear"
+                class="text-base text-gray-400 dark:text-gray-400 shrink-0"
+              />
               <span class="font-semibold text-gray-700 dark:text-gray-200">
                 {{ cls.studentsCount }} / {{ cls.capacity }}
               </span>
@@ -133,20 +134,14 @@
           </div>
 
           <!-- Pastki qator: Shablonlar va Ochish amallari - Standard AppButton o'lchami -->
-          <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between gap-2">
+          <div
+            class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between gap-2"
+          >
             <!-- Shablonlar tugmasi -->
-            <AppButton
-              variant="outline"
-              @click="openTemplatesModal(cls)"
-            >
-              Shablonlar
-            </AppButton>
+            <AppButton variant="outline" @click="openTemplatesModal(cls)"> Shablonlar </AppButton>
 
             <!-- Ochish -> tugmasi (Primary rangli AppButton) -->
-            <AppButton
-              variant="primary"
-              @click="openClassSchedule(cls)"
-            >
+            <AppButton variant="primary" @click="openClassSchedule(cls)">
               <span class="flex items-center gap-1.5">
                 <span>Ochish</span>
                 <Icon icon="solar:arrow-right-linear" class="text-sm font-bold" />
@@ -179,19 +174,15 @@
 
           <!-- Sinf rahbari -->
           <template #cell(teacherName)="{ row }">
-            <AppUserCell
-              v-if="row.teacherName"
-              :name="row.teacherName"
-              subtitle="Sinf rahbari"
-            />
-            <span v-else class="text-gray-400 italic text-xs">
-              Belgilanmagan
-            </span>
+            <AppUserCell v-if="row.teacherName" :name="row.teacherName" subtitle="Sinf rahbari" />
+            <span v-else class="text-gray-400 italic text-xs"> Belgilanmagan </span>
           </template>
 
           <!-- O'quvchilar soni / Sig'im -->
           <template #cell(capacityInfo)="{ row }">
-            <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300">
+            <div
+              class="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-300"
+            >
               <Icon icon="solar:users-group-rounded-linear" class="text-sm text-gray-400" />
               <span>{{ row.studentsCount }} / {{ row.capacity }}</span>
             </div>
@@ -207,16 +198,8 @@
           <!-- Amallar ustuni: Standard AppButton komponentlari bilan -->
           <template #actions="{ row }">
             <div class="flex items-center gap-2 justify-end">
-              <AppButton
-                variant="outline"
-                @click="openTemplatesModal(row)"
-              >
-                Shablonlar
-              </AppButton>
-              <AppButton
-                variant="primary"
-                @click="openClassSchedule(row)"
-              >
+              <AppButton variant="outline" @click="openTemplatesModal(row)"> Shablonlar </AppButton>
+              <AppButton variant="primary" @click="openClassSchedule(row)">
                 <span class="flex items-center gap-1.5">
                   <span>Ochish</span>
                   <Icon icon="solar:arrow-right-linear" class="text-sm font-bold" />
@@ -233,15 +216,19 @@
       <div
         v-for="group in levelGroups"
         :key="group.title"
-        class="bg-white dark:bg-[#131b2e] border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-2xs space-y-3"
+        class="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-2xs space-y-3"
       >
-        <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+        <div
+          class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3"
+        >
           <div class="flex items-center gap-2.5">
             <span class="w-3 h-3 rounded-full bg-primary"></span>
             <h3 class="font-bold text-base text-gray-900 dark:text-gray-100">
               {{ group.title }}
             </h3>
-            <span class="text-xs text-gray-400 font-medium">({{ group.classes.length }} ta sinf)</span>
+            <span class="text-xs text-gray-400 font-medium"
+              >({{ group.classes.length }} ta sinf)</span
+            >
           </div>
           <span class="text-xs text-gray-500 font-medium">
             Jami o'quvchilar: {{ group.classes.reduce((sum, c) => sum + c.studentsCount, 0) }} nafar
@@ -252,8 +239,8 @@
           <div
             v-for="c in group.classes"
             :key="c.id"
-            @click="openClassSchedule(c)"
             class="p-3 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-primary hover:bg-primary/5 transition cursor-pointer text-center group"
+            @click="openClassSchedule(c)"
           >
             <div
               class="w-10 h-8 rounded-lg mx-auto flex items-center justify-center font-bold text-white text-xs shadow-2xs mb-2"
@@ -261,12 +248,12 @@
             >
               {{ c.name }}
             </div>
-            <div class="text-xs font-semibold text-gray-800 dark:text-gray-200 group-hover:text-primary transition truncate">
-              {{ c.teacherName || 'Raxbar yo\'q' }}
+            <div
+              class="text-xs font-semibold text-gray-800 dark:text-gray-200 group-hover:text-primary transition truncate"
+            >
+              {{ c.teacherName || "Raxbar yo'q" }}
             </div>
-            <div class="text-[11px] text-gray-400 mt-0.5">
-              {{ c.studentsCount }} o'quvchi
-            </div>
+            <div class="text-[11px] text-gray-400 mt-0.5">{{ c.studentsCount }} o'quvchi</div>
           </div>
         </div>
       </div>
@@ -278,10 +265,12 @@
         <div
           v-for="teacher in teachersList"
           :key="teacher.id"
-          class="bg-white dark:bg-[#131b2e] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-2xs hover:shadow-md transition space-y-3"
+          class="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-2xs hover:shadow-md transition space-y-3"
         >
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+            <div
+              class="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm"
+            >
               {{ teacher.name.charAt(0) }}
             </div>
             <div class="min-w-0 flex-1">
@@ -294,7 +283,9 @@
             </div>
           </div>
 
-          <div class="space-y-1 text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
+          <div
+            class="space-y-1 text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800"
+          >
             <div class="flex items-center justify-between">
               <span>Telefon:</span>
               <span class="font-medium text-gray-700 dark:text-gray-300">{{ teacher.phone }}</span>
@@ -327,7 +318,7 @@
         <div
           v-for="room in roomsList"
           :key="room.id"
-          class="bg-white dark:bg-[#131b2e] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-2xs hover:shadow-md transition space-y-3"
+          class="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-2xs hover:shadow-md transition space-y-3"
         >
           <div class="flex items-start justify-between gap-2">
             <div>
@@ -338,15 +329,21 @@
                 {{ room.floor }}
               </p>
             </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+            <span
+              class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+            >
               Faol
             </span>
           </div>
 
-          <div class="space-y-1 text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
+          <div
+            class="space-y-1 text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800"
+          >
             <div class="flex items-center justify-between">
               <span>Sig'imi:</span>
-              <span class="font-medium text-gray-700 dark:text-gray-300">{{ room.capacity }} o'rin</span>
+              <span class="font-medium text-gray-700 dark:text-gray-300"
+                >{{ room.capacity }} o'rin</span
+              >
             </div>
             <div class="flex items-center justify-between">
               <span>Bugungi bandlik:</span>
@@ -354,12 +351,7 @@
             </div>
           </div>
 
-          <AppButton
-            variant="outline"
-            size="sm"
-            :full-width="true"
-            @click="openRoomSchedule(room)"
-          >
+          <AppButton variant="outline" size="sm" :full-width="true" @click="openRoomSchedule(room)">
             Xona bandligini ko'rish
           </AppButton>
         </div>
@@ -383,17 +375,14 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
+import { ROOMS_LIST, SCHEDULE_CLASSES, TEACHERS_LIST } from "@/api/scheduleData";
 import Breadcrumb from "@/components/Breadcrumb.vue";
-import AppTable from "@/components/AppTable.vue";
-import AppButton from "@/components/AppButton.vue";
-import AppUserCell from "@/components/AppUserCell.vue";
+import AppButton from "@/components/common/AppButton.vue";
+import AppTable from "@/components/common/AppTable.vue";
+import AppUserCell from "@/components/common/AppUserCell.vue";
 import ClassScheduleDetailModal from "@/components/education/ClassScheduleDetailModal.vue";
 import ScheduleTemplateModal from "@/components/education/ScheduleTemplateModal.vue";
-import {
-  SCHEDULE_CLASSES,
-  TEACHERS_LIST,
-  ROOMS_LIST,
-} from "@/api/scheduleData";
 
 export default {
   name: "ScheduleView",
@@ -505,8 +494,8 @@ export default {
       this.activeClassId = "1-a";
       this.showScheduleModal = true;
     },
-    handleScheduleSaved({ classId }) {
-      console.log("Schedule updated for", classId);
+    handleScheduleSaved({ classId: _classId } = {}) {
+      // Dars jadvali muvaffaqiyatli yangilandi
     },
     handleTemplateApplied({ classId }) {
       this.activeClassId = classId;

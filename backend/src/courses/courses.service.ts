@@ -1,13 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { AuditAction } from '@prisma/client';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { AuditAction } from "@prisma/client";
+import { UpdateCourseDto } from "./dto/course.dto";
 
 @Injectable()
 export class CoursesService {
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
   async findAll(query: { search?: string; orgId: string }) {
@@ -18,8 +19,8 @@ export class CoursesService {
         isActive: true,
         OR: query.search
           ? [
-              { name: { contains: query.search, mode: 'insensitive' } },
-              { description: { contains: query.search, mode: 'insensitive' } },
+              { name: { contains: query.search, mode: "insensitive" } },
+              { description: { contains: query.search, mode: "insensitive" } },
             ]
           : undefined,
       },
@@ -31,7 +32,7 @@ export class CoursesService {
           select: { groups: true, leads: true },
         },
       },
-      orderBy: { name: 'asc' },
+      orderBy: { name: "asc" },
     });
   }
 
@@ -49,17 +50,21 @@ export class CoursesService {
         },
       },
     });
-    if (!course) throw new NotFoundException('Kurs topilmadi');
+    if (!course) throw new NotFoundException("Kurs topilmadi");
     return course;
   }
 
-  async create(data: {
-    name: string;
-    description?: string;
-    price: number;
-    duration: number;
-    lessonCount?: number;
-  }, orgId: string, userId?: string) {
+  async create(
+    data: {
+      name: string;
+      description?: string;
+      price: number;
+      duration: number;
+      lessonCount?: number;
+    },
+    orgId: string,
+    userId?: string
+  ) {
     const course = await this.prisma.course.create({
       data: {
         name: data.name,
@@ -76,7 +81,7 @@ export class CoursesService {
       organizationId: orgId,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Course',
+      entityType: "Course",
       entityId: course.id,
       after: course,
     });
@@ -84,9 +89,9 @@ export class CoursesService {
     return course;
   }
 
-  async update(id: string, data: any, orgId: string, userId?: string) {
+  async update(id: string, data: UpdateCourseDto, orgId: string, userId?: string) {
     const course = await this.prisma.course.findFirst({ where: { id, organizationId: orgId } });
-    if (!course) throw new NotFoundException('Kurs topilmadi');
+    if (!course) throw new NotFoundException("Kurs topilmadi");
 
     const updated = await this.prisma.course.update({
       where: { id },
@@ -102,7 +107,7 @@ export class CoursesService {
       organizationId: orgId,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Course',
+      entityType: "Course",
       entityId: id,
       before: course,
       after: updated,
@@ -115,7 +120,7 @@ export class CoursesService {
     const course = await this.prisma.course.findFirst({
       where: { id, organizationId: orgId, deletedAt: null },
     });
-    if (!course) throw new NotFoundException('Kurs topilmadi');
+    if (!course) throw new NotFoundException("Kurs topilmadi");
 
     const deleted = await this.prisma.course.update({
       where: { id },
@@ -126,7 +131,7 @@ export class CoursesService {
       organizationId: orgId,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Course',
+      entityType: "Course",
       entityId: id,
       before: course,
       after: deleted,
@@ -137,7 +142,7 @@ export class CoursesService {
 
   async restore(id: string, orgId: string, userId?: string) {
     const course = await this.prisma.course.findFirst({ where: { id, organizationId: orgId } });
-    if (!course) throw new NotFoundException('Kurs topilmadi');
+    if (!course) throw new NotFoundException("Kurs topilmadi");
 
     const restored = await this.prisma.course.update({
       where: { id },
@@ -148,7 +153,7 @@ export class CoursesService {
       organizationId: orgId,
       userId,
       action: AuditAction.RESTORE,
-      entityType: 'Course',
+      entityType: "Course",
       entityId: id,
       before: course,
       after: restored,

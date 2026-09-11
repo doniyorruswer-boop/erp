@@ -6,6 +6,8 @@
  * docs/MODULE_PERMISSION_CONTRACT.md (UPPERCASE string, e.g. 'ATTENDANCE', 'FINANCE', 'STUDENTS')
  */
 
+import type { RouteRecordRaw } from "vue-router";
+
 export type ModuleCategory =
   | "CORE"
   | "ACADEMIC"
@@ -59,7 +61,7 @@ export interface ModuleDefinition {
   /** Optional target business types (e.g. ['COURSE_CENTER', 'SCHOOL']) */
   applicableBusinessTypes?: string[];
   /** Route definitions registered by this module */
-  routes?: ModuleRouteDefinition[];
+  routes?: RouteRecordRaw[];
   /** Navigation / sidebar items contributed by this module */
   navigation?: ModuleNavigationItem[];
   /** Permission codes declared by this module */

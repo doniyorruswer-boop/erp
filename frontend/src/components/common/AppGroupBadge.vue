@@ -1,6 +1,6 @@
 <template>
   <div class="inline-flex items-center justify-center whitespace-nowrap select-none">
-    <router-link
+    <RouterLink
       v-if="to"
       :to="to"
       class="inline-flex items-center gap-1 font-bold rounded-md border transition-colors cursor-pointer hover:border-primary hover:text-primary"
@@ -8,7 +8,7 @@
       @click.stop
     >
       <slot>{{ name }}</slot>
-    </router-link>
+    </RouterLink>
     <span
       v-else
       class="inline-flex items-center gap-1 font-bold rounded-md border"
@@ -25,28 +25,26 @@ export default {
   props: {
     name: {
       type: [String, Number],
-      default: ""
+      default: "",
     },
     to: {
       type: [String, Object],
-      default: null
+      default: null,
     },
     variant: {
       type: String,
       default: "blue",
-      validator: (v) => ["blue", "purple", "gray", "emerald"].includes(v)
+      validator: (v) => ["blue", "purple", "gray", "emerald"].includes(v),
     },
     size: {
       type: String,
       default: "md",
-      validator: (v) => ["sm", "md"].includes(v)
-    }
+      validator: (v) => ["sm", "md"].includes(v),
+    },
   },
   computed: {
     sizeClasses() {
-      return this.size === "sm"
-        ? "px-2 py-0.5 text-[11px]"
-        : "px-2.5 py-1 text-xs";
+      return this.size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-2.5 py-1 text-xs";
     },
     badgeClasses() {
       switch (this.variant) {
@@ -60,7 +58,7 @@ export default {
         default:
           return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
       }
-    }
-  }
+    },
+  },
 };
 </script>

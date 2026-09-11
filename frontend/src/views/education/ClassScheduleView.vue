@@ -66,8 +66,22 @@
     <AppConfirmModal
       ref="deleteConfirmModal"
       title="Darsni o'chirish"
-      :message="lessonToDelete ? '«' + (lessonToDelete.lesson?.subject || 'Dars') + '» darsini o\'chirishni tasdiqlaysizmi?' : ''"
-      :description="lessonToDelete ? (lessonToDelete.day?.dayName + ', ' + lessonToDelete.day?.dateString + ' soat ' + lessonToDelete.period?.time) : ''"
+      :message="
+        lessonToDelete
+          ? '«' +
+            (lessonToDelete.lesson?.subject || 'Dars') +
+            '» darsini o\'chirishni tasdiqlaysizmi?'
+          : ''
+      "
+      :description="
+        lessonToDelete
+          ? lessonToDelete.day?.dayName +
+            ', ' +
+            lessonToDelete.day?.dateString +
+            ' soat ' +
+            lessonToDelete.period?.time
+          : ''
+      "
       confirm-text="Tasdiqlash va O'chirish"
       cancel-text="Bekor qilish"
       variant="danger"
@@ -87,24 +101,23 @@
 </template>
 
 <script>
-import ClassScheduleHeader from "@/components/education/ClassScheduleHeader.vue";
-import ClassScheduleGrid from "@/components/education/ClassScheduleGrid.vue";
-import ClassLessonDetailModal from "@/components/education/ClassLessonDetailModal.vue";
-import ClassLessonEditModal from "@/components/education/ClassLessonEditModal.vue";
-import ClassLessonAddModal from "@/components/education/ClassLessonAddModal.vue";
-import ScheduleTemplateModal from "@/components/education/ScheduleTemplateModal.vue";
-import AppConfirmModal from "@/components/AppConfirmModal.vue";
-import toast from "@/utils/toast";
-
 import {
+  generateWeeksForQuarter,
+  ROOMS_LIST,
   SCHEDULE_CLASSES,
+  SCHOOL_QUARTERS,
   SUBJECTS_LIST,
   TEACHERS_LIST,
-  ROOMS_LIST,
-  SCHOOL_QUARTERS,
-  generateWeeksForQuarter,
 } from "@/api/scheduleData";
 import { initialSchoolStudents } from "@/api/schoolStudentsData";
+import AppConfirmModal from "@/components/common/AppConfirmModal.vue";
+import ClassLessonAddModal from "@/components/education/ClassLessonAddModal.vue";
+import ClassLessonDetailModal from "@/components/education/ClassLessonDetailModal.vue";
+import ClassLessonEditModal from "@/components/education/ClassLessonEditModal.vue";
+import ClassScheduleGrid from "@/components/education/ClassScheduleGrid.vue";
+import ClassScheduleHeader from "@/components/education/ClassScheduleHeader.vue";
+import ScheduleTemplateModal from "@/components/education/ScheduleTemplateModal.vue";
+import toast from "@/utils/toast";
 
 export default {
   name: "ClassScheduleView",
@@ -156,16 +169,10 @@ export default {
   },
   computed: {
     activeQuarter() {
-      return (
-        this.quarters.find((q) => q.id === this.activeQuarterId) ||
-        this.quarters[0]
-      );
+      return this.quarters.find((q) => q.id === this.activeQuarterId) || this.quarters[0];
     },
     weeksList() {
-      return generateWeeksForQuarter(
-        this.activeQuarter.startDate,
-        this.activeQuarter.endDate
-      );
+      return generateWeeksForQuarter(this.activeQuarter.startDate, this.activeQuarter.endDate);
     },
     currentClass() {
       return (
@@ -272,7 +279,10 @@ export default {
     saveToStorage() {
       localStorage.setItem(this.getStorageKey(), JSON.stringify(this.scheduleMap));
       if (this.activeQuarterId === "1") {
-        localStorage.setItem(`educrm_dated_schedule_${this.activeClassId}`, JSON.stringify(this.scheduleMap));
+        localStorage.setItem(
+          `educrm_dated_schedule_${this.activeClassId}`,
+          JSON.stringify(this.scheduleMap)
+        );
       }
     },
     getLesson(dateKey, periodNum) {

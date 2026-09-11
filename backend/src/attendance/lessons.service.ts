@@ -1,15 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { AuditAction } from '@prisma/client';
-import { CreateLessonDto, UpdateLessonDto, QueryLessonDto } from './dto/lesson.dto';
-import { BranchContext, buildBranchWhere } from '../auth/branch-access';
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { AuditAction, Prisma } from "@prisma/client";
+import { CreateLessonDto, UpdateLessonDto, QueryLessonDto } from "./dto/lesson.dto";
+import { BranchContext, buildBranchWhere } from "../auth/branch-access";
 
 @Injectable()
 export class LessonsService {
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
   async findAll(query: QueryLessonDto, orgId: string, branchCtx?: BranchContext) {
@@ -19,7 +19,7 @@ export class LessonsService {
 
     const branchFilter = branchCtx ? buildBranchWhere(branchCtx) : {};
 
-    const where: any = {
+    const where: Prisma.LessonWhereInput = {
       group: {
         organizationId: orgId,
         deletedAt: null,
@@ -31,7 +31,7 @@ export class LessonsService {
         gte: query.dateFrom ? new Date(query.dateFrom) : undefined,
         lte: query.dateTo ? new Date(query.dateTo) : undefined,
       },
-      title: query.search ? { contains: query.search, mode: 'insensitive' } : undefined,
+      title: query.search ? { contains: query.search, mode: "insensitive" } : undefined,
     };
 
     const [lessons, total] = await Promise.all([
@@ -52,7 +52,7 @@ export class LessonsService {
           homework: true,
           _count: { select: { attendances: true, grades: true } },
         },
-        orderBy: { date: 'asc' },
+        orderBy: { date: "asc" },
       }),
       this.prisma.lesson.count({ where }),
     ]);
@@ -104,7 +104,7 @@ export class LessonsService {
     });
 
     if (!lesson) {
-      throw new NotFoundException('Dars topilmadi yoki ushbu tashkilot/filialga tegishli emas');
+      throw new NotFoundException("Dars topilmadi yoki ushbu tashkilot/filialga tegishli emas");
     }
 
     return lesson;
@@ -118,11 +118,13 @@ export class LessonsService {
     });
 
     if (!group) {
-      throw new NotFoundException('Guruh topilmadi yoki ushbu tashkilot/filialga tegishli emas');
+      throw new NotFoundException("Guruh topilmadi yoki ushbu tashkilot/filialga tegishli emas");
     }
 
     if (dto.startTime && dto.endTime && dto.startTime >= dto.endTime) {
-      throw new BadRequestException("Dars boshlanish vaqti tugash vaqtidan oldin bo'lishi shart (start < end)");
+      throw new BadRequestException(
+        "Dars boshlanish vaqti tugash vaqtidan oldin bo'lishi shart (start < end)"
+      );
     }
 
     const lesson = await this.prisma.lesson.create({
@@ -150,7 +152,7 @@ export class LessonsService {
       branchId: group.branchId || undefined,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Lesson',
+      entityType: "Lesson",
       entityId: lesson.id,
       after: lesson,
     });
@@ -158,11 +160,19 @@ export class LessonsService {
     return lesson;
   }
 
-  async update(id: string, dto: UpdateLessonDto, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async update(
+    id: string,
+    dto: UpdateLessonDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const lesson = await this.findOne(id, orgId, branchCtx);
 
     if (dto.startTime && dto.endTime && dto.startTime >= dto.endTime) {
-      throw new BadRequestException("Dars boshlanish vaqti tugash vaqtidan oldin bo'lishi shart (start < end)");
+      throw new BadRequestException(
+        "Dars boshlanish vaqti tugash vaqtidan oldin bo'lishi shart (start < end)"
+      );
     }
 
     const updated = await this.prisma.lesson.update({
@@ -189,7 +199,7 @@ export class LessonsService {
       branchId: lesson.group?.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Lesson',
+      entityType: "Lesson",
       entityId: id,
       before: lesson,
       after: updated,
@@ -211,11 +221,11 @@ export class LessonsService {
       branchId: lesson.group?.branchId || undefined,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Lesson',
+      entityType: "Lesson",
       entityId: id,
       before: lesson,
     });
 
-    return { success: true, message: 'Dars muvaffaqiyatli o\'chirildi', id: deleted.id };
+    return { success: true, message: "Dars muvaffaqiyatli o'chirildi", id: deleted.id };
   }
 }

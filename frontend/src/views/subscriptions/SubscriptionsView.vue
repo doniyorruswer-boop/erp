@@ -6,7 +6,9 @@
     <!-- Header Section -->
     <div class="flex items-center justify-between flex-wrap gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">EduHub Tarif Rejalari & Obuna (SaaS)</h1>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
+          EduHub Tarif Rejalari & Obuna (SaaS)
+        </h1>
         <p class="text-sm text-gray-400 mt-0.5">
           O'quv markazingiz yoki maktabingiz uchun faol obuna holati, limitlar va qulay tariflar
         </p>
@@ -14,8 +16,8 @@
       <div class="flex items-center gap-2.5">
         <button
           type="button"
-          @click="fetchData"
           class="border flex items-center text-sm gap-2 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-700 rounded-md py-2 px-4 font-medium shadow-sm transition cursor-pointer"
+          @click="fetchData"
         >
           <Icon icon="solar:restart-bold" class="text-base" />
           <span>Yangilash</span>
@@ -24,20 +26,31 @@
     </div>
 
     <!-- Alert Message -->
-    <Alert v-if="alertMessage" :message="alertMessage" :type="alertType" @close="alertMessage = ''" />
+    <Alert
+      v-if="alertMessage"
+      :message="alertMessage"
+      :type="alertType"
+      @close="alertMessage = ''"
+    />
 
     <!-- Active Subscription Status Banner (Windzo Card Style) -->
-    <div class="card bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-5 shadow-sm space-y-4">
+    <div
+      class="card bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-5 shadow-sm space-y-4"
+    >
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary/10 text-primary rounded-md text-xs font-bold uppercase tracking-wider mb-2">
+          <div
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary/10 text-primary rounded-md text-xs font-bold uppercase tracking-wider mb-2"
+          >
             <Icon icon="solar:star-fall-bold" class="text-sm" />
             <span>Faol Reja</span>
           </div>
           <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
             {{ currentSubscription?.plan?.name || "Professional Plan" }}
           </h2>
-          <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-1 flex-wrap">
+          <div
+            class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-1 flex-wrap"
+          >
             <span class="flex items-center gap-1">
               <span>Status:</span>
               <Badge variant="success" :dot="true" size="sm">
@@ -48,26 +61,36 @@
             <span>
               Amal qilish muddati:
               <strong class="text-gray-700 dark:text-gray-200">
-                {{ currentSubscription?.endDate ? formatDate(currentSubscription.endDate) : "Cheksiz (Umrbod)" }}
+                {{
+                  currentSubscription?.endDate
+                    ? formatDate(currentSubscription.endDate)
+                    : "Cheksiz (Umrbod)"
+                }}
               </strong>
             </span>
           </div>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div class="bg-gray-50 dark:bg-gray-700/50 p-3.5 rounded-md border dark:border-gray-700 text-center">
+          <div
+            class="bg-gray-50 dark:bg-gray-700/50 p-3.5 rounded-md border dark:border-gray-700 text-center"
+          >
             <p class="text-[11px] text-gray-400 font-semibold uppercase">O'quvchilar Limiti</p>
             <p class="text-lg font-bold text-gray-800 dark:text-white mt-1">
               {{ currentSubscription?.studentLimit || "1,000" }} ta
             </p>
           </div>
-          <div class="bg-gray-50 dark:bg-gray-700/50 p-3.5 rounded-md border dark:border-gray-700 text-center">
+          <div
+            class="bg-gray-50 dark:bg-gray-700/50 p-3.5 rounded-md border dark:border-gray-700 text-center"
+          >
             <p class="text-[11px] text-gray-400 font-semibold uppercase">Filiallar</p>
             <p class="text-lg font-bold text-gray-800 dark:text-white mt-1">
               {{ currentSubscription?.branchLimit || "5" }} ta
             </p>
           </div>
-          <div class="bg-gray-50 dark:bg-gray-700/50 p-3.5 rounded-md border dark:border-gray-700 text-center col-span-2 sm:col-span-1">
+          <div
+            class="bg-gray-50 dark:bg-gray-700/50 p-3.5 rounded-md border dark:border-gray-700 text-center col-span-2 sm:col-span-1"
+          >
             <p class="text-[11px] text-gray-400 font-semibold uppercase">SMS Balans</p>
             <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">
               {{ currentSubscription?.smsBalance || "5,000" }} dona
@@ -92,7 +115,7 @@
             'card bg-white dark:bg-gray-800 rounded-lg border p-5 transition flex flex-col justify-between space-y-5',
             plan.isPopular
               ? 'border-primary ring-2 ring-primary/20 shadow-md'
-              : 'dark:border-gray-700 hover:shadow-sm'
+              : 'dark:border-gray-700 hover:shadow-sm',
           ]"
         >
           <div class="space-y-4">
@@ -101,10 +124,14 @@
               <Badge v-if="plan.isPopular" variant="primary" size="xs">Tavsiya etiladi</Badge>
             </div>
 
-            <p class="text-xs text-gray-500 dark:text-gray-400 min-h-[32px]">{{ plan.description }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 min-h-[32px]">
+              {{ plan.description }}
+            </p>
 
             <div class="py-2 border-y dark:border-gray-700/70">
-              <span class="text-3xl font-black text-gray-900 dark:text-white">{{ formatMoney(plan.price) }}</span>
+              <span class="text-3xl font-black text-gray-900 dark:text-white">{{
+                formatMoney(plan.price)
+              }}</span>
               <span class="text-xs text-gray-400 ml-1">so'm / oyiga</span>
             </div>
 
@@ -121,18 +148,22 @@
             <button
               type="button"
               :disabled="subscribing || isCurrentPlan(plan)"
-              @click="subscribeToPlan(plan)"
               :class="[
                 'w-full py-2.5 px-4 rounded-md text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5',
                 isCurrentPlan(plan)
                   ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
                   : plan.isPopular
-                  ? 'bg-primary hover:bg-primary/90 text-white shadow-sm'
-                  : 'bg-gray-800 hover:bg-gray-900 text-white dark:bg-gray-700 dark:hover:bg-gray-600'
+                    ? 'bg-primary hover:bg-primary/90 text-white shadow-sm'
+                    : 'bg-gray-800 hover:bg-gray-900 text-white dark:bg-gray-700 dark:hover:bg-gray-600',
               ]"
+              @click="subscribeToPlan(plan)"
             >
-              <Icon v-if="subscribing && selectedPlanId === plan.id" icon="eos-icons:loading" class="animate-spin text-sm" />
-              <span>{{ isCurrentPlan(plan) ? 'Joriy Tarif' : 'Ushbu Tarifga O\'tish' }}</span>
+              <Icon
+                v-if="subscribing && selectedPlanId === plan.id"
+                icon="eos-icons:loading"
+                class="animate-spin text-sm"
+              />
+              <span>{{ isCurrentPlan(plan) ? "Joriy Tarif" : "Ushbu Tarifga O'tish" }}</span>
             </button>
           </div>
         </div>
@@ -143,10 +174,11 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import Badge from "@/components/Badge.vue";
-import Alert from "@/components/Alert.vue";
+
 import { subscriptionsApi } from "@/api/services";
+import Alert from "@/components/Alert.vue";
+import Badge from "@/components/Badge.vue";
+import Breadcrumb from "@/components/Breadcrumb.vue";
 
 export default {
   name: "SubscriptionsView",
@@ -225,7 +257,11 @@ export default {
         if (curRes.status === "fulfilled" && curRes.value) {
           this.currentSubscription = curRes.value;
         }
-        if (plansRes.status === "fulfilled" && Array.isArray(plansRes.value) && plansRes.value.length > 0) {
+        if (
+          plansRes.status === "fulfilled" &&
+          Array.isArray(plansRes.value) &&
+          plansRes.value.length > 0
+        ) {
           this.plans = plansRes.value;
         }
       } catch (err) {
@@ -236,7 +272,10 @@ export default {
     },
     isCurrentPlan(plan) {
       if (!this.currentSubscription) return plan.id === "PRO";
-      return this.currentSubscription.plan?.name === plan.name || this.currentSubscription.planId === plan.id;
+      return (
+        this.currentSubscription.plan?.name === plan.name ||
+        this.currentSubscription.planId === plan.id
+      );
     },
     async subscribeToPlan(plan) {
       if (!confirm(`${plan.name} tarifiga o'tishni tasdiqlaysizmi?`)) return;
@@ -249,7 +288,8 @@ export default {
         await this.fetchData();
       } catch (err) {
         this.alertType = "danger";
-        this.alertMessage = "Obuna bo'lishda xatolik: " + (err.response?.data?.message || err.message);
+        this.alertMessage =
+          "Obuna bo'lishda xatolik: " + (err.response?.data?.message || err.message);
       } finally {
         this.subscribing = false;
         this.selectedPlanId = null;

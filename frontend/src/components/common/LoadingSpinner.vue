@@ -2,7 +2,7 @@
   <div
     :class="[
       'flex flex-col items-center justify-center font-lexend transition-all duration-300',
-      fullPage ? 'py-24 w-full' : 'py-8'
+      fullPage ? 'py-24 w-full' : 'py-8',
     ]"
   >
     <!-- Smooth SVG Ring Spinner -->
@@ -14,22 +14,13 @@
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <circle
-          cx="25"
-          cy="25"
-          r="20"
-          stroke="currentColor"
-          :stroke-width="strokeWidth"
-        />
+        <circle cx="25" cy="25" r="20" stroke="currentColor" :stroke-width="strokeWidth" />
       </svg>
 
       <!-- Animated Rotating Gradient Arc -->
       <svg
-        :class="[
-          sizeClass,
-          'absolute inset-0 text-primary animate-spin'
-        ]"
-        style="animation-duration: 0.85s; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);"
+        :class="[sizeClass, 'absolute inset-0 text-primary animate-spin']"
+        style="animation-duration: 0.85s; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1)"
         viewBox="0 0 50 50"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -47,17 +38,14 @@
       </svg>
 
       <!-- Inner Pulsing Glowing Center Dot -->
-      <div
-        :class="[
-          'absolute rounded-full bg-primary/80 animate-pulse',
-          dotSizeClass
-        ]"
-      />
+      <div :class="['absolute rounded-full bg-primary/80 animate-pulse', dotSizeClass]" />
     </div>
 
     <!-- Optional Label / Text -->
     <div v-if="text || $slots.default" class="mt-3.5 text-center">
-      <p class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 animate-pulse tracking-wide">
+      <p
+        class="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 animate-pulse tracking-wide"
+      >
         <slot>{{ text }}</slot>
       </p>
     </div>

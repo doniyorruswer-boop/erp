@@ -4,14 +4,16 @@
     <Breadcrumb :items="[{ title: 'Lidlar & CRM' }, { title: 'Sotuv Voronkasi' }]" />
 
     <!-- TOP TOOLBAR: Academic Season, Import, Template, Export, Settings, Add Button -->
-    <div class="flex items-center justify-between flex-wrap gap-3 bg-white dark:bg-gray-800 p-3.5 rounded-lg border dark:border-gray-700 shadow-xs">
+    <div
+      class="flex items-center justify-between flex-wrap gap-3 bg-white dark:bg-gray-800 p-3.5 rounded-lg border dark:border-gray-700 shadow-xs"
+    >
       <!-- Left: Season / Blackboard Dropdown -->
       <div class="flex items-center gap-2">
         <div class="relative season-dropdown-container">
           <button
             type="button"
-            @click.stop="showSeasonMenu = !showSeasonMenu"
             class="py-2 px-3.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-100 hover:border-primary flex items-center gap-2 transition cursor-pointer shadow-2xs"
+            @click.stop="showSeasonMenu = !showSeasonMenu"
           >
             <Icon icon="solar:filter-bold" class="text-primary text-base" />
             <span>{{ selectedSeason }}</span>
@@ -21,26 +23,35 @@
           <!-- Season Dropdown Menu -->
           <div
             v-if="showSeasonMenu"
-            @click.stop
             class="absolute left-0 mt-1.5 w-52 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg py-1 z-50 text-xs font-medium"
+            @click.stop
           >
             <div
               v-for="s in seasonOptions"
               :key="s"
-              @click="selectedSeason = s; showSeasonMenu = false"
               :class="[
                 'px-3.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer flex items-center justify-between',
-                selectedSeason === s ? 'text-primary font-bold bg-primary/5' : 'text-gray-700 dark:text-gray-200'
+                selectedSeason === s
+                  ? 'text-primary font-bold bg-primary/5'
+                  : 'text-gray-700 dark:text-gray-200',
               ]"
+              @click="
+                selectedSeason = s;
+                showSeasonMenu = false;
+              "
             >
               <span>{{ s }}</span>
-              <Icon v-if="selectedSeason === s" icon="solar:check-circle-bold" class="text-primary text-sm" />
+              <Icon
+                v-if="selectedSeason === s"
+                icon="solar:check-circle-bold"
+                class="text-primary text-sm"
+              />
             </div>
             <div class="border-t dark:border-gray-700 my-1"></div>
             <button
               type="button"
-              @click="openSeasonModal"
               class="w-full text-left px-3.5 py-2 text-primary hover:bg-primary/5 font-semibold flex items-center gap-1.5 cursor-pointer"
+              @click="openSeasonModal"
             >
               <Icon icon="solar:add-circle-linear" class="text-base" />
               <span>+ Yangi mavsum</span>
@@ -52,28 +63,15 @@
       <!-- Right Actions: Import, Import Shabloni, Export, Sozlash, Yangi Lid -->
       <div class="flex items-center gap-2 flex-wrap">
         <!-- Import Button -->
-        <AppButton
-          icon="solar:import-linear"
-          @click="openImportModal"
-        >
-          Import
-        </AppButton>
+        <AppButton icon="solar:import-linear" @click="openImportModal"> Import </AppButton>
 
         <!-- Import Shabloni Button -->
-        <AppButton
-          icon="solar:file-download-linear"
-          @click="downloadImportTemplate"
-        >
+        <AppButton icon="solar:file-download-linear" @click="downloadImportTemplate">
           Import shabloni
         </AppButton>
 
         <!-- Export Button -->
-        <AppButton
-          icon="solar:export-linear"
-          @click="exportLeadsToExcel"
-        >
-          Export
-        </AppButton>
+        <AppButton icon="solar:export-linear" @click="exportLeadsToExcel"> Export </AppButton>
 
         <!-- Sozlash Toggle Button -->
         <AppButton
@@ -81,7 +79,7 @@
           icon="solar:settings-linear"
           @click="isCustomizing = !isCustomizing"
         >
-          {{ isCustomizing ? 'Saqlash' : 'Sozlash' }}
+          {{ isCustomizing ? "Saqlash" : "Sozlash" }}
         </AppButton>
 
         <!-- Yangi Lid Primary Button -->
@@ -97,7 +95,9 @@
     </div>
 
     <!-- SEARCH & VIEW MODE BAR with Advanced Filters Toggle -->
-    <div class="bg-white dark:bg-gray-800 p-3.5 rounded-lg border dark:border-gray-700 shadow-xs space-y-3">
+    <div
+      class="bg-white dark:bg-gray-800 p-3.5 rounded-lg border dark:border-gray-700 shadow-xs space-y-3"
+    >
       <div class="flex items-center justify-between flex-wrap gap-3">
         <!-- Search Input (Compact Width) -->
         <div class="relative w-64 sm:w-72">
@@ -105,31 +105,33 @@
             <Icon icon="ei:search" class="text-xl" />
           </span>
           <input
-            type="text"
             v-model="searchQuery"
+            type="text"
             :placeholder="searchPlaceholder"
             class="w-full pl-9 pr-8 py-2 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none focus:border-primary focus:ring-1 focus:ring-primary text-gray-800 dark:text-gray-200 transition"
           />
           <button
             v-if="searchQuery"
-            @click="searchQuery = ''"
             class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
+            @click="searchQuery = ''"
           >
             <Icon icon="mdi:close-circle" class="text-base" />
           </button>
         </div>
 
         <!-- Center: View Switcher (Kanban doska | Jadval) -->
-        <div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-md border dark:border-gray-700 text-xs">
+        <div
+          class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-md border dark:border-gray-700 text-xs"
+        >
           <button
             type="button"
-            @click="viewMode = 'kanban'"
             :class="[
               'px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5',
               viewMode === 'kanban'
                 ? 'bg-white dark:bg-gray-700 text-primary shadow-xs'
-                : 'text-gray-500 hover:text-gray-800 dark:text-gray-300'
+                : 'text-gray-500 hover:text-gray-800 dark:text-gray-300',
             ]"
+            @click="viewMode = 'kanban'"
           >
             <Icon icon="solar:widget-2-bold" class="text-sm" />
             <span>Kanban doska</span>
@@ -137,13 +139,13 @@
 
           <button
             type="button"
-            @click="viewMode = 'table'"
             :class="[
               'px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5',
               viewMode === 'table'
                 ? 'bg-white dark:bg-gray-700 text-primary shadow-xs'
-                : 'text-gray-500 hover:text-gray-800 dark:text-gray-300'
+                : 'text-gray-500 hover:text-gray-800 dark:text-gray-300',
             ]"
+            @click="viewMode = 'table'"
           >
             <Icon icon="solar:list-bold" class="text-sm" />
             <span>Jadval</span>
@@ -153,22 +155,27 @@
         <!-- Right: Advanced Filters Button -->
         <button
           type="button"
-          @click="showAdvancedFilters = !showAdvancedFilters"
           :class="[
             'py-2 px-3.5 rounded-md border text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer',
             showAdvancedFilters
               ? 'bg-primary/10 text-primary border-primary/30'
-              : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60'
+              : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60',
           ]"
+          @click="showAdvancedFilters = !showAdvancedFilters"
         >
           <Icon icon="solar:filter-linear" class="text-base" />
           <span>Filtrlar</span>
-          <Icon :icon="showAdvancedFilters ? 'solar:alt-arrow-up-linear' : 'solar:alt-arrow-down-linear'" class="text-xs" />
+          <Icon
+            :icon="
+              showAdvancedFilters ? 'solar:alt-arrow-up-linear' : 'solar:alt-arrow-down-linear'
+            "
+            class="text-xs"
+          />
         </button>
       </div>
 
       <!-- COLLAPSIBLE ADVANCED FILTER BAR -->
-      <transition name="fade">
+      <Transition name="fade">
         <div
           v-if="showAdvancedFilters"
           class="pt-3 border-t dark:border-gray-700/80 flex items-center gap-3 flex-wrap text-xs"
@@ -177,19 +184,19 @@
           <div class="relative stage-dropdown-container">
             <button
               type="button"
-              @click.stop="showStageDropdown = !showStageDropdown"
               class="py-2 px-3 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 flex items-center gap-1.5 hover:border-primary cursor-pointer font-medium shadow-2xs"
+              @click.stop="showStageDropdown = !showStageDropdown"
             >
               <Icon icon="solar:flag-2-bold" class="text-primary text-sm" />
-              <span>Bosqichlar ({{ selectedStages.length || 'Barchasi' }})</span>
+              <span>Bosqichlar ({{ selectedStages.length || "Barchasi" }})</span>
               <Icon icon="solar:alt-arrow-down-linear" class="text-xs text-gray-400" />
             </button>
 
             <!-- Stage Multi-Select Popup -->
             <div
               v-if="showStageDropdown"
-              @click.stop
               class="absolute left-0 mt-1.5 w-56 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg p-2 z-50 space-y-1"
+              @click.stop
             >
               <label
                 v-for="col in pipelineColumns"
@@ -197,9 +204,9 @@
                 class="flex items-center gap-2 px-2.5 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg cursor-pointer text-xs"
               >
                 <input
+                  v-model="selectedStages"
                   type="checkbox"
                   :value="col.id"
-                  v-model="selectedStages"
                   class="rounded text-primary focus:ring-0 cursor-pointer"
                 />
                 <span class="w-2.5 h-2.5 rounded-full" :class="col.badgeColor"></span>
@@ -208,15 +215,15 @@
               <div class="pt-1.5 border-t dark:border-gray-700 flex justify-between">
                 <button
                   type="button"
-                  @click="selectedStages = []"
                   class="text-[11px] text-gray-400 hover:text-gray-600"
+                  @click="selectedStages = []"
                 >
                   Tozalash
                 </button>
                 <button
                   type="button"
-                  @click="showStageDropdown = false"
                   class="text-[11px] font-bold text-primary"
+                  @click="showStageDropdown = false"
                 >
                   Yopish
                 </button>
@@ -268,14 +275,14 @@
           <!-- 5. Tozalash Tugmasi -->
           <button
             type="button"
-            @click="resetAllFilters"
             class="py-2 px-3 rounded-md text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold flex items-center gap-1 transition cursor-pointer ml-auto"
+            @click="resetAllFilters"
           >
             <Icon icon="solar:restart-linear" class="text-sm" />
             <span>Tozalash</span>
           </button>
         </div>
-      </transition>
+      </Transition>
     </div>
 
     <!-- Toast Alert -->
@@ -283,23 +290,31 @@
 
     <!-- 1. KANBAN DOSKA VIEW -->
     <div v-if="viewMode === 'kanban'" class="w-full">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-start w-full">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-start w-full"
+      >
         <!-- Kanban Columns -->
         <!-- Kanban Columns -->
         <div
           v-for="(col, colIndex) in visibleColumns"
           :key="col.id"
           :draggable="isCustomizing"
+          :class="[
+            'kanban-column w-full flex flex-col bg-gray-50/95 dark:bg-gray-800/70 rounded-lg border dark:border-gray-700 min-h-[520px] max-h-[780px] transition-all shadow-xs relative',
+            isCustomizing
+              ? 'border-dashed border-primary/40 hover:border-primary cursor-grab active:cursor-grabbing'
+              : '',
+            dragOverColIndex === colIndex && isCustomizing
+              ? 'ring-2 ring-primary border-primary scale-[1.01]'
+              : '',
+            dragOverColId === col.id
+              ? 'ring-2 ring-primary border-primary bg-primary/5 dark:bg-primary/10'
+              : '',
+          ]"
           @dragstart="onColumnDragStart($event, colIndex)"
           @dragover.prevent="handleColumnOrItemDragOver($event, col.id, colIndex)"
           @dragleave="onDragLeave(col.id)"
           @drop="handleColumnOrItemDrop($event, col.id, colIndex)"
-          :class="[
-            'kanban-column w-full flex flex-col bg-gray-50/95 dark:bg-gray-800/70 rounded-lg border dark:border-gray-700 min-h-[520px] max-h-[780px] transition-all shadow-xs relative',
-            isCustomizing ? 'border-dashed border-primary/40 hover:border-primary cursor-grab active:cursor-grabbing' : '',
-            dragOverColIndex === colIndex && isCustomizing ? 'ring-2 ring-primary border-primary scale-[1.01]' : '',
-            dragOverColId === col.id ? 'ring-2 ring-primary border-primary bg-primary/5 dark:bg-primary/10' : ''
-          ]"
         >
           <!-- Column Header -->
           <div
@@ -308,12 +323,23 @@
           >
             <div class="flex items-center gap-2 truncate">
               <!-- Reorder Grip icon in Sozlash mode -->
-              <span v-if="isCustomizing" class="text-primary/70 cursor-grab" title="Ustunni tortib surish">
+              <span
+                v-if="isCustomizing"
+                class="text-primary/70 cursor-grab"
+                title="Ustunni tortib surish"
+              >
                 <Icon icon="solar:reorder-bold" class="text-base" />
               </span>
-              <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="col.badgeColor || 'bg-primary'" />
-              <h3 class="font-bold text-xs sm:text-sm text-gray-800 dark:text-gray-100 truncate">{{ col.title }}</h3>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 shrink-0">
+              <span
+                class="w-2.5 h-2.5 rounded-full shrink-0"
+                :class="col.badgeColor || 'bg-primary'"
+              />
+              <h3 class="font-bold text-xs sm:text-sm text-gray-800 dark:text-gray-100 truncate">
+                {{ col.title }}
+              </h3>
+              <span
+                class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 shrink-0"
+              >
                 {{ getColumnItems(col.id).length }}
               </span>
             </div>
@@ -321,22 +347,25 @@
             <!-- Header Action Dots / Add / Reorder Arrows -->
             <div class="flex items-center gap-1">
               <!-- Reorder Arrows (Chapga / O'ngga surish) in Sozlash mode -->
-              <div v-if="isCustomizing" class="flex items-center gap-0.5 bg-gray-100 dark:bg-gray-700/80 p-0.5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-2xs mr-1">
+              <div
+                v-if="isCustomizing"
+                class="flex items-center gap-0.5 bg-gray-100 dark:bg-gray-700/80 p-0.5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-2xs mr-1"
+              >
                 <button
                   type="button"
-                  @click.stop="moveColumnLeft(colIndex)"
                   :disabled="colIndex === 0"
                   class="p-1 rounded text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-600 disabled:opacity-30 disabled:hover:bg-transparent transition cursor-pointer"
                   title="Chapga surish (←)"
+                  @click.stop="moveColumnLeft(colIndex)"
                 >
                   <Icon icon="solar:arrow-left-linear" class="text-xs font-bold" />
                 </button>
                 <button
                   type="button"
-                  @click.stop="moveColumnRight(colIndex)"
                   :disabled="colIndex === visibleColumns.length - 1"
                   class="p-1 rounded text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-600 disabled:opacity-30 disabled:hover:bg-transparent transition cursor-pointer"
                   title="O'ngga surish (→)"
+                  @click.stop="moveColumnRight(colIndex)"
                 >
                   <Icon icon="solar:arrow-right-linear" class="text-xs font-bold" />
                 </button>
@@ -346,9 +375,9 @@
               <div v-if="isCustomizing" class="relative column-menu-container">
                 <button
                   type="button"
-                  @click.stop="activeColumnMenu = activeColumnMenu === col.id ? null : col.id"
                   class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition cursor-pointer"
                   title="Ustun sozlamalari"
+                  @click.stop="activeColumnMenu = activeColumnMenu === col.id ? null : col.id"
                 >
                   <Icon icon="solar:menu-dots-bold" class="text-sm" />
                 </button>
@@ -356,21 +385,21 @@
                 <!-- Column Action Popup Menu -->
                 <div
                   v-if="activeColumnMenu === col.id"
-                  @click.stop
                   class="absolute right-0 mt-1 w-36 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg py-1 z-50 text-xs font-medium"
+                  @click.stop
                 >
                   <button
                     type="button"
-                    @click="openEditColumnModal(col)"
                     class="w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-1.5 cursor-pointer"
+                    @click="openEditColumnModal(col)"
                   >
                     <Icon icon="solar:pen-linear" class="text-sm text-primary" />
                     <span>Tahrirlash</span>
                   </button>
                   <button
                     type="button"
-                    @click="openDeleteColumnModal(col)"
                     class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-1.5 cursor-pointer"
+                    @click="openDeleteColumnModal(col)"
                   >
                     <Icon icon="solar:trash-bin-trash-linear" class="text-sm" />
                     <span>O'chirish</span>
@@ -381,9 +410,9 @@
               <!-- Quick Add inside Column -->
               <button
                 type="button"
-                @click="handleQuickAddFromColumn(col.id)"
                 class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition cursor-pointer"
                 title="+ Lid qo'shish"
+                @click="handleQuickAddFromColumn(col.id)"
               >
                 <Icon icon="ic:round-add" class="text-base" />
               </button>
@@ -397,15 +426,21 @@
               v-for="item in getColumnItems(col.id)"
               :key="item.id"
               draggable="true"
-              @dragstart="onDragStart(item, col.id)"
               class="kanban-card bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700 shadow-2xs hover:shadow-md cursor-grab active:cursor-grabbing transition hover:border-primary/60 group select-none space-y-3"
+              @dragstart="onDragStart(item, col.id)"
             >
               <!-- Top row: Name & Source Badge -->
               <div class="flex items-start justify-between gap-2">
-                <h4 class="font-bold text-sm sm:text-base text-gray-900 dark:text-gray-100 group-hover:text-primary transition leading-snug">
+                <h4
+                  class="font-bold text-sm sm:text-base text-gray-900 dark:text-gray-100 group-hover:text-primary transition leading-snug"
+                >
                   {{ item.fullName }}
                 </h4>
-                <Badge :variant="getSourceBadgeVariant(item.source)" size="xs" class="font-semibold shrink-0">
+                <Badge
+                  :variant="getSourceBadgeVariant(item.source)"
+                  size="xs"
+                  class="font-semibold shrink-0"
+                >
                   {{ item.source }}
                 </Badge>
               </div>
@@ -414,27 +449,34 @@
               <div class="text-xs sm:text-sm space-y-1.5 text-gray-600 dark:text-gray-300">
                 <div class="flex items-center gap-2">
                   <Icon icon="solar:phone-calling-linear" class="text-primary text-base shrink-0" />
-                  <span class="font-semibold text-gray-800 dark:text-gray-200">{{ formatPhone(item.phone) }}</span>
+                  <span class="font-semibold text-gray-800 dark:text-gray-200">{{
+                    formatPhone(item.phone)
+                  }}</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <Icon icon="solar:book-bookmark-linear" class="text-primary text-base shrink-0" />
-                  <span class="font-semibold text-primary px-2 py-0.5 rounded-md bg-primary/10 text-xs">
+                  <span
+                    class="font-semibold text-primary px-2 py-0.5 rounded-md bg-primary/10 text-xs"
+                  >
                     {{ getTargetDisplay(item) }}
                   </span>
                 </div>
               </div>
 
               <!-- Bottom: Amount & Manager -->
-              <div class="pt-2.5 border-t dark:border-gray-700/80 flex items-center justify-between text-xs sm:text-sm">
-                <span v-if="item.amount" class="font-extrabold text-emerald-600 dark:text-emerald-400">
+              <div
+                class="pt-2.5 border-t dark:border-gray-700/80 flex items-center justify-between text-xs sm:text-sm"
+              >
+                <span
+                  v-if="item.amount"
+                  class="font-extrabold text-emerald-600 dark:text-emerald-400"
+                >
                   {{ formatUZS(item.amount) }}
                 </span>
-                <span v-else class="text-xs text-gray-400 font-medium">
-                  —
-                </span>
+                <span v-else class="text-xs text-gray-400 font-medium"> — </span>
                 <span class="text-xs text-gray-400 flex items-center gap-1">
                   <Icon icon="solar:user-circle-linear" class="text-sm" />
-                  {{ item.manager?.firstName || item.manager || 'Menejer' }}
+                  {{ item.manager?.firstName || item.manager || "Menejer" }}
                 </span>
               </div>
 
@@ -443,9 +485,9 @@
                 <template v-if="item.stage !== 'ENROLLED'">
                   <button
                     type="button"
-                    @click.stop="openLeadDetails(item)"
                     class="py-2 px-3 rounded-md text-xs font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center justify-center gap-1 cursor-pointer shrink-0"
                     title="Lidni tahrirlash"
+                    @click.stop="openLeadDetails(item)"
                   >
                     <Icon icon="solar:pen-linear" class="text-sm" />
                     <span>Tahrirlash</span>
@@ -453,23 +495,32 @@
 
                   <button
                     type="button"
-                    @click.stop="openConvertModal(item)"
                     class="flex-1 py-2 px-3 rounded-md text-xs font-bold text-white bg-primary hover:bg-primary/90 transition shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer truncate"
+                    @click.stop="openConvertModal(item)"
                   >
                     <Icon icon="solar:user-plus-bold" class="text-sm shrink-0" />
-                    <span class="truncate">{{ isKindergarten ? "Bog'chaga Qabul" : isSchool ? "Maktabga Qabul" : "O'quvchiga Aylantirish" }}</span>
+                    <span class="truncate">{{
+                      isKindergarten
+                        ? "Bog'chaga Qabul"
+                        : isSchool
+                          ? "Maktabga Qabul"
+                          : "O'quvchiga Aylantirish"
+                    }}</span>
                   </button>
                 </template>
 
-                <router-link
+                <RouterLink
                   v-else
                   to="/students"
-                  @click.stop
                   class="w-full py-2.5 px-3 rounded-md text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center gap-1.5 transition truncate text-center"
+                  @click.stop
                 >
-                  <Icon icon="solar:check-circle-bold" class="text-base text-emerald-600 shrink-0" />
+                  <Icon
+                    icon="solar:check-circle-bold"
+                    class="text-base text-emerald-600 shrink-0"
+                  />
                   <span>Qabul qilingan o'quvchi</span>
-                </router-link>
+                </RouterLink>
               </div>
             </div>
 
@@ -488,7 +539,10 @@
             v-if="getColumnTotalSum(col.id) > 0"
             class="p-2.5 bg-gray-100/70 dark:bg-gray-800/90 border-t dark:border-gray-700 rounded-b-2xl text-center text-xs text-gray-500 dark:text-gray-400 font-medium"
           >
-            Jami: <span class="font-bold text-gray-800 dark:text-gray-200">{{ formatUZS(getColumnTotalSum(col.id)) }}</span>
+            Jami:
+            <span class="font-bold text-gray-800 dark:text-gray-200">{{
+              formatUZS(getColumnTotalSum(col.id))
+            }}</span>
           </div>
         </div>
 
@@ -497,17 +551,21 @@
           v-if="isCustomizing"
           class="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg min-h-[220px] bg-white/50 dark:bg-gray-800/40 text-center space-y-3"
         >
-          <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold">
+          <div
+            class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold"
+          >
             <Icon icon="ic:round-add" />
           </div>
           <div>
-            <h4 class="font-bold text-sm text-gray-800 dark:text-gray-100">Yangi Bosqich (Ustun)</h4>
+            <h4 class="font-bold text-sm text-gray-800 dark:text-gray-100">
+              Yangi Bosqich (Ustun)
+            </h4>
             <p class="text-xs text-gray-400">Voronkaga yangi bosqich qo'shish</p>
           </div>
           <button
             type="button"
-            @click="openAddColumnModal"
             class="py-2 px-4 rounded-md bg-primary hover:bg-primary/90 text-white text-xs font-bold shadow-xs cursor-pointer"
+            @click="openAddColumnModal"
           >
             + Guruh yaratish
           </button>
@@ -516,14 +574,19 @@
     </div>
 
     <!-- 2. JADVAL (TABLE) VIEW -->
-    <div v-else class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden">
+    <div
+      v-else
+      class="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-xs overflow-hidden"
+    >
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs sm:text-sm">
-          <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700">
+          <thead
+            class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 uppercase text-[11px] font-bold border-b dark:border-gray-700"
+          >
             <tr>
               <th class="p-3.5 pl-4">F.I.SH</th>
               <th class="p-3.5">Telefon</th>
-              <th class="p-3.5">{{ isSchool ? 'Sinf' : isKindergarten ? 'Guruh' : 'Kurs' }}</th>
+              <th class="p-3.5">{{ isSchool ? "Sinf" : isKindergarten ? "Guruh" : "Kurs" }}</th>
               <th class="p-3.5">Manba</th>
               <th class="p-3.5">Bosqich</th>
               <th class="p-3.5">Summa</th>
@@ -545,7 +608,9 @@
                 {{ formatPhone(lead.phone) }}
               </td>
               <td class="p-3.5">
-                <span class="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-semibold text-xs">
+                <span
+                  class="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-semibold text-xs"
+                >
                   {{ getTargetDisplay(lead) }}
                 </span>
               </td>
@@ -555,7 +620,10 @@
                 </Badge>
               </td>
               <td class="p-3.5">
-                <span class="px-2 py-1 rounded-lg text-xs font-bold" :class="getStageBadgeClass(lead.stage)">
+                <span
+                  class="px-2 py-1 rounded-lg text-xs font-bold"
+                  :class="getStageBadgeClass(lead.stage)"
+                >
                   {{ getStageTitle(lead.stage) }}
                 </span>
               </td>
@@ -563,39 +631,39 @@
                 {{ formatUZS(lead.amount) }}
               </td>
               <td class="p-3.5 text-gray-400 text-xs">
-                {{ lead.manager?.firstName || 'Menejer' }}
+                {{ lead.manager?.firstName || "Menejer" }}
               </td>
               <td class="p-3.5 pr-4 text-center" @click.stop>
                 <div class="flex items-center justify-center gap-1.5">
                   <template v-if="lead.stage !== 'ENROLLED'">
                     <button
                       type="button"
-                      @click="openLeadDetails(lead)"
                       class="px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-xs font-medium border border-gray-200 dark:border-gray-600 flex items-center gap-1 transition cursor-pointer shadow-2xs"
                       title="Lidni tahrirlash"
+                      @click="openLeadDetails(lead)"
                     >
                       <Icon icon="solar:pen-linear" class="text-sm" />
                       <span>Tahrirlash</span>
                     </button>
                     <button
                       type="button"
-                      @click="promptDeleteLead(lead)"
                       class="p-1.5 rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 text-xs font-semibold flex items-center justify-center cursor-pointer transition shadow-2xs"
                       title="Lidni o'chirish"
+                      @click="promptDeleteLead(lead)"
                     >
                       <Icon icon="solar:trash-bin-trash-linear" class="text-base" />
                     </button>
                     <button
                       type="button"
-                      @click="openConvertModal(lead)"
                       class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
                       title="O'quvchiga aylantirish"
+                      @click="openConvertModal(lead)"
                     >
                       <Icon icon="solar:user-plus-bold" class="text-sm" />
                       <span>Qabul qilish</span>
                     </button>
                   </template>
-                  <router-link
+                  <RouterLink
                     v-else
                     to="/students"
                     class="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5 transition"
@@ -603,7 +671,7 @@
                   >
                     <Icon icon="solar:check-circle-bold" class="text-sm text-emerald-600" />
                     <span>Qabul qilingan</span>
-                  </router-link>
+                  </RouterLink>
                 </div>
               </td>
             </tr>
@@ -623,20 +691,20 @@
     </div>
 
     <!-- ADD LEAD MODAL -->
-    <vmodal
+    <Vmodal
       ref="addLeadModal"
-      :hideButton="true"
+      :hide-button="true"
       title="Yangi Lid / Murojaat Qo'shish"
       :subtitle="modalSubtitle"
-      btnTextSubmit="Saqlash"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-primary"
+      btn-text-submit="Saqlash"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-primary"
       @submit="submitAddLead"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:user-plus-bold" class="text-3xl text-primary mb-2" />
       </template>
-      <template v-slot:body>
+      <template #body>
         <div class="space-y-3 text-sm text-left">
           <div class="grid grid-cols-2 gap-3">
             <FormInput
@@ -688,13 +756,13 @@
                 v-for="cNum in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']"
                 :key="cNum"
                 type="button"
-                @click="newLead.target = `${cNum}-sinf`"
                 :class="[
                   'h-10 rounded-md text-sm font-semibold transition flex items-center justify-center cursor-pointer border',
                   newLead.target === `${cNum}-sinf` || newLead.target === cNum
                     ? 'bg-primary text-white border-primary shadow-xs ring-2 ring-primary/30'
-                    : 'bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-gray-600/80 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-gray-600/80 hover:bg-gray-200 dark:hover:bg-gray-600',
                 ]"
+                @click="newLead.target = `${cNum}-sinf`"
               >
                 {{ cNum }}
               </button>
@@ -738,20 +806,12 @@
               label="Yillik/Oylik to'lov"
               placeholder="3 200 000"
             />
-            <FormSelect
-              v-model="newLead.source"
-              label="Reklama manbasi"
-              :options="sourceOptions"
-            />
+            <FormSelect v-model="newLead.source" label="Reklama manbasi" :options="sourceOptions" />
           </div>
 
           <!-- Bog'cha uchun Reklama va Boshlang'ich bosqich -->
           <div v-if="isKindergarten" class="grid grid-cols-2 gap-3">
-            <FormSelect
-              v-model="newLead.source"
-              label="Reklama manbasi"
-              :options="sourceOptions"
-            />
+            <FormSelect v-model="newLead.source" label="Reklama manbasi" :options="sourceOptions" />
             <FormSelect
               v-model="newLead.status"
               label="Boshlang'ich bosqich"
@@ -771,28 +831,32 @@
           <FormInput
             v-model="newLead.notes"
             label="Izoh / Eslatma"
-            :placeholder="isKindergarten ? 'Bolaning qiziqishlari, sog\'lig\'i haqida...' : 'Mijoz haqida eslatma...'"
+            :placeholder="
+              isKindergarten
+                ? 'Bolaning qiziqishlari, sog\'lig\'i haqida...'
+                : 'Mijoz haqida eslatma...'
+            "
           />
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- FULL LEAD EDIT MODAL -->
-    <vmodal
+    <Vmodal
       ref="detailModal"
-      :hideButton="true"
+      :hide-button="true"
       class="hidden"
       :title="editForm.id ? 'Lidni Tahrirlash' : 'Lid Tafsilotlari'"
       subtitle="Ma'lumotlarni to'g'rilash va yangilash"
-      btnTextSubmit="O'zgarishlarni Saqlash"
-      btnTextClose="Yopish"
-      btnColorSubmit="bg-primary"
+      btn-text-submit="O'zgarishlarni Saqlash"
+      btn-text-close="Yopish"
+      btn-color-submit="bg-primary"
       @submit="saveLeadDetails"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:pen-new-square-bold" class="text-3xl text-primary mb-2" />
       </template>
-      <template v-slot:body>
+      <template #body>
         <div class="space-y-3.5 text-sm text-left">
           <div class="grid grid-cols-2 gap-3">
             <FormInput
@@ -835,13 +899,14 @@
                 v-for="cNum in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']"
                 :key="cNum"
                 type="button"
-                @click="editForm.notes = `${cNum}-sinf`"
                 :class="[
                   'h-10 rounded-md text-sm font-semibold transition flex items-center justify-center cursor-pointer border',
-                  editForm.notes && (editForm.notes.includes(`${cNum}-sinf`) || editForm.notes === cNum)
+                  editForm.notes &&
+                  (editForm.notes.includes(`${cNum}-sinf`) || editForm.notes === cNum)
                     ? 'bg-primary text-white border-primary shadow-xs ring-2 ring-primary/30'
-                    : 'bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-gray-600/80 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-gray-600/80 hover:bg-gray-200 dark:hover:bg-gray-600',
                 ]"
+                @click="editForm.notes = `${cNum}-sinf`"
               >
                 {{ cNum }}
               </button>
@@ -858,11 +923,7 @@
           </div>
 
           <div :class="isKindergarten ? 'grid grid-cols-1 gap-3' : 'grid grid-cols-2 gap-3'">
-            <FormSelect
-              v-model="editForm.status"
-              label="Bosqich holati"
-              :options="stageOptions"
-            />
+            <FormSelect v-model="editForm.status" label="Bosqich holati" :options="stageOptions" />
             <FormCurrencyInput
               v-if="!isKindergarten"
               v-model="editForm.amount"
@@ -880,8 +941,8 @@
           <div class="pt-3 flex items-center justify-start border-t dark:border-gray-700">
             <button
               type="button"
-              @click="promptDeleteLead(editForm)"
               class="px-3.5 py-2 rounded-md text-red-600 dark:text-red-400 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition shadow-2xs"
+              @click="promptDeleteLead(editForm)"
             >
               <Icon icon="solar:trash-bin-trash-bold" class="text-base" />
               <span>Lidni o'chirish</span>
@@ -889,23 +950,23 @@
           </div>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- CUSTOM SEASON MODAL -->
-    <vmodal
+    <Vmodal
       ref="seasonModal"
-      :hideButton="true"
+      :hide-button="true"
       title="Yangi Qabul Mavsumi"
       subtitle="Qabul mavsumi nomini kiriting"
-      btnTextSubmit="Mavsum Yaratish"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-primary"
+      btn-text-submit="Mavsum Yaratish"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-primary"
       @submit="submitNewSeason"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:calendar-add-bold" class="text-3xl text-primary mb-2" />
       </template>
-      <template v-slot:body>
+      <template #body>
         <div class="space-y-3 text-left">
           <FormInput
             v-model="newSeasonName"
@@ -916,23 +977,23 @@
           />
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- CUSTOM COLUMN / STAGE MODAL (Create & Edit) -->
-    <vmodal
+    <Vmodal
       ref="columnModal"
-      :hideButton="true"
+      :hide-button="true"
       :title="editingColumnId ? 'Bosqichni Tahrirlash' : 'Yangi Voronka Bosqichi'"
       subtitle="Bosqich nomi va belgi rangini tanlang"
-      btnTextSubmit="Saqlash"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-primary"
+      btn-text-submit="Saqlash"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-primary"
       @submit="submitColumnForm"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:flag-2-bold" class="text-3xl text-primary mb-2" />
       </template>
-      <template v-slot:body>
+      <template #body>
         <div class="space-y-4 text-left">
           <FormInput
             v-model="columnForm.title"
@@ -951,120 +1012,136 @@
                 v-for="color in availableColors"
                 :key="color.class"
                 type="button"
-                @click="columnForm.badgeColor = color.class"
                 :class="[
                   'w-8 h-8 rounded-full transition flex items-center justify-center cursor-pointer',
                   color.class,
-                  columnForm.badgeColor === color.class ? 'ring-4 ring-primary/30 scale-110 shadow-sm' : 'opacity-70 hover:opacity-100'
+                  columnForm.badgeColor === color.class
+                    ? 'ring-4 ring-primary/30 scale-110 shadow-sm'
+                    : 'opacity-70 hover:opacity-100',
                 ]"
+                @click="columnForm.badgeColor = color.class"
               >
-                <Icon v-if="columnForm.badgeColor === color.class" icon="solar:check-circle-bold" class="text-white text-base" />
+                <Icon
+                  v-if="columnForm.badgeColor === color.class"
+                  icon="solar:check-circle-bold"
+                  class="text-white text-base"
+                />
               </button>
             </div>
           </div>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- CUSTOM DELETE COLUMN MODAL -->
-    <vmodal
+    <Vmodal
       ref="deleteColumnModal"
-      :hideButton="true"
+      :hide-button="true"
       title="Bosqichni O'chirish"
       subtitle="Ushbu voronka bosqichini o'chirishni tasdiqlaysizmi?"
-      btnTextSubmit="O'chirish"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-red-600"
+      btn-text-submit="O'chirish"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-red-600"
       @submit="confirmDeleteColumn"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:trash-bin-trash-bold" class="text-3xl text-red-500 mb-2" />
       </template>
-      <template v-slot:body>
-        <div class="p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-700 dark:text-red-300 text-left">
+      <template #body>
+        <div
+          class="p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-xs text-red-700 dark:text-red-300 text-left"
+        >
           <p class="font-bold">Diqqat!</p>
           <p class="mt-0.5">Ushbu bosqich o'chirilgandan so'ng qayta tiklanmaydi.</p>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- IMPORT MODAL -->
-    <vmodal
+    <Vmodal
       ref="importModal"
-      :hideButton="true"
+      :hide-button="true"
       class="hidden"
       title="Import"
       subtitle="Excel yoki CSV fayldan lidlarni ommaviy yuklash"
-      btnTextSubmit="Saqlash"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-primary"
+      btn-text-submit="Saqlash"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-primary"
       @submit="submitImportFile"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:import-bold" class="text-3xl text-primary mb-2" />
       </template>
-      <template v-slot:body>
-        <div class="space-y-4 text-center">
-          <label
-            class="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition"
-          >
-            <Icon icon="solar:upload-track-2-bold" class="text-4xl text-primary mb-2" />
-            <span class="text-sm font-bold text-gray-800 dark:text-gray-200">
-              {{ importedFileName || 'Fayl kiriting (.xlsx, .csv)' }}
-            </span>
-            <span class="text-xs text-gray-400 mt-1">Faylni shu yerga tortib keling yoki tanlang</span>
-            <input type="file" accept=".csv,.xlsx,.xls" @change="onFileSelected" class="hidden" />
-          </label>
+      <template #body>
+        <div class="space-y-4 text-left">
+          <AppDropzone
+            accept=".xlsx, .csv, .xls"
+            title="Excel yoki CSV faylni shu yerga tortib keling"
+            subtitle="Faqat .xlsx, .csv, .xls fayllar qabul qilinadi (maksimal 10 MB)"
+            @change="onFileChanged"
+          />
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- Student Wizard Modal -->
     <StudentWizardModal ref="studentWizard" @saved="onStudentWizardSaved" />
 
     <!-- Confirm Revert From Enrolled Modal (Standard vmodal) -->
-    <vmodal
+    <Vmodal
       ref="revertConfirmModal"
-      :hideButton="true"
+      :hide-button="true"
       title="Qabul qilingan lidni qaytarish"
       subtitle="Ushbu o'quvchi allaqachon mijoz bo'lgan"
-      btnTextSubmit="Ha, qaytarilsin"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-primary"
+      btn-text-submit="Ha, qaytarilsin"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-primary"
       @submit="executeRevertLead"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:info-circle-bold" class="text-3xl text-primary mb-2" />
       </template>
-      <template v-slot:body>
-        <div class="p-3.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-xs text-blue-900 dark:text-blue-200 text-left">
+      <template #body>
+        <div
+          class="p-3.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-xs text-blue-900 dark:text-blue-200 text-left"
+        >
           <p class="font-bold text-sm leading-snug">{{ revertModalMessage }}</p>
-          <p class="mt-1 text-gray-500 dark:text-gray-400">Uni boshqa voronka bosqichiga qaytarishni tasdiqlaysizmi?</p>
+          <p class="mt-1 text-gray-500 dark:text-gray-400">
+            Uni boshqa voronka bosqichiga qaytarishni tasdiqlaysizmi?
+          </p>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- Confirm Delete Lead Modal -->
-    <vmodal
+    <Vmodal
       ref="deleteConfirmModal"
-      :hideButton="true"
+      :hide-button="true"
       title="Lidni o'chirish / Yo'qotish"
       subtitle="O'chirish sababini ko'rsating"
-      btnTextSubmit="Tasdiqlash va O'chirish"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-red-600"
+      btn-text-submit="Tasdiqlash va O'chirish"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-red-600"
       @submit="executeDeleteLead"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:trash-bin-trash-bold" class="text-3xl text-red-500 mb-2" />
       </template>
-      <template v-slot:body>
+      <template #body>
         <div class="space-y-3.5 text-xs text-left">
-          <div class="p-3.5 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-200">
+          <div
+            class="p-3.5 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-200"
+          >
             <p class="font-bold text-sm leading-snug">
-              "{{ leadToDelete ? (leadToDelete.fullName || editForm.fullName || 'Ushbu lid') : 'Ushbu lid' }}" ni o'chirishni tasdiqlaysizmi?
+              "{{
+                leadToDelete
+                  ? leadToDelete.fullName || editForm.fullName || "Ushbu lid"
+                  : "Ushbu lid"
+              }}" ni o'chirishni tasdiqlaysizmi?
             </p>
-            <p class="mt-1 text-gray-500 dark:text-gray-400">Iltimos, lid nima sababdan o'chirilayotganini belgilang.</p>
+            <p class="mt-1 text-gray-500 dark:text-gray-400">
+              Iltimos, lid nima sababdan o'chirilayotganini belgilang.
+            </p>
           </div>
 
           <FormSelect
@@ -1075,26 +1152,27 @@
           />
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import AppButton from "@/components/AppButton.vue";
-import { formatUZS, formatPhone } from "@/helper/formatters";
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import Badge from "@/components/Badge.vue";
+
+import { coursesApi, groupsApi, leadsApi } from "@/api/services";
 import Alert from "@/components/Alert.vue";
+import Badge from "@/components/Badge.vue";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import AppButton from "@/components/common/AppButton.vue";
+import vmodal from "@/components/common/AppModal.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
+import FilterSelect from "@/components/common/FilterSelect.vue";
+import FormCurrencyInput from "@/components/FormCurrencyInput.vue";
+import FormDatePicker from "@/components/FormDatePicker.vue";
 import FormInput from "@/components/FormInput.vue";
 import FormSelect from "@/components/FormSelect.vue";
-import FormDatePicker from "@/components/FormDatePicker.vue";
-import FormCurrencyInput from "@/components/FormCurrencyInput.vue";
-import FilterSelect from "@/components/FilterSelect.vue";
-import vmodal from "@/components/modal.vue";
-import EmptyState from "@/components/EmptyState.vue";
 import StudentWizardModal from "@/components/students/StudentWizardModal.vue";
-import { leadsApi, coursesApi, studentsApi, groupsApi, usersApi } from "@/api/services";
+import { formatPhone, formatUZS } from "@/helper/formatters";
 import { useTenantStore } from "@/store/tenant";
 
 const DEFAULT_COURSES = [
@@ -1139,7 +1217,10 @@ export default {
         { value: "Boshqa maktabga ketdi", label: "Boshqa maktabga ketdi" },
         { value: "Maktab uzoqlik qildi", label: "Maktab uzoqlik qildi" },
         { value: "Narxi to'g'ri kelmadi", label: "Narxi to'g'ri kelmadi" },
-        { value: "Qiziqmadi / Qayta aloqaga chiqmadi", label: "Qiziqmadi / Qayta aloqaga chiqmadi" },
+        {
+          value: "Qiziqmadi / Qayta aloqaga chiqmadi",
+          label: "Qiziqmadi / Qayta aloqaga chiqmadi",
+        },
         { value: "Raqam noto'g'ri / Xato kiritilgan", label: "Raqam noto'g'ri / Xato kiritilgan" },
       ],
       pendingRevertItem: null,
@@ -1278,9 +1359,10 @@ export default {
       return this.courseOptions;
     },
     courseOptions() {
-      const dbCourses = Array.isArray(this.courses) && this.courses.length > 0
-        ? this.courses.filter((c) => !c.name?.includes("Maktab") && !c.name?.includes("Bog'cha"))
-        : [];
+      const dbCourses =
+        Array.isArray(this.courses) && this.courses.length > 0
+          ? this.courses.filter((c) => !c.name?.includes("Maktab") && !c.name?.includes("Bog'cha"))
+          : [];
       const list = dbCourses.length > 0 ? dbCourses : DEFAULT_COURSES;
       return list.map((c) => ({
         value: c.id,
@@ -1300,7 +1382,7 @@ export default {
       if (this.searchQuery.trim()) {
         const q = this.searchQuery.toLowerCase();
         list = list.filter((l) =>
-          `${l.fullName} ${l.phone} ${l.notes || ''}`.toLowerCase().includes(q)
+          `${l.fullName} ${l.phone} ${l.notes || ""}`.toLowerCase().includes(q)
         );
       }
       if (this.sourceFilter) {
@@ -1419,7 +1501,11 @@ export default {
             if (Array.isArray(parsed) && parsed.length > 0) {
               if (!parsed.some((c) => c.id === "NO_ANSWER")) {
                 const contactedIdx = parsed.findIndex((c) => c.id === "CONTACTED");
-                const noAnswerCol = { id: "NO_ANSWER", title: "Javob bermadi", badgeColor: "bg-rose-500" };
+                const noAnswerCol = {
+                  id: "NO_ANSWER",
+                  title: "Javob bermadi",
+                  badgeColor: "bg-rose-500",
+                };
                 if (contactedIdx !== -1) {
                   parsed.splice(contactedIdx + 1, 0, noAnswerCol);
                 } else {
@@ -1446,7 +1532,10 @@ export default {
             if (Array.isArray(parsedCrm.pipelines) && parsedCrm.pipelines.length > 0) {
               this.seasonOptions = parsedCrm.pipelines.map((p) => p.name);
               const def = parsedCrm.pipelines.find((p) => p.isDefault);
-              if (def && (!this.selectedSeason || !this.seasonOptions.includes(this.selectedSeason))) {
+              if (
+                def &&
+                (!this.selectedSeason || !this.seasonOptions.includes(this.selectedSeason))
+              ) {
                 this.selectedSeason = def.name;
               }
             }
@@ -1479,24 +1568,59 @@ export default {
         }
 
         if (currentLeads.length === 0) {
-          currentLeads = JSON.parse(JSON.stringify(DEFAULT_LEADS_MAP[currentType] || []));
+          currentLeads = [];
         }
 
         // Merge backend DB leads for this profile
         const rawDbLeads = Array.isArray(leadsRes) ? leadsRes : [];
         for (const dbL of rawDbLeads) {
-          const text = `${dbL.notes || ''} ${dbL.courseName || ''} ${dbL.type || ''}`.toLowerCase();
+          const text = `${dbL.notes || ""} ${dbL.courseName || ""} ${dbL.type || ""}`.toLowerCase();
           let belongsToCurrent = false;
-          if (dbL.organizationId && currentOrgId && String(dbL.organizationId) === String(currentOrgId)) belongsToCurrent = true;
-          else if (dbL.organization && dbL.organization.businessType === currentType) belongsToCurrent = true;
-          else if (dbL.type === currentType || dbL.businessType === currentType) belongsToCurrent = true;
-          else if (this.isSchool && (text.includes("sinf") || text.includes("maktab") || text.includes("school") || text.includes("type:school"))) belongsToCurrent = true;
-          else if (this.isKindergarten && (text.includes("guruh") || text.includes("bog'cha") || text.includes("yosh") || text.includes("mittivoy") || text.includes("kichkintoy") || text.includes("type:kindergarten"))) belongsToCurrent = true;
-          else if (!this.isSchool && !this.isKindergarten && (text.includes("kurs") || text.includes("fullstack") || text.includes("frontend") || text.includes("python") || text.includes("ielts") || text.includes("type:course_center"))) belongsToCurrent = true;
+          if (
+            dbL.organizationId &&
+            currentOrgId &&
+            String(dbL.organizationId) === String(currentOrgId)
+          )
+            belongsToCurrent = true;
+          else if (dbL.organization && dbL.organization.businessType === currentType)
+            belongsToCurrent = true;
+          else if (dbL.type === currentType || dbL.businessType === currentType)
+            belongsToCurrent = true;
+          else if (
+            this.isSchool &&
+            (text.includes("sinf") ||
+              text.includes("maktab") ||
+              text.includes("school") ||
+              text.includes("type:school"))
+          )
+            belongsToCurrent = true;
+          else if (
+            this.isKindergarten &&
+            (text.includes("guruh") ||
+              text.includes("bog'cha") ||
+              text.includes("yosh") ||
+              text.includes("mittivoy") ||
+              text.includes("kichkintoy") ||
+              text.includes("type:kindergarten"))
+          )
+            belongsToCurrent = true;
+          else if (
+            !this.isSchool &&
+            !this.isKindergarten &&
+            (text.includes("kurs") ||
+              text.includes("fullstack") ||
+              text.includes("frontend") ||
+              text.includes("python") ||
+              text.includes("ielts") ||
+              text.includes("type:course_center"))
+          )
+            belongsToCurrent = true;
           else if (!dbL.organizationId && currentType === "COURSE_CENTER") belongsToCurrent = true;
 
           if (belongsToCurrent) {
-            const existingIdx = currentLeads.findIndex((l) => String(l.id) === String(dbL.id) || (dbL.phone && l.phone === dbL.phone));
+            const existingIdx = currentLeads.findIndex(
+              (l) => String(l.id) === String(dbL.id) || (dbL.phone && l.phone === dbL.phone)
+            );
             if (existingIdx !== -1) {
               currentLeads[existingIdx] = {
                 ...currentLeads[existingIdx],
@@ -1539,9 +1663,13 @@ export default {
             stage: st,
             status: st,
             courseName: l.courseName || this.getTargetDisplay(l),
-            amount: (l.amount !== undefined && l.amount !== null && l.amount !== "" && !isNaN(Number(l.amount)))
-              ? Number(l.amount)
-              : null,
+            amount:
+              l.amount !== undefined &&
+              l.amount !== null &&
+              l.amount !== "" &&
+              !isNaN(Number(l.amount))
+                ? Number(l.amount)
+                : null,
           };
         });
       } catch (err) {
@@ -1622,7 +1750,6 @@ export default {
     async submitAddLead() {
       try {
         const fullName = `${this.newLead.firstName.trim()} ${this.newLead.lastName.trim()}`.trim();
-        let courseId = this.newLead.target;
         let notes = this.newLead.notes || "";
         const currentType = this.tenantStore.businessType || "COURSE_CENTER";
 
@@ -1633,7 +1760,6 @@ export default {
           if (this.newLead.target) {
             notes = `${this.newLead.target}. ` + notes;
           }
-          courseId = this.courses[0]?.id || null;
         } else if (this.isKindergarten) {
           if (this.newLead.parentName) {
             notes = `Ota-onasi: ${this.newLead.parentName}. ` + notes;
@@ -1641,13 +1767,11 @@ export default {
           if (this.newLead.target) {
             notes = `${this.newLead.target}. ` + notes;
           }
-          courseId = this.courses[0]?.id || null;
         } else {
           const matchedCourse = (this.courses || []).find((c) => c.id === this.newLead.target);
           if (matchedCourse) {
             notes = `${matchedCourse.name || matchedCourse.title}. ` + notes;
           }
-          courseId = this.newLead.target || (this.courses[0]?.id || null);
         }
 
         let apiCourseId = undefined;
@@ -1660,7 +1784,8 @@ export default {
 
         notes = `[type:${currentType}] ${notes}`.trim();
 
-        const orgId = this.tenantStore.organization?.id || this.tenantStore.activeOrgId || undefined;
+        const orgId =
+          this.tenantStore.organization?.id || this.tenantStore.activeOrgId || undefined;
         let created = null;
         try {
           created = await leadsApi.create({
@@ -1669,7 +1794,9 @@ export default {
             courseId: apiCourseId,
             source: this.newLead.source,
             status: this.newLead.status || "NEW",
-            amount: Number(this.newLead.amount) || (this.isSchool ? 3200000 : this.isKindergarten ? 1800000 : undefined),
+            amount:
+              Number(this.newLead.amount) ||
+              (this.isSchool ? 3200000 : this.isKindergarten ? 1800000 : undefined),
             notes: notes.trim(),
             organizationId: orgId,
           });
@@ -1677,9 +1804,11 @@ export default {
           console.warn("Backendga saqlashda ogohlantirish, lokal saqlanmoqda:", apiErr);
         }
 
-        const customAmount = (created && created.amount !== undefined && created.amount !== null)
-          ? Number(created.amount)
-          : (Number(this.newLead.amount) || (this.isSchool ? 3200000 : this.isKindergarten ? 1800000 : 700000));
+        const customAmount =
+          created && created.amount !== undefined && created.amount !== null
+            ? Number(created.amount)
+            : Number(this.newLead.amount) ||
+              (this.isSchool ? 3200000 : this.isKindergarten ? 1800000 : 700000);
 
         let targetLabel = this.newLead.target;
         if (this.isSchool) {
@@ -1687,8 +1816,12 @@ export default {
         } else if (this.isKindergarten) {
           targetLabel = this.newLead.target || "Mittivoylar guruhi";
         } else {
-          const matched = DEFAULT_COURSES.concat(this.courses || []).find((c) => c.id === this.newLead.target || c.name === this.newLead.target);
-          targetLabel = matched ? (matched.name || matched.title) : (this.newLead.target || "Fullstack Web Dasturlash");
+          const matched = DEFAULT_COURSES.concat(this.courses || []).find(
+            (c) => c.id === this.newLead.target || c.name === this.newLead.target
+          );
+          targetLabel = matched
+            ? matched.name || matched.title
+            : this.newLead.target || "Fullstack Web Dasturlash";
         }
 
         const newLeadObj = {
@@ -1739,9 +1872,10 @@ export default {
       const parts = (lead.fullName || "").trim().split(" ");
       let initialCourseId = lead.courseId;
       if (this.isKindergarten) {
-        const found = this.targetOptions.find((t) =>
-          (lead.courseName && lead.courseName.includes(t.value)) ||
-          (lead.notes && lead.notes.includes(t.value))
+        const found = this.targetOptions.find(
+          (t) =>
+            (lead.courseName && lead.courseName.includes(t.value)) ||
+            (lead.notes && lead.notes.includes(t.value))
         );
         initialCourseId = found ? found.value : this.targetOptions[0]?.value;
       } else if (this.isSchool) {
@@ -1774,7 +1908,8 @@ export default {
       if (!this.editForm.id) return;
       try {
         const currentType = this.tenantStore.businessType || "COURSE_CENTER";
-        const fullName = `${this.editForm.firstName.trim()} ${this.editForm.lastName.trim()}`.trim();
+        const fullName =
+          `${this.editForm.firstName.trim()} ${this.editForm.lastName.trim()}`.trim();
         let targetLabel = this.editForm.courseId;
         let notes = this.editForm.notes || "";
 
@@ -1784,8 +1919,10 @@ export default {
         } else if (this.isSchool) {
           targetLabel = this.editForm.notes?.includes("-sinf") ? this.editForm.notes : "1-sinf";
         } else {
-          const matched = DEFAULT_COURSES.concat(this.courses || []).find((c) => c.id === this.editForm.courseId);
-          targetLabel = matched ? (matched.name || matched.title) : this.editForm.courseId;
+          const matched = DEFAULT_COURSES.concat(this.courses || []).find(
+            (c) => c.id === this.editForm.courseId
+          );
+          targetLabel = matched ? matched.name || matched.title : this.editForm.courseId;
         }
 
         notes = `[type:${currentType}] ${notes}`.trim();
@@ -1796,7 +1933,7 @@ export default {
           courseId: this.editForm.courseId || undefined,
           source: this.editForm.source || undefined,
           status: this.editForm.status,
-          amount: !this.isKindergarten ? (Number(this.editForm.amount) || undefined) : undefined,
+          amount: !this.isKindergarten ? Number(this.editForm.amount) || undefined : undefined,
           notes,
         };
         const updated = await leadsApi.update(this.editForm.id, payload).catch(() => ({}));
@@ -1814,7 +1951,7 @@ export default {
             status: this.editForm.status,
             courseId: this.editForm.courseId,
             courseName: targetLabel,
-            amount: !this.isKindergarten ? (Number(this.editForm.amount) || 0) : 0,
+            amount: !this.isKindergarten ? Number(this.editForm.amount) || 0 : 0,
             notes,
             type: currentType,
             businessType: currentType,
@@ -1870,23 +2007,27 @@ export default {
       }
     },
     async onStudentWizardSaved(student) {
-      const fullName = `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'O\'quvchi';
+      const fullName = `${student.firstName || ""} ${student.lastName || ""}`.trim() || "O'quvchi";
       this.alertMessage = `Tabriklaymiz! ${fullName} muvaffaqiyatli qabul qilindi!`;
-      
+
       const currentType = this.tenantStore.businessType || "COURSE_CENTER";
       const storageKey = `educrm_leads_store_${currentType}`;
 
-      const paymentAmount = (student.amount !== undefined && student.amount !== null && student.amount !== "")
-        ? Number(student.amount)
-        : (student.initialPayment !== undefined && student.initialPayment !== null && student.initialPayment !== "")
-        ? Number(student.initialPayment)
-        : undefined;
+      const paymentAmount =
+        student.amount !== undefined && student.amount !== null && student.amount !== ""
+          ? Number(student.amount)
+          : student.initialPayment !== undefined &&
+              student.initialPayment !== null &&
+              student.initialPayment !== ""
+            ? Number(student.initialPayment)
+            : undefined;
 
       const leadIdToUpdate = this.convertingLeadId || this.selectedLead?.id || student.leadId;
-      const found = this.leads.find((l) =>
-        (leadIdToUpdate && String(l.id) === String(leadIdToUpdate)) ||
-        (student.phone && l.phone === student.phone) ||
-        (student.firstName && l.fullName?.toLowerCase().includes(student.firstName.toLowerCase()))
+      const found = this.leads.find(
+        (l) =>
+          (leadIdToUpdate && String(l.id) === String(leadIdToUpdate)) ||
+          (student.phone && l.phone === student.phone) ||
+          (student.firstName && l.fullName?.toLowerCase().includes(student.firstName.toLowerCase()))
       );
 
       if (found) {
@@ -1895,10 +2036,12 @@ export default {
         if (paymentAmount !== undefined) {
           found.amount = paymentAmount;
         }
-        await leadsApi.update(found.id, {
-          status: "ENROLLED",
-          amount: paymentAmount,
-        }).catch(() => {});
+        await leadsApi
+          .update(found.id, {
+            status: "ENROLLED",
+            amount: paymentAmount,
+          })
+          .catch(() => {});
       }
       if (this.selectedLead) {
         this.selectedLead.stage = "ENROLLED";
@@ -2087,6 +2230,13 @@ export default {
         this.importedFileName = file.name;
       }
     },
+    onFileChanged(file) {
+      if (file) {
+        this.importedFileName = file.name;
+      } else {
+        this.importedFileName = "";
+      }
+    },
     submitImportFile() {
       if (!this.importedFileName) {
         alert("Iltimos, avval fayl tanlang!");
@@ -2108,7 +2258,8 @@ export default {
       this.alertMessage = "Fayldagi lidlar muvaffaqiyatli import qilindi!";
     },
     downloadImportTemplate() {
-      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" +
+      const csvContent =
+        "data:text/csv;charset=utf-8,\uFEFF" +
         "Ism,Familiya,Telefon,Sinf_yoki_Kurs,Manba,Kutilayotgan_summa,Izoh\n" +
         "Bekzod,Rahimov,+998901234567,1-sinf,Instagram,3200000,Sinov darsiga yozildi\n" +
         "Malika,Saidova,+998909876543,4-sinf,Veb sayt,3200000,Suhbatga kelmoqchi";
@@ -2121,18 +2272,19 @@ export default {
       document.body.removeChild(link);
     },
     exportLeadsToExcel() {
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF" +
+      let csvContent =
+        "data:text/csv;charset=utf-8,\uFEFF" +
         "F.I.SH,Telefon,Yo'nalish,Manba,Bosqich,Summa,Izoh\n";
-      
+
       this.filteredLeads.forEach((l) => {
         const row = [
-          `"${l.fullName || ''}"`,
-          `"${l.phone || ''}"`,
+          `"${l.fullName || ""}"`,
+          `"${l.phone || ""}"`,
           `"${this.getTargetDisplay(l)}"`,
-          `"${l.source || ''}"`,
+          `"${l.source || ""}"`,
           `"${this.getStageTitle(l.stage)}"`,
           `"${l.amount || 0}"`,
-          `"${(l.notes || '').replace(/"/g, '""')}"`,
+          `"${(l.notes || "").replace(/"/g, '""')}"`,
         ].join(",");
         csvContent += row + "\n";
       });

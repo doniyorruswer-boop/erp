@@ -1,23 +1,34 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { AuditAction } from '@prisma/client';
-import { BranchContext, buildBranchWhere, assertBranchAccess } from '../auth/branch-access';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { AuditAction } from "@prisma/client";
+import { BranchContext, buildBranchWhere, assertBranchAccess } from "../auth/branch-access";
+import { UpdateRoomDto } from "./dto/room.dto";
 
 @Injectable()
 export class RoomsService {
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
-  async findAll(params: { orgId: string; branchId?: string; search?: string }, branchCtx?: BranchContext) {
+  async findAll(
+    params: { orgId: string; branchId?: string; search?: string },
+    branchCtx?: BranchContext
+  ) {
     const branchWhere = branchCtx
       ? buildBranchWhere(branchCtx, params.branchId)
-      : (params.branchId ? { branchId: params.branchId } : {});
+      : params.branchId
+        ? { branchId: params.branchId }
+        : {};
 
     const searchWhere = params.search
-      ? { name: { contains: params.search, mode: 'insensitive' as const } }
+      ? { name: { contains: params.search, mode: "insensitive" as const } }
       : {};
 
     return this.prisma.room.findMany({
@@ -30,7 +41,7 @@ export class RoomsService {
       include: {
         _count: { select: { groups: true } },
       },
-      orderBy: { name: 'asc' },
+      orderBy: { name: "asc" },
     });
   }
 
@@ -44,11 +55,16 @@ export class RoomsService {
         },
       },
     });
-    if (!room) throw new NotFoundException('Xona topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    if (!room) throw new NotFoundException("Xona topilmadi yoki ushbu filialga kirish huquqi yo'q");
     return room;
   }
 
-  async create(data: { name: string; capacity?: number; branchId?: string }, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async create(
+    data: { name: string; capacity?: number; branchId?: string },
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     let targetBranchId = data.branchId;
     if (branchCtx) {
       targetBranchId = assertBranchAccess(branchCtx, data.branchId);
@@ -59,7 +75,8 @@ export class RoomsService {
       const branch = await this.prisma.branch.findFirst({
         where: { id: data.branchId, organizationId: orgId, deletedAt: null },
       });
-      if (!branch) throw new BadRequestException('Filial topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!branch)
+        throw new BadRequestException("Filial topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     const room = await this.prisma.room.create({
@@ -76,7 +93,7 @@ export class RoomsService {
       branchId: data.branchId,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Room',
+      entityType: "Room",
       entityId: room.id,
       after: room,
     });
@@ -84,10 +101,19 @@ export class RoomsService {
     return room;
   }
 
-  async update(id: string, data: any, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async update(
+    id: string,
+    data: UpdateRoomDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const existing = await this.prisma.room.findFirst({ where: { id, organizationId: orgId, deletedAt: null, ...branchWhere } });
-    if (!existing) throw new NotFoundException('Xona topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    const existing = await this.prisma.room.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Xona topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     if (data.branchId && branchCtx) {
       assertBranchAccess(branchCtx, data.branchId);
@@ -97,7 +123,8 @@ export class RoomsService {
       const branch = await this.prisma.branch.findFirst({
         where: { id: data.branchId, organizationId: orgId, deletedAt: null },
       });
-      if (!branch) throw new BadRequestException('Filial topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!branch)
+        throw new BadRequestException("Filial topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     const updated = await this.prisma.room.update({
@@ -110,7 +137,7 @@ export class RoomsService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Room',
+      entityType: "Room",
       entityId: id,
       before: existing,
       after: updated,
@@ -121,8 +148,11 @@ export class RoomsService {
 
   async remove(id: string, orgId: string, userId?: string, branchCtx?: BranchContext) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const existing = await this.prisma.room.findFirst({ where: { id, organizationId: orgId, deletedAt: null, ...branchWhere } });
-    if (!existing) throw new NotFoundException('Xona topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    const existing = await this.prisma.room.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Xona topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const deleted = await this.prisma.room.update({
       where: { id },
@@ -134,7 +164,7 @@ export class RoomsService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Room',
+      entityType: "Room",
       entityId: id,
       before: existing,
       after: deleted,
@@ -145,8 +175,11 @@ export class RoomsService {
 
   async restore(id: string, orgId: string, userId?: string, branchCtx?: BranchContext) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const existing = await this.prisma.room.findFirst({ where: { id, organizationId: orgId, ...branchWhere } });
-    if (!existing) throw new NotFoundException('Xona topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    const existing = await this.prisma.room.findFirst({
+      where: { id, organizationId: orgId, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Xona topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const restored = await this.prisma.room.update({
       where: { id },
@@ -158,7 +191,7 @@ export class RoomsService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.RESTORE,
-      entityType: 'Room',
+      entityType: "Room",
       entityId: id,
       before: existing,
       after: restored,

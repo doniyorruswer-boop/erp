@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend"
+  >
     <!-- Header -->
     <div class="flex items-center justify-between flex-wrap gap-2">
       <div>
@@ -13,10 +15,7 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <span
-          class="px-2.5 py-1 rounded-full text-xs font-bold"
-          :class="rateBadgeClass"
-        >
+        <span class="px-2.5 py-1 rounded-full text-xs font-bold" :class="rateBadgeClass">
           {{ attendanceRate }}% Qatnashish
         </span>
       </div>
@@ -25,10 +24,10 @@
     <!-- Main Content -->
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
       <!-- Big Rate Box -->
-      <div class="p-3.5 rounded-xl bg-gray-50/90 dark:bg-gray-700/40 border border-gray-200/80 dark:border-gray-700/60 flex flex-col justify-between">
-        <div class="text-xs font-medium text-gray-500 dark:text-gray-400">
-          Umumiy ko'rsatkich
-        </div>
+      <div
+        class="p-3.5 rounded-xl bg-gray-50/90 dark:bg-gray-700/40 border border-gray-200/80 dark:border-gray-700/60 flex flex-col justify-between"
+      >
+        <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Umumiy ko'rsatkich</div>
         <div class="my-1.5 flex items-baseline gap-2">
           <span class="text-2xl sm:text-3xl font-black text-gray-800 dark:text-gray-100">
             {{ attendanceRate }}%
@@ -47,9 +46,13 @@
       </div>
 
       <!-- Kelganlar (Present) -->
-      <div class="p-3.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/50 flex flex-col justify-between">
+      <div
+        class="p-3.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/50 flex flex-col justify-between"
+      >
         <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Kelganlar</span>
+          <span class="text-xs font-semibold text-emerald-800 dark:text-emerald-300"
+            >Kelganlar</span
+          >
           <Icon icon="solar:check-circle-bold" class="text-emerald-500 text-base" />
         </div>
         <div class="mt-2 text-xl sm:text-2xl font-black text-emerald-700 dark:text-emerald-400">
@@ -62,7 +65,9 @@
       </div>
 
       <!-- Kechikkanlar (Late) -->
-      <div class="p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/50 flex flex-col justify-between">
+      <div
+        class="p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/50 flex flex-col justify-between"
+      >
         <div class="flex items-center justify-between">
           <span class="text-xs font-semibold text-amber-800 dark:text-amber-300">Kechikkanlar</span>
           <Icon icon="solar:clock-circle-bold" class="text-amber-500 text-base" />
@@ -77,7 +82,9 @@
       </div>
 
       <!-- Kelmaganlar (Absent) -->
-      <div class="p-3.5 rounded-xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-800/50 flex flex-col justify-between">
+      <div
+        class="p-3.5 rounded-xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200/80 dark:border-rose-800/50 flex flex-col justify-between"
+      >
         <div class="flex items-center justify-between">
           <span class="text-xs font-semibold text-rose-800 dark:text-rose-300">Kelmaganlar</span>
           <Icon icon="solar:close-circle-bold" class="text-rose-500 text-base" />
@@ -126,7 +133,8 @@ export default {
     },
     rateBadgeClass() {
       const rate = this.attendanceRate;
-      if (rate >= 90) return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300";
+      if (rate >= 90)
+        return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300";
       if (rate >= 75) return "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300";
       return "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300";
     },

@@ -1,23 +1,33 @@
-import { Injectable, Logger, NotFoundException, OnApplicationBootstrap, OnModuleDestroy } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { JobStatus, InvoiceStatus } from '@prisma/client';
-import { NotificationsService } from '../notifications/notifications.service';
-import { CreateJobDto, QueryJobDto } from './dto/job.dto';
-import Redis from 'ioredis';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnApplicationBootstrap,
+  OnModuleDestroy,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { JobStatus, InvoiceStatus, Prisma, NotificationChannel } from "@prisma/client";
+import { NotificationsService } from "../notifications/notifications.service";
+import {
+  SendNotificationDto,
+  SendEventNotificationDto,
+} from "../notifications/dto/notification.dto";
+import { CreateJobDto, QueryJobDto } from "./dto/job.dto";
+import Redis from "ioredis";
 
 @Injectable()
 export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
   private readonly logger = new Logger(JobsService.name);
   private redis: Redis | null = null;
-  private pollerInterval: any = null;
+  private pollerInterval: NodeJS.Timeout | null = null;
 
   constructor(
     private prisma: PrismaService,
-    private notificationsService: NotificationsService,
+    private notificationsService: NotificationsService
   ) {}
 
   async onApplicationBootstrap() {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
     try {
       this.redis = new Redis(redisUrl, {
         maxRetriesPerRequest: 3,
@@ -25,19 +35,20 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
         lazyConnect: true,
       });
 
-      this.redis.on('connect', () => {
+      this.redis.on("connect", () => {
         this.logger.log(`[REDIS] Background jobs connected to Redis at ${redisUrl}`);
       });
 
-      this.redis.on('error', (err) => {
+      this.redis.on("error", (err) => {
         this.logger.warn(`[REDIS] Connection notice: ${err.message}`);
       });
 
       await this.redis.connect().catch((err) => {
         this.logger.warn(`[REDIS] Initial connect skipped: ${err.message}`);
       });
-    } catch (e: any) {
-      this.logger.warn(`[REDIS] Redis initialization skipped: ${e.message}`);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.logger.warn(`[REDIS] Redis initialization skipped: ${msg}`);
     }
 
     // Recover any pending or interrupted jobs from previous server run
@@ -63,25 +74,28 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
           status: { in: [JobStatus.PENDING, JobStatus.PROCESSING] },
         },
         take: 100,
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: "asc" },
       });
 
       if (orphaned.length > 0) {
-        this.logger.log(`[JOB RECOVERY] Found ${orphaned.length} pending/interrupted jobs to re-enqueue.`);
+        this.logger.log(
+          `[JOB RECOVERY] Found ${orphaned.length} pending/interrupted jobs to re-enqueue.`
+        );
         for (const job of orphaned) {
           const delay = Math.max(0, job.runAt.getTime() - Date.now());
           this.scheduleExecution(job.id, delay);
         }
       }
-    } catch (err: any) {
-      this.logger.error(`[JOB RECOVERY ERROR]: ${err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.error(`[JOB RECOVERY ERROR]: ${msg}`);
     }
   }
 
   private scheduleExecution(jobId: string, delayMs: number) {
-    if (this.redis && this.redis.status === 'ready') {
+    if (this.redis && this.redis.status === "ready") {
       const runTimestamp = Date.now() + delayMs;
-      this.redis.zadd('eduhub:jobs:delayed', runTimestamp, jobId).catch(() => {});
+      this.redis.zadd("eduhub:jobs:delayed", runTimestamp, jobId).catch(() => {});
     }
 
     if (!delayMs || delayMs <= 0) {
@@ -93,17 +107,17 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
 
   private startDelayedJobPoller() {
     this.pollerInterval = setInterval(async () => {
-      if (!this.redis || this.redis.status !== 'ready') return;
+      if (!this.redis || this.redis.status !== "ready") return;
       try {
         const now = Date.now();
-        const dueJobIds = await this.redis.zrangebyscore('eduhub:jobs:delayed', 0, now);
+        const dueJobIds = await this.redis.zrangebyscore("eduhub:jobs:delayed", 0, now);
         if (dueJobIds && dueJobIds.length > 0) {
-          await this.redis.zrem('eduhub:jobs:delayed', ...dueJobIds);
+          await this.redis.zrem("eduhub:jobs:delayed", ...dueJobIds);
           for (const jobId of dueJobIds) {
             this.processJob(jobId);
           }
         }
-      } catch (err: any) {
+      } catch {
         // Suppress poller error
       }
     }, 3000);
@@ -144,30 +158,43 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
       },
     });
 
-    this.logger.log(`[JOB START] ID: ${job.id} | Type: ${job.type} | Attempt: ${attempts}/${job.maxRetries}`);
+    this.logger.log(
+      `[JOB START] ID: ${job.id} | Type: ${job.type} | Attempt: ${attempts}/${job.maxRetries}`
+    );
 
     try {
-      let result: any = null;
+      let result: Prisma.InputJsonValue = {};
       const orgId = job.organizationId;
       if (!orgId) {
-        throw new Error('Organization context missing for job');
+        throw new Error("Organization context missing for job");
       }
 
       switch (job.type) {
-        case 'NOTIFICATION':
-          result = await this.handleNotificationJob(job.payload as any, orgId);
+        case "NOTIFICATION":
+          result = (await this.handleNotificationJob(
+            job.payload as Record<string, unknown>,
+            orgId
+          )) as unknown as Prisma.InputJsonValue;
           break;
 
-        case 'SCHEDULED_REMINDER':
-          result = await this.handleScheduledReminderJob(job.payload as any, orgId);
+        case "SCHEDULED_REMINDER":
+          result = (await this.handleScheduledReminderJob(
+            job.payload as Record<string, unknown>,
+            orgId
+          )) as unknown as Prisma.InputJsonValue;
           break;
 
-        case 'RECURRING_BILLING':
-          result = await this.handleRecurringBillingJob(orgId);
+        case "RECURRING_BILLING":
+          result = (await this.handleRecurringBillingJob(
+            orgId
+          )) as unknown as Prisma.InputJsonValue;
           break;
 
-        case 'REPORT_GENERATION':
-          result = await this.handleReportGenerationJob(job.payload as any, orgId);
+        case "REPORT_GENERATION":
+          result = (await this.handleReportGenerationJob(
+            job.payload as Record<string, unknown>,
+            orgId
+          )) as unknown as Prisma.InputJsonValue;
           break;
 
         default:
@@ -185,8 +212,9 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
       });
 
       this.logger.log(`[JOB COMPLETED] ID: ${job.id} | Type: ${job.type}`);
-    } catch (err: any) {
-      this.logger.error(`[JOB ERROR] ID: ${job.id} | Type: ${job.type} | Error: ${err.message}`);
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      this.logger.error(`[JOB ERROR] ID: ${job.id} | Type: ${job.type} | Error: ${errMsg}`);
 
       if (attempts < job.maxRetries) {
         const backoffMs = Math.pow(2, attempts) * 1000;
@@ -196,7 +224,7 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
           where: { id: jobId },
           data: {
             status: JobStatus.PENDING,
-            error: err.message,
+            error: errMsg,
             runAt: nextRunAt,
           },
         });
@@ -208,21 +236,24 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
           data: {
             status: JobStatus.FAILED,
             completedAt: new Date(),
-            error: err.message,
+            error: errMsg,
           },
         });
       }
     }
   }
 
-  private async handleNotificationJob(payload: any, orgId: string) {
+  private async handleNotificationJob(payload: Record<string, unknown>, orgId: string) {
     if (payload.event) {
-      return this.notificationsService.sendEvent(payload, orgId);
+      return this.notificationsService.sendEvent(
+        payload as unknown as SendEventNotificationDto,
+        orgId
+      );
     }
-    return this.notificationsService.send(payload, orgId);
+    return this.notificationsService.send(payload as unknown as SendNotificationDto, orgId);
   }
 
-  private async handleScheduledReminderJob(payload: any, orgId: string) {
+  private async handleScheduledReminderJob(payload: Record<string, unknown>, orgId: string) {
     const now = new Date();
     const futureLimit = new Date(now.getTime() + 2 * 60 * 60 * 1000); // next 2 hours
 
@@ -244,11 +275,11 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
         await this.notificationsService.send(
           {
             recipient: item.instructor.phone,
-            channel: 'IN_APP' as any,
-            title: 'Dars eslatmasi',
-            body: `${item.title || 'Dars'} ${item.startAt.toLocaleTimeString('uz-UZ')} da boshlanadi`,
+            channel: NotificationChannel.IN_APP,
+            title: "Dars eslatmasi",
+            body: `${item.title || "Dars"} ${item.startAt.toLocaleTimeString("uz-UZ")} da boshlanadi`,
           },
-          orgId,
+          orgId
         );
         count++;
       }
@@ -279,15 +310,21 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
     };
   }
 
-  private async handleReportGenerationJob(payload: any, orgId: string) {
+  private async handleReportGenerationJob(payload: Record<string, unknown>, orgId: string) {
     const [students, revenue, expenses] = await Promise.all([
       this.prisma.student.count({ where: { organizationId: orgId, deletedAt: null } }),
-      this.prisma.payment.aggregate({ where: { organizationId: orgId, status: 'PAID' }, _sum: { amount: true } }),
-      this.prisma.expense.aggregate({ where: { organizationId: orgId, deletedAt: null }, _sum: { amount: true } }),
+      this.prisma.payment.aggregate({
+        where: { organizationId: orgId, status: "PAID" },
+        _sum: { amount: true },
+      }),
+      this.prisma.expense.aggregate({
+        where: { organizationId: orgId, deletedAt: null },
+        _sum: { amount: true },
+      }),
     ]);
 
     return {
-      reportType: payload?.reportType || 'SUMMARY',
+      reportType: payload?.reportType || "SUMMARY",
       generatedAt: new Date(),
       metrics: {
         totalStudents: students,
@@ -305,7 +342,7 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
         status: query?.status,
         type: query?.type,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 50,
     });
   }
@@ -314,7 +351,7 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
     const job = await this.prisma.job.findFirst({
       where: { id, organizationId: orgId },
     });
-    if (!job) throw new NotFoundException('Job topilmadi');
+    if (!job) throw new NotFoundException("Job topilmadi");
     return job;
   }
 
@@ -322,7 +359,7 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
     const job = await this.prisma.job.findFirst({
       where: { id, organizationId: orgId },
     });
-    if (!job) throw new NotFoundException('Job topilmadi');
+    if (!job) throw new NotFoundException("Job topilmadi");
 
     const updated = await this.prisma.job.update({
       where: { id },
@@ -338,11 +375,11 @@ export class JobsService implements OnApplicationBootstrap, OnModuleDestroy {
   }
 
   async triggerMaintenanceJobs(orgId: string) {
-    const reminderJob = await this.addJob({ type: 'SCHEDULED_REMINDER', payload: {} }, orgId);
-    const billingJob = await this.addJob({ type: 'RECURRING_BILLING', payload: {} }, orgId);
+    const reminderJob = await this.addJob({ type: "SCHEDULED_REMINDER", payload: {} }, orgId);
+    const billingJob = await this.addJob({ type: "RECURRING_BILLING", payload: {} }, orgId);
 
     return {
-      message: 'Maintenance jobs triggered successfully',
+      message: "Maintenance jobs triggered successfully",
       reminderJobId: reminderJob.id,
       billingJobId: billingJob.id,
     };

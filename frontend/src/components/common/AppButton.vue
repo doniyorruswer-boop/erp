@@ -5,19 +5,11 @@
     :type="to ? undefined : type"
     :disabled="disabled || loading"
     class="app-button inline-flex items-center justify-center font-lexend transition cursor-pointer shadow-2xs select-none disabled:opacity-50 disabled:cursor-not-allowed group"
-    :class="[
-      variantClasses,
-      sizeClasses,
-      fullWidth ? 'w-full' : '',
-    ]"
+    :class="[variantClasses, sizeClasses, fullWidth ? 'w-full' : '']"
     @click="handleClick"
   >
     <!-- Loading Spinner -->
-    <Icon
-      v-if="loading"
-      icon="eos-icons:loading"
-      class="animate-spin shrink-0 text-base"
-    />
+    <Icon v-if="loading" icon="eos-icons:loading" class="animate-spin shrink-0 text-base" />
     <!-- Icon -->
     <Icon
       v-else-if="icon"

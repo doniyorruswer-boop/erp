@@ -1,20 +1,17 @@
 <template>
-  <div
-    class="relative inline-block app-filter-dropdown font-lexend"
-    ref="containerRef"
-  >
+  <div ref="containerRef" class="relative inline-block app-filter-dropdown font-lexend">
     <!-- Trigger Button (No .stop to allow clean document clicks, and event coordination) -->
     <button
       type="button"
-      @click="toggleDropdown"
       :class="[
         'h-9 sm:h-9.5 px-3 rounded-lg border bg-white dark:bg-gray-900 text-xs sm:text-sm font-medium flex items-center gap-1.5 transition cursor-pointer shadow-2xs group select-none',
         isOpen
           ? 'border-primary ring-2 ring-primary/20 text-primary'
           : isNonDefault
             ? 'border-primary text-primary bg-primary/[0.03]'
-            : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:border-gray-400'
+            : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:border-gray-400',
       ]"
+      @click="toggleDropdown"
     >
       <!-- Leading Icon -->
       <Icon
@@ -24,14 +21,22 @@
           'text-base transition-colors shrink-0',
           isOpen || isNonDefault
             ? 'text-primary'
-            : 'text-gray-500 dark:text-gray-400 group-hover:text-primary'
+            : 'text-gray-500 dark:text-gray-400 group-hover:text-primary',
         ]"
       />
 
       <!-- Label & Value text -->
       <span class="whitespace-nowrap flex items-center">
-        <span v-if="label" class="text-gray-700 dark:text-gray-300 font-semibold mr-1">{{ label }}:</span>
-        <span :class="isNonDefault ? 'font-bold text-primary' : 'font-semibold text-gray-800 dark:text-gray-100'">
+        <span v-if="label" class="text-gray-700 dark:text-gray-300 font-semibold mr-1"
+          >{{ label }}:</span
+        >
+        <span
+          :class="
+            isNonDefault
+              ? 'font-bold text-primary'
+              : 'font-semibold text-gray-800 dark:text-gray-100'
+          "
+        >
           {{ displayLabel }}
         </span>
       </span>
@@ -45,23 +50,25 @@
     </button>
 
     <!-- Dropdown Menu Popup (O'quvchilar ro'yxati andozasi) -->
-    <transition name="fade">
+    <Transition name="fade">
       <div
         v-if="isOpen"
         :class="[
           'absolute mt-2 max-h-64 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 py-1 font-lexend text-xs sm:text-sm',
           placement === 'right' ? 'right-0' : 'left-0',
-          minWidth
+          minWidth,
         ]"
       >
         <!-- "Barchasi / All" Variant -->
         <div
           v-if="allLabel"
-          @click="selectOption(allValue)"
           :class="[
             'px-4 py-2.5 cursor-pointer flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition',
-            isSelected(allValue) ? 'text-primary font-bold bg-primary/5' : 'text-gray-700 dark:text-gray-200'
+            isSelected(allValue)
+              ? 'text-primary font-bold bg-primary/5'
+              : 'text-gray-700 dark:text-gray-200',
           ]"
+          @click="selectOption(allValue)"
         >
           <span>{{ allLabel }}</span>
           <Icon
@@ -75,11 +82,13 @@
         <div
           v-for="opt in normalizedOptions"
           :key="opt.value"
-          @click="selectOption(opt.value)"
           :class="[
             'px-4 py-2.5 cursor-pointer flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition',
-            isSelected(opt.value) ? 'text-primary font-bold bg-primary/5' : 'text-gray-700 dark:text-gray-200'
+            isSelected(opt.value)
+              ? 'text-primary font-bold bg-primary/5'
+              : 'text-gray-700 dark:text-gray-200',
           ]"
+          @click="selectOption(opt.value)"
         >
           <span>{{ opt.label }}</span>
           <Icon
@@ -89,7 +98,7 @@
           />
         </div>
       </div>
-    </transition>
+    </Transition>
   </div>
 </template>
 
@@ -174,7 +183,12 @@ export default {
       return this.modelValue || this.allLabel || "Barchasi";
     },
     isNonDefault() {
-      return !this.isSelected(this.allValue) && this.modelValue !== "" && this.modelValue !== null && this.modelValue !== undefined;
+      return (
+        !this.isSelected(this.allValue) &&
+        this.modelValue !== "" &&
+        this.modelValue !== null &&
+        this.modelValue !== undefined
+      );
     },
   },
   mounted() {
@@ -234,7 +248,9 @@ export default {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 .fade-enter-from,
 .fade-leave-to {

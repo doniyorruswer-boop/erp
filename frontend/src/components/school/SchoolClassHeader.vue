@@ -5,7 +5,7 @@
       :items="[
         { title: 'Ta\'lim', to: '/school/classes' },
         { title: tenantStore.classesLabel, to: '/school/classes' },
-        { title: `${classInfo.name} ${tenantStore.classLabel.toLowerCase()}i` }
+        { title: `${classInfo.name} ${tenantStore.classLabel.toLowerCase()}i` },
       ]"
     />
 
@@ -19,24 +19,13 @@
 
       <!-- O'ng tomondagi amallar tugmalari (Kanban AppButton komponenti bilan) -->
       <div class="flex items-center gap-2 flex-wrap">
-        <AppButton
-          icon="ri:team-fill"
-          @click="$emit('action', 'groups')"
-        >
-          Guruhlar
-        </AppButton>
+        <AppButton icon="ri:team-fill" @click="$emit('action', 'groups')"> Guruhlar </AppButton>
 
-        <AppButton
-          icon="solar:document-text-bold"
-          @click="$emit('action', 'template')"
-        >
+        <AppButton icon="solar:document-text-bold" @click="$emit('action', 'template')">
           Shablon
         </AppButton>
 
-        <AppButton
-          icon="solar:import-linear"
-          @click="$emit('action', 'import')"
-        >
+        <AppButton icon="solar:import-linear" @click="$emit('action', 'import')">
           Import Excel
         </AppButton>
 
@@ -48,17 +37,11 @@
           Ommaviy
         </AppButton>
 
-        <AppButton
-          icon="solar:export-linear"
-          @click="$emit('action', 'export')"
-        >
+        <AppButton icon="solar:export-linear" @click="$emit('action', 'export')">
           Export Excel
         </AppButton>
 
-        <AppButton
-          icon="solar:restart-linear"
-          @click="$emit('action', 'passwords')"
-        >
+        <AppButton icon="solar:restart-linear" @click="$emit('action', 'passwords')">
           Parollarni yangilash
         </AppButton>
 
@@ -78,7 +61,7 @@
 
 <script>
 import Breadcrumb from "@/components/Breadcrumb.vue";
-import AppButton from "@/components/AppButton.vue";
+import AppButton from "@/components/common/AppButton.vue";
 import { useTenantStore } from "@/store/tenant";
 
 export default {
@@ -86,10 +69,6 @@ export default {
   components: {
     Breadcrumb,
     AppButton,
-  },
-  setup() {
-    const tenantStore = useTenantStore();
-    return { tenantStore };
   },
   props: {
     classInfo: {
@@ -102,5 +81,9 @@ export default {
     },
   },
   emits: ["toggle-bulk", "action"],
+  setup() {
+    const tenantStore = useTenantStore();
+    return { tenantStore };
+  },
 };
 </script>

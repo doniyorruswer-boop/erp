@@ -1,12 +1,12 @@
 <template>
-  <div class="relative inline-block font-lexend" ref="containerRef">
+  <div ref="containerRef" class="relative inline-block font-lexend">
     <!-- Trigger Button (Matching DashboardHeaderBar 1:1, NO down arrow icon) -->
     <AppButton
       variant="outline"
       :size="size"
       icon="solar:calendar-linear"
-      @click="toggleDatePicker"
       :title="title || 'Sana oralig\'ini tanlash'"
+      @click="toggleDatePicker"
     >
       <span>{{ displayRangeText }}</span>
     </AppButton>
@@ -16,18 +16,22 @@
       v-if="isOpen"
       :class="[
         'absolute top-full mt-2 z-50 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl p-4 space-y-3 font-lexend select-none animate-fade-in',
-        align === 'left' ? 'left-0' : 'right-0'
+        align === 'left' ? 'left-0' : 'right-0',
       ]"
       @click.stop
     >
       <!-- Popover Sarlavhasi -->
-      <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-700">
-        <span class="text-xs font-bold text-gray-800 dark:text-gray-100 uppercase tracking-wider">Davrni tanlash</span>
+      <div
+        class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-700"
+      >
+        <span class="text-xs font-bold text-gray-800 dark:text-gray-100 uppercase tracking-wider"
+          >Davrni tanlash</span
+        >
         <button
           type="button"
-          @click="closeDatePicker"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition"
           title="Yopish"
+          @click="closeDatePicker"
         >
           <Icon icon="solar:close-circle-linear" class="text-base" />
         </button>
@@ -39,36 +43,40 @@
           v-for="p in presetRanges"
           :key="p.key"
           type="button"
-          @click="selectPreset(p)"
           :class="[
             'py-1.5 px-2 rounded-lg text-xs font-medium transition cursor-pointer border text-center',
             selectedPresetKey === p.key
               ? 'border-primary bg-primary/10 text-primary font-bold shadow-2xs'
-              : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
+              : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300',
           ]"
+          @click="selectPreset(p)"
         >
           {{ p.label }}
         </button>
       </div>
 
       <!-- Interaktiv Taqvim Gridi -->
-      <div class="border border-gray-100 dark:border-gray-700 rounded-lg p-2.5 bg-gray-50/50 dark:bg-gray-800/40 space-y-2">
+      <div
+        class="border border-gray-100 dark:border-gray-700 rounded-lg p-2.5 bg-gray-50/50 dark:bg-gray-800/40 space-y-2"
+      >
         <!-- Oy va Yil navigatsiyasi -->
-        <div class="flex items-center justify-between px-1 text-xs font-bold text-gray-700 dark:text-gray-200">
+        <div
+          class="flex items-center justify-between px-1 text-xs font-bold text-gray-700 dark:text-gray-200"
+        >
           <button
             type="button"
-            @click="prevCalMonth"
             class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition"
             title="Oldingi oy"
+            @click="prevCalMonth"
           >
             <Icon icon="solar:alt-arrow-left-linear" class="text-sm" />
           </button>
           <span>{{ calMonthName }} {{ calYear }}</span>
           <button
             type="button"
-            @click="nextCalMonth"
             class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white transition"
             title="Keyingi oy"
+            @click="nextCalMonth"
           >
             <Icon icon="solar:alt-arrow-right-linear" class="text-sm" />
           </button>
@@ -95,15 +103,15 @@
             <button
               v-if="d.day"
               type="button"
-              @click="selectCalendarDay(d)"
               :class="[
                 'w-7 h-7 flex items-center justify-center rounded-lg text-xs font-semibold transition cursor-pointer',
                 d.isStart || d.isEnd
                   ? 'bg-primary text-white font-bold shadow-2xs'
                   : d.isInRange
-                  ? 'bg-primary/15 text-primary rounded-none w-full'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-primary/15 text-primary rounded-none w-full'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700',
               ]"
+              @click="selectCalendarDay(d)"
             >
               {{ d.day }}
             </button>
@@ -134,27 +142,29 @@
       </div>
 
       <!-- Pastki boshqaruv amallari -->
-      <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+      <div
+        class="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-gray-700"
+      >
         <button
           v-if="clearable && (tempStartDate || tempEndDate)"
           type="button"
-          @click="clearDateRange"
           class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 hover:underline text-xs font-semibold cursor-pointer"
+          @click="clearDateRange"
         >
           Tozalash
         </button>
         <div class="flex items-center gap-2 ml-auto">
           <button
             type="button"
-            @click="cancelDateRange"
             class="py-1.5 px-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold cursor-pointer shadow-2xs transition"
+            @click="cancelDateRange"
           >
             Bekor qilish
           </button>
           <button
             type="button"
-            @click="applyDateRange"
             class="py-1.5 px-3.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-semibold cursor-pointer shadow-2xs transition"
+            @click="applyDateRange"
           >
             Qo'llash
           </button>
@@ -166,7 +176,8 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import AppButton from "@/components/AppButton.vue";
+
+import AppButton from "@/components/common/AppButton.vue";
 import FormDatePicker from "@/components/FormDatePicker.vue";
 
 export default {
@@ -280,8 +291,18 @@ export default {
     },
     calMonthName() {
       const months = [
-        "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
-        "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
+        "Yanvar",
+        "Fevral",
+        "Mart",
+        "Aprel",
+        "May",
+        "Iyun",
+        "Iyul",
+        "Avgust",
+        "Sentabr",
+        "Oktabr",
+        "Noyabr",
+        "Dekabr",
       ];
       return months[this.calMonth] || "Sentabr";
     },
@@ -495,7 +516,7 @@ export default {
         end: this.innerEndDate,
         rangeKey: this.selectedPresetKey || "custom",
         label: this.selectedPresetKey
-          ? (this.presetRanges.find((p) => p.key === this.selectedPresetKey)?.label || "Davr")
+          ? this.presetRanges.find((p) => p.key === this.selectedPresetKey)?.label || "Davr"
           : "Maxsus sana oralig'i",
       };
 

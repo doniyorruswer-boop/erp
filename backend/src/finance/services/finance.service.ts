@@ -1,15 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AuditService } from '../../audit/audit.service';
-import { AuditAction, TransactionType, PaymentStatus, InvoiceStatus } from '@prisma/client';
-import { AllocatePaymentDto, CreateRefundDto } from '../dto/payment-allocation.dto';
-import { BranchContext, buildBranchWhere } from '../../auth/branch-access';
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { AuditService } from "../../audit/audit.service";
+import { AuditAction, TransactionType, PaymentStatus, InvoiceStatus } from "@prisma/client";
+import { AllocatePaymentDto, CreateRefundDto } from "../dto/payment-allocation.dto";
+import { BranchContext, buildBranchWhere } from "../../auth/branch-access";
 
 @Injectable()
 export class FinanceService {
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
   async allocatePayment(dto: AllocatePaymentDto, orgId: string, userId?: string) {
@@ -17,19 +17,23 @@ export class FinanceService {
       where: { id: dto.paymentId, organizationId: orgId, deletedAt: null },
       include: { allocations: true },
     });
-    if (!payment) throw new NotFoundException('To\'lov topilmadi yoki ushbu tashkilotga tegishli emas');
+    if (!payment)
+      throw new NotFoundException("To'lov topilmadi yoki ushbu tashkilotga tegishli emas");
 
     const invoice = await this.prisma.invoice.findFirst({
       where: { id: dto.invoiceId, organizationId: orgId, deletedAt: null },
       include: { allocations: true },
     });
-    if (!invoice) throw new NotFoundException('Hisob-faktura topilmadi yoki ushbu tashkilotga tegishli emas');
+    if (!invoice)
+      throw new NotFoundException("Hisob-faktura topilmadi yoki ushbu tashkilotga tegishli emas");
 
     const allocatedAmount = payment.allocations.reduce((sum, a) => sum + Number(a.amount), 0);
     const unallocated = Number(payment.amount) - allocatedAmount;
 
     if (dto.amount > unallocated) {
-      throw new BadRequestException(`Taqsimlanmagan summa yetarli emas. Qolgan summa: ${unallocated} UZS`);
+      throw new BadRequestException(
+        `Taqsimlanmagan summa yetarli emas. Qolgan summa: ${unallocated} UZS`
+      );
     }
 
     const allocation = await this.prisma.paymentAllocation.create({
@@ -42,7 +46,10 @@ export class FinanceService {
 
     // Update Invoice paidAmount and status
     const newPaidAmount = Number(invoice.paidAmount) + Number(dto.amount);
-    const newStatus = newPaidAmount >= Number(invoice.totalAmount) ? InvoiceStatus.PAID : InvoiceStatus.PARTIALLY_PAID;
+    const newStatus =
+      newPaidAmount >= Number(invoice.totalAmount)
+        ? InvoiceStatus.PAID
+        : InvoiceStatus.PARTIALLY_PAID;
 
     await this.prisma.invoice.update({
       where: { id: dto.invoiceId },
@@ -57,7 +64,7 @@ export class FinanceService {
       branchId: invoice.branchId || payment.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Invoice',
+      entityType: "Invoice",
       entityId: dto.invoiceId,
       after: { allocationId: allocation.id, paidAmount: newPaidAmount, status: newStatus },
     });
@@ -70,15 +77,16 @@ export class FinanceService {
       where: { id: dto.paymentId, organizationId: orgId, deletedAt: null },
       include: { allocations: { include: { invoice: true } } },
     });
-    if (!payment) throw new NotFoundException('To\'lov topilmadi yoki ushbu tashkilotga tegishli emas');
+    if (!payment)
+      throw new NotFoundException("To'lov topilmadi yoki ushbu tashkilotga tegishli emas");
 
     if (payment.status === PaymentStatus.VOIDED || payment.status === PaymentStatus.REFUNDED) {
-      throw new BadRequestException('Ushbu to\'lov allaqachon bekor qilingan yoki qaytarilgan');
+      throw new BadRequestException("Ushbu to'lov allaqachon bekor qilingan yoki qaytarilgan");
     }
 
     const refundAmount = Number(dto.amount);
     if (refundAmount > Number(payment.amount)) {
-      throw new BadRequestException('Qaytarilayotgan summa to\'lov summasidan oshishi mumkin emas');
+      throw new BadRequestException("Qaytarilayotgan summa to'lov summasidan oshishi mumkin emas");
     }
 
     let cashboxId = dto.cashboxId || payment.cashboxId;
@@ -86,12 +94,13 @@ export class FinanceService {
       const cb = await this.prisma.cashbox.findFirst({
         where: { id: cashboxId, organizationId: orgId, deletedAt: null },
       });
-      if (!cb) throw new BadRequestException('Kassa topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!cb)
+        throw new BadRequestException("Kassa topilmadi yoki ushbu tashkilotga tegishli emas");
     } else {
       const defaultCashbox = await this.prisma.cashbox.findFirst({
         where: { organizationId: orgId, isDefault: true, deletedAt: null },
       });
-      cashboxId = defaultCashbox?.id;
+      cashboxId = defaultCashbox?.id || null;
     }
 
     const refundRecord = await this.prisma.refundRecord.create({
@@ -102,7 +111,7 @@ export class FinanceService {
         paymentId: payment.id,
         amount: refundAmount,
         reason: dto.reason,
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
     });
 
@@ -153,7 +162,7 @@ export class FinanceService {
       branchId: payment.branchId || undefined,
       userId,
       action: AuditAction.REFUND,
-      entityType: 'Payment',
+      entityType: "Payment",
       entityId: payment.id,
       after: refundRecord,
     });
@@ -164,7 +173,9 @@ export class FinanceService {
   async getSummary(orgId: string, branchId?: string, branchCtx?: BranchContext) {
     const branchWhere = branchCtx
       ? buildBranchWhere(branchCtx, branchId)
-      : (branchId ? { branchId } : {});
+      : branchId
+        ? { branchId }
+        : {};
 
     // 1. Total Payments (Revenues)
     const paymentsAgg = await this.prisma.payment.aggregate({

@@ -1,6 +1,15 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsArray, ValidateNested, IsDateString } from 'class-validator';
-import { Type } from 'class-transformer';
-import { InvoiceStatus } from '@prisma/client';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsNumber,
+  IsArray,
+  ValidateNested,
+  IsDateString,
+} from "class-validator";
+import { Type } from "class-transformer";
+import { InvoiceStatus } from "@prisma/client";
 
 export class CreateInvoiceItemDto {
   @IsString()
@@ -63,7 +72,7 @@ export class CreateInvoiceDto {
   items: CreateInvoiceItemDto[];
 
   @IsOptional()
-  customFields?: any;
+  customFields?: Record<string, unknown>;
 
   @IsString()
   @IsOptional()
@@ -88,7 +97,7 @@ export class UpdateInvoiceDto {
   notes?: string;
 
   @IsOptional()
-  customFields?: any;
+  customFields?: Record<string, unknown>;
 }
 
 export class QueryInvoiceDto {

@@ -1,5 +1,8 @@
 <template>
-  <div class="filter-select-component font-lexend relative inline-block" :class="[minWidth, widthClass]">
+  <div
+    class="filter-select-component font-lexend relative inline-block"
+    :class="[minWidth, widthClass]"
+  >
     <!-- Left Filter Icon -->
     <span
       v-if="icon"
@@ -19,7 +22,7 @@
         icon ? 'pl-9' : 'pl-3.5',
         'pr-9',
         sizeClasses,
-        disabled ? 'opacity-60 cursor-not-allowed bg-gray-100 dark:bg-gray-900' : ''
+        disabled ? 'opacity-60 cursor-not-allowed bg-gray-100 dark:bg-gray-900' : '',
       ]"
       @change="onChange($event.target.value)"
     >
@@ -29,17 +32,15 @@
       </option>
 
       <!-- Options list -->
-      <option
-        v-for="opt in normalizedOptions"
-        :key="opt.value"
-        :value="opt.value"
-      >
+      <option v-for="opt in normalizedOptions" :key="opt.value" :value="opt.value">
         {{ opt.label }}
       </option>
     </select>
 
     <!-- Right Dropdown Arrow Icon -->
-    <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 dark:text-gray-500">
+    <span
+      class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 dark:text-gray-500"
+    >
       <Icon icon="solar:alt-arrow-down-linear" class="text-sm" />
     </span>
   </div>

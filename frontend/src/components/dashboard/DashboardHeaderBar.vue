@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs space-y-3.5 font-lexend">
+  <div
+    class="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs space-y-3.5 font-lexend"
+  >
     <!-- Top Row: Title & Action Buttons -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <!-- Title, Academic Year & Subtitle -->
@@ -8,24 +10,30 @@
           <h1 class="text-lg sm:text-xl font-bold text-gray-800 dark:text-white tracking-tight">
             Dashboard
           </h1>
-          <span class="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+          <span
+            class="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20"
+          >
             {{ academicYear }}
           </span>
         </div>
         <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-          Davr: <span class="font-semibold text-gray-700 dark:text-gray-200">{{ displayPeriodName }}</span> · {{ academicYear }} o'quv yili
+          Davr:
+          <span class="font-semibold text-gray-700 dark:text-gray-200">{{
+            displayPeriodName
+          }}</span>
+          · {{ academicYear }} o'quv yili
         </p>
       </div>
 
       <!-- Action Buttons (Windzo UI clean secondary buttons with matching DateRange button) -->
       <div class="flex items-center gap-2 flex-wrap">
         <!-- DateRange Picker Button (Matching 2nd Image, exact button dimensions) -->
-        <div class="relative" ref="datePickerRef">
+        <div ref="datePickerRef" class="relative">
           <AppButton
             variant="outline"
             icon="solar:calendar-linear"
-            @click="toggleDatePicker"
             title="Sana oralig'ini tanlash"
+            @click="toggleDatePicker"
           >
             <span>{{ customDateRangeText }}</span>
           </AppButton>
@@ -36,11 +44,16 @@
             class="absolute right-0 sm:right-auto sm:left-0 top-full mt-2 z-50 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl p-4 space-y-3 font-lexend"
             @click.stop
           >
-            <div class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-700">
-              <span class="text-xs font-bold text-gray-800 dark:text-gray-100 uppercase tracking-wider">Davrni tanlash</span>
+            <div
+              class="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-700"
+            >
+              <span
+                class="text-xs font-bold text-gray-800 dark:text-gray-100 uppercase tracking-wider"
+                >Davrni tanlash</span
+              >
               <button
-                @click="isDatePickerOpen = false"
                 class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-0.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+                @click="isDatePickerOpen = false"
               >
                 <Icon icon="solar:close-circle-linear" class="text-base" />
               </button>
@@ -52,34 +65,38 @@
                 v-for="p in presetRanges"
                 :key="p.key"
                 type="button"
-                @click="selectPreset(p)"
                 :class="[
                   'py-1.5 px-2 rounded-lg text-xs font-medium transition cursor-pointer border text-center',
                   selectedPresetKey === p.key
                     ? 'border-primary bg-primary/10 text-primary font-bold shadow-2xs'
-                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
+                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300',
                 ]"
+                @click="selectPreset(p)"
               >
                 {{ p.label }}
               </button>
             </div>
 
             <!-- Interactive Calendar Grid Component -->
-            <div class="border border-gray-100 dark:border-gray-700 rounded-lg p-2.5 bg-gray-50/50 dark:bg-gray-800/40 space-y-2">
+            <div
+              class="border border-gray-100 dark:border-gray-700 rounded-lg p-2.5 bg-gray-50/50 dark:bg-gray-800/40 space-y-2"
+            >
               <!-- Calendar Month & Year Navigation -->
-              <div class="flex items-center justify-between px-1 text-xs font-bold text-gray-700 dark:text-gray-200">
+              <div
+                class="flex items-center justify-between px-1 text-xs font-bold text-gray-700 dark:text-gray-200"
+              >
                 <button
                   type="button"
-                  @click="prevCalMonth"
                   class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                  @click="prevCalMonth"
                 >
                   <Icon icon="solar:alt-arrow-left-linear" class="text-sm" />
                 </button>
                 <span>{{ calMonthName }} {{ calYear }}</span>
                 <button
                   type="button"
-                  @click="nextCalMonth"
                   class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                  @click="nextCalMonth"
                 >
                   <Icon icon="solar:alt-arrow-right-linear" class="text-sm" />
                 </button>
@@ -106,15 +123,15 @@
                   <button
                     v-if="d.day"
                     type="button"
-                    @click="selectCalendarDay(d)"
                     :class="[
                       'w-7 h-7 flex items-center justify-center rounded-lg text-xs font-semibold transition cursor-pointer',
                       d.isStart || d.isEnd
                         ? 'bg-primary text-white font-bold shadow-2xs'
                         : d.isInRange
-                        ? 'bg-primary/15 text-primary rounded-none w-full'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                          ? 'bg-primary/15 text-primary rounded-none w-full'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700',
                     ]"
+                    @click="selectCalendarDay(d)"
                   >
                     {{ d.day }}
                   </button>
@@ -145,18 +162,20 @@
             </div>
 
             <!-- Footer Actions -->
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+            <div
+              class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-700"
+            >
               <button
                 type="button"
-                @click="isDatePickerOpen = false"
                 class="py-1.5 px-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold cursor-pointer shadow-2xs"
+                @click="isDatePickerOpen = false"
               >
                 Bekor qilish
               </button>
               <button
                 type="button"
-                @click="applyDateRange"
                 class="py-1.5 px-3.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-xs font-semibold cursor-pointer shadow-2xs"
+                @click="applyDateRange"
               >
                 Qo'llash
               </button>
@@ -166,17 +185,20 @@
 
         <button
           type="button"
-          @click="$emit('open-download-modal')"
           class="py-2 px-3 sm:px-3.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+          @click="$emit('open-download-modal')"
         >
-          <Icon icon="solar:download-minimalistic-linear" class="text-base text-gray-500 dark:text-gray-300" />
+          <Icon
+            icon="solar:download-minimalistic-linear"
+            class="text-base text-gray-500 dark:text-gray-300"
+          />
           <span>Vidjetni yuklab olish</span>
         </button>
 
         <button
           type="button"
-          @click="$emit('open-settings-modal')"
           class="py-2 px-3 sm:px-3.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/60 text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+          @click="$emit('open-settings-modal')"
         >
           <Icon icon="solar:settings-linear" class="text-base text-gray-500 dark:text-gray-300" />
           <span>Vidjetlarni sozlash</span>
@@ -185,20 +207,22 @@
     </div>
 
     <!-- Bottom Row: Month Pills & Quick Date Range Filters (Sentabr - Iyun) -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-3 border-t border-gray-100 dark:border-gray-700/70">
+    <div
+      class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-3 border-t border-gray-100 dark:border-gray-700/70"
+    >
       <!-- Month Pills (Project Primary Theme Color - 10 oylik o'quv yili) -->
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
         <button
           v-for="m in academicMonths"
           :key="m.key"
           type="button"
-          @click="onSelectMonth(m.key)"
           :class="[
             'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition cursor-pointer shrink-0',
             selectedMonth === m.key
               ? 'bg-primary text-white shadow-2xs'
-              : 'bg-gray-100 hover:bg-gray-200/80 dark:bg-gray-700/60 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
+              : 'bg-gray-100 hover:bg-gray-200/80 dark:bg-gray-700/60 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300',
           ]"
+          @click="onSelectMonth(m.key)"
         >
           {{ m.label }}
         </button>
@@ -212,13 +236,13 @@
             v-for="df in quickDateFilters"
             :key="df.key"
             type="button"
-            @click="handleDateRangeFilter(df.key)"
             :class="[
               'px-2.5 py-1 rounded-md text-xs sm:text-sm font-semibold transition cursor-pointer',
               localDateFilter === df.key
                 ? 'bg-white dark:bg-gray-800 text-primary shadow-2xs font-bold'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white',
             ]"
+            @click="handleDateRangeFilter(df.key)"
           >
             {{ df.label }}
           </button>
@@ -230,7 +254,7 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import AppButton from "@/components/AppButton.vue";
+
 import FormDatePicker from "@/components/FormDatePicker.vue";
 
 export default {
@@ -249,7 +273,12 @@ export default {
       default: "2026-2027",
     },
   },
-  emits: ["update:selectedMonth", "open-download-modal", "open-settings-modal", "date-range-change"],
+  emits: [
+    "update:selectedMonth",
+    "open-download-modal",
+    "open-settings-modal",
+    "date-range-change",
+  ],
   data() {
     const now = new Date();
     const pad = (n) => String(n).padStart(2, "0");
@@ -333,14 +362,29 @@ export default {
       if (this.localDateFilter === "today") return "Bugun";
       if (this.localDateFilter === "yesterday") return "Kecha";
       if (this.localDateFilter === "7days") return "Oxirgi 7 kun";
-      if (this.localDateFilter === "month" || this.localDateFilter === "this_month") return this.currentMonthFullName;
+      if (this.localDateFilter === "month" || this.localDateFilter === "this_month")
+        return this.currentMonthFullName;
       if (this.localDateFilter === "prev_month") return "O'tgan oy";
-      if (this.localDateFilter === "year" || this.localDateFilter === "academic_year") return `${this.academicYear} o'quv yili`;
+      if (this.localDateFilter === "year" || this.localDateFilter === "academic_year")
+        return `${this.academicYear} o'quv yili`;
       if (this.activePeriodCustomLabel) return this.activePeriodCustomLabel;
       return this.currentMonthFullName;
     },
     calMonthName() {
-      const months = ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"];
+      const months = [
+        "Yanvar",
+        "Fevral",
+        "Mart",
+        "Aprel",
+        "May",
+        "Iyun",
+        "Iyul",
+        "Avgust",
+        "Sentabr",
+        "Oktabr",
+        "Noyabr",
+        "Dekabr",
+      ];
       return months[this.calMonth] || "Oktabr";
     },
     todayStr() {
@@ -415,7 +459,11 @@ export default {
       }
     },
     handleClickOutside(event) {
-      if (this.isDatePickerOpen && this.$refs.datePickerRef && !this.$refs.datePickerRef.contains(event.target)) {
+      if (
+        this.isDatePickerOpen &&
+        this.$refs.datePickerRef &&
+        !this.$refs.datePickerRef.contains(event.target)
+      ) {
         this.isDatePickerOpen = false;
       }
     },

@@ -21,15 +21,15 @@
             <Icon icon="ei:search" class="text-xl" />
           </span>
           <input
-            type="text"
             v-model="searchQuery"
+            type="text"
             :placeholder="searchPlaceholder"
             class="w-full pl-9 pr-8 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-md outline-none focus:border-primary focus:ring-1 focus:ring-primary text-gray-800 dark:text-gray-200 transition"
           />
           <button
             v-if="searchQuery"
-            @click="searchQuery = ''"
             class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-gray-400 hover:text-gray-600"
+            @click="searchQuery = ''"
           >
             <Icon icon="mdi:close-circle" class="text-base" />
           </button>
@@ -50,30 +50,33 @@
           :key="col.id"
           :class="[
             'kanban-column w-full flex flex-col bg-gray-50/95 dark:bg-gray-800/70 rounded-xl border dark:border-gray-700 min-h-[520px] max-h-[780px] transition-all shadow-xs',
-            dragOverColId === col.id ? 'ring-2 ring-primary border-primary bg-primary/5 dark:bg-primary/10' : ''
+            dragOverColId === col.id
+              ? 'ring-2 ring-primary border-primary bg-primary/5 dark:bg-primary/10'
+              : '',
           ]"
           @dragover.prevent="onDragOver(col.id)"
           @dragleave="onDragLeave(col.id)"
           @drop="onDrop(col.id)"
         >
           <!-- Column Header -->
-          <div class="p-3.5 px-4 border-b dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800 rounded-t-xl">
+          <div
+            class="p-3.5 px-4 border-b dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800 rounded-t-xl"
+          >
             <div class="flex items-center gap-2.5">
-              <span
-                class="w-3 h-3 rounded-full shrink-0"
-                :class="col.badgeColor || 'bg-primary'"
-              />
+              <span class="w-3 h-3 rounded-full shrink-0" :class="col.badgeColor || 'bg-primary'" />
               <h3 class="font-bold text-sm text-gray-800 dark:text-gray-100">{{ col.title }}</h3>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+              <span
+                class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+              >
                 {{ getColumnItems(col.id).length }}
               </span>
             </div>
 
             <button
               v-if="col.allowQuickAdd !== false"
-              @click="$emit('quickAdd', col.id)"
               class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
               title="Yangi qo'shish"
+              @click="$emit('quickAdd', col.id)"
             >
               <Icon icon="ic:round-add" class="text-lg" />
             </button>
@@ -86,17 +89,22 @@
               v-for="item in getColumnItems(col.id)"
               :key="item[itemKey]"
               draggable="true"
+              class="kanban-card bg-white dark:bg-gray-800 rounded-xl p-4 border dark:border-gray-700 shadow-sm hover:shadow-md cursor-grab active:cursor-grabbing transition hover:border-primary/60 group select-none"
               @dragstart="onDragStart(item, col.id)"
               @click="$emit('cardClick', item)"
-              class="kanban-card bg-white dark:bg-gray-800 rounded-xl p-4 border dark:border-gray-700 shadow-sm hover:shadow-md cursor-grab active:cursor-grabbing transition hover:border-primary/60 group select-none"
             >
               <slot name="card" :item="item" :column="col">
                 <!-- Default Card Layout -->
                 <div class="flex items-start justify-between gap-2">
-                  <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 group-hover:text-primary transition">
+                  <h4
+                    class="font-semibold text-sm text-gray-800 dark:text-gray-100 group-hover:text-primary transition"
+                  >
                     {{ item.title || item.name || item.fullName }}
                   </h4>
-                  <span v-if="item.badge" class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                  <span
+                    v-if="item.badge"
+                    class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                  >
                     {{ item.badge }}
                   </span>
                 </div>
@@ -105,7 +113,10 @@
                   {{ item.subtitle || item.phone }}
                 </p>
 
-                <div v-if="item.amount" class="mt-2.5 font-bold text-xs text-green-600 dark:text-green-400">
+                <div
+                  v-if="item.amount"
+                  class="mt-2.5 font-bold text-xs text-green-600 dark:text-green-400"
+                >
                   {{ item.amount }}
                 </div>
               </slot>
@@ -126,7 +137,10 @@
             v-if="col.showFooterSum !== false && getColumnTotalSum(col.id) > 0"
             class="p-2.5 bg-gray-100/70 dark:bg-gray-800/90 border-t dark:border-gray-700 rounded-b-xl text-center text-xs text-gray-500 dark:text-gray-400 font-medium"
           >
-            Jami: <span class="font-bold text-gray-800 dark:text-gray-200">{{ formatUZS(getColumnTotalSum(col.id)) }}</span>
+            Jami:
+            <span class="font-bold text-gray-800 dark:text-gray-200">{{
+              formatUZS(getColumnTotalSum(col.id))
+            }}</span>
           </div>
         </div>
       </div>
@@ -136,6 +150,7 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
 import { formatUZS } from "@/helper/formatters";
 
 export default {
@@ -180,7 +195,8 @@ export default {
           typeof item.course === "object" && item.course !== null
             ? item.course.name || item.course.title || ""
             : item.course || item.courseName || "";
-        const text = `${item.title || ""} ${item.name || ""} ${item.fullName || ""} ${item.phone || ""} ${item.source || ""} ${courseStr}`.toLowerCase();
+        const text =
+          `${item.title || ""} ${item.name || ""} ${item.fullName || ""} ${item.phone || ""} ${item.source || ""} ${courseStr}`.toLowerCase();
         return text.includes(q);
       });
     },

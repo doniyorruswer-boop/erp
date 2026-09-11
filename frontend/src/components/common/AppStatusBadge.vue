@@ -5,11 +5,7 @@
       :class="[shapeClasses, colorClasses]"
     >
       <!-- Rangli nuqtacha -->
-      <span
-        v-if="showDot"
-        class="w-1.5 h-1.5 rounded-full shrink-0"
-        :class="dotColorClass"
-      />
+      <span v-if="showDot" class="w-1.5 h-1.5 rounded-full shrink-0" :class="dotColorClass" />
       <span>{{ label || status }}</span>
     </span>
   </div>
@@ -21,32 +17,32 @@ export default {
   props: {
     status: {
       type: [String, Boolean],
-      default: ""
+      default: "",
     },
     // Agar status kalit bo'lib alohida o'zbekcha yozuv chiqarmoqchi bo'linsa
     label: {
       type: String,
-      default: ""
+      default: "",
     },
     variant: {
       type: String,
       default: "auto",
-      validator: (v) => ["auto", "success", "warning", "danger", "info", "neutral"].includes(v)
+      validator: (v) => ["auto", "success", "warning", "danger", "info", "neutral"].includes(v),
     },
     shape: {
       type: String,
       default: "pill", // 'pill' | 'rounded'
-      validator: (v) => ["pill", "rounded"].includes(v)
+      validator: (v) => ["pill", "rounded"].includes(v),
     },
     showDot: {
       type: Boolean,
-      default: true
+      default: true,
     },
     size: {
       type: String,
       default: "sm",
-      validator: (v) => ["xs", "sm", "md"].includes(v)
-    }
+      validator: (v) => ["xs", "sm", "md"].includes(v),
+    },
   },
   computed: {
     resolvedVariant() {
@@ -58,13 +54,19 @@ export default {
       ) {
         return "success";
       }
-      if (
-        ["sinov", "on_leave", "kutilmoqda", "pending", "qisman", "partial"].includes(s)
-      ) {
+      if (["sinov", "on_leave", "kutilmoqda", "pending", "qisman", "partial"].includes(s)) {
         return "warning";
       }
       if (
-        ["chetlatilgan", "nofaol", "terminated", "false", "rad etildi", "rejected", "qarzdor"].includes(s)
+        [
+          "chetlatilgan",
+          "nofaol",
+          "terminated",
+          "false",
+          "rad etildi",
+          "rejected",
+          "qarzdor",
+        ].includes(s)
       ) {
         return "danger";
       }
@@ -79,8 +81,8 @@ export default {
         this.size === "xs"
           ? "px-2 py-0.5 text-[10px]"
           : this.size === "md"
-          ? "px-3 py-1 text-sm"
-          : "px-2.5 py-0.5 text-xs";
+            ? "px-3 py-1 text-sm"
+            : "px-2.5 py-0.5 text-xs";
       return `${radius} ${sizePad}`;
     },
     colorClasses() {
@@ -112,7 +114,7 @@ export default {
         default:
           return "bg-gray-400";
       }
-    }
-  }
+    },
+  },
 };
 </script>

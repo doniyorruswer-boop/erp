@@ -10,7 +10,7 @@ export const initialDroppedStudents = [
     droppedDate: "2026-07-18",
     reasonCategory: "Boshqa shaharga ko'chish",
     reason: "Boshqa shaharga ko'chish: Oilasi bilan boshqa shaharga ko'chib ketmoqda.",
-    notes: "Hujjatlari topshirilgan, qarzdorligi yo'q."
+    notes: "Hujjatlari topshirilgan, qarzdorligi yo'q.",
   },
   {
     id: "drop-102",
@@ -21,7 +21,7 @@ export const initialDroppedStudents = [
     droppedDate: "2026-08-05",
     reasonCategory: "Boshqa ta'lim muassasasiga o'tish",
     reason: "Boshqa maktabga o'tish: Ixtisoslashtirilgan litseyga qabul qilindi.",
-    notes: "Tavsiyanoma va baholar tabeli berildi."
+    notes: "Tavsiyanoma va baholar tabeli berildi.",
   },
   {
     id: "drop-103",
@@ -32,7 +32,7 @@ export const initialDroppedStudents = [
     droppedDate: "2026-08-20",
     reasonCategory: "O'qish narxi / Shartnoma",
     reason: "O'qish narxi sababli: Shartnoma to'lovi o'z vaqtida to'lanmadi.",
-    notes: "Ota-onasi bilan kelishilgan holda shartnoma bekor qilindi."
+    notes: "Ota-onasi bilan kelishilgan holda shartnoma bekor qilindi.",
   },
   {
     id: "drop-104",
@@ -43,7 +43,7 @@ export const initialDroppedStudents = [
     droppedDate: "2026-09-01",
     reasonCategory: "Salomatlik sababli",
     reason: "Salomatlik sababli: Uzoq muddatli davolanishga ketmoqda.",
-    notes: "Tibbiy ma'lumotnoma ilova qilingan."
+    notes: "Tibbiy ma'lumotnoma ilova qilingan.",
   },
   {
     id: "drop-105",
@@ -54,7 +54,7 @@ export const initialDroppedStudents = [
     droppedDate: "2026-09-03",
     reasonCategory: "Intizom qoidalari buzilishi",
     reason: "Intizom buzilishi: Darslarni muntazam sababsiz qoldirgan.",
-    notes: "Pedagogik kengash qarori asosida chetlatildi."
+    notes: "Pedagogik kengash qarori asosida chetlatildi.",
   },
   {
     id: "drop-106",
@@ -65,7 +65,7 @@ export const initialDroppedStudents = [
     droppedDate: "2026-08-14",
     reasonCategory: "Oilaviy sharoit",
     reason: "Oilaviy sharoit: Yashash manzili uzoqlashganligi sababli.",
-    notes: "Ariza asosida chetlatildi."
+    notes: "Ariza asosida chetlatildi.",
   },
   {
     id: "drop-107",
@@ -76,8 +76,8 @@ export const initialDroppedStudents = [
     droppedDate: "2026-07-29",
     reasonCategory: "O'z xohishiga ko'ra",
     reason: "O'z xohishiga ko'ra: Ota-onasining arizasiga binoan.",
-    notes: "Barcha hisob-kitoblar to'liq yopildi."
-  }
+    notes: "Barcha hisob-kitoblar to'liq yopildi.",
+  },
 ];
 
 const STORAGE_KEY = "educrm_dropped_students_list";
@@ -108,17 +108,17 @@ export function saveSchoolDroppedStudents(list) {
 
 export function deleteDroppedStudent(id) {
   const list = loadSchoolDroppedStudents();
-  const filtered = list.filter(s => s.id !== id);
+  const filtered = list.filter((s) => s.id !== id);
   saveSchoolDroppedStudents(filtered);
   return filtered;
 }
 
 export function restoreDroppedStudent(id, targetClass = null) {
   const list = loadSchoolDroppedStudents();
-  const student = list.find(s => s.id === id);
+  const student = list.find((s) => s.id === id);
   if (!student) return null;
 
-  const filtered = list.filter(s => s.id !== id);
+  const filtered = list.filter((s) => s.id !== id);
   saveSchoolDroppedStudents(filtered);
 
   // Faol o'quvchilar safiga qo'shish
@@ -126,17 +126,19 @@ export function restoreDroppedStudent(id, targetClass = null) {
     const STUDENTS_STORAGE_KEY = "educrm_school_students_list";
     const studentsRaw = localStorage.getItem(STUDENTS_STORAGE_KEY);
     let students = studentsRaw ? JSON.parse(studentsRaw) : [];
-    
+
     // Agar oldin mavjud bo'lmasa yoki qayta tiklansa
     const restoredRecord = {
       ...student,
       className: targetClass || student.className,
       status: "Faol",
       stage: "O'quvchi",
-      restoredAt: new Date().toISOString().split("T")[0]
+      restoredAt: new Date().toISOString().split("T")[0],
     };
-    
-    const existingIndex = students.findIndex(s => s.id === student.id || s.studentId === student.studentId);
+
+    const existingIndex = students.findIndex(
+      (s) => s.id === student.id || s.studentId === student.studentId
+    );
     if (existingIndex >= 0) {
       students[existingIndex] = { ...students[existingIndex], ...restoredRecord };
     } else {
@@ -161,7 +163,7 @@ export function addDroppedStudent(data) {
     droppedDate: data.droppedDate || new Date().toISOString().split("T")[0],
     reasonCategory: data.reasonCategory || "Boshqa sabab",
     reason: data.reason || "Chetlatilgan",
-    notes: data.notes || ""
+    notes: data.notes || "",
   };
   list.unshift(newRecord);
   saveSchoolDroppedStudents(list);

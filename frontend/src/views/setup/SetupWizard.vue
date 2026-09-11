@@ -1,26 +1,38 @@
 <template>
-  <div class="setup-wizard-page min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-lexend p-4 sm:p-6 lg:p-10 flex flex-col justify-between">
+  <div
+    class="setup-wizard-page min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-lexend p-4 sm:p-6 lg:p-10 flex flex-col justify-between"
+  >
     <!-- Top Header Brand (Clean, centered, no return link) -->
-    <div class="max-w-4xl mx-auto w-full flex items-center justify-between pb-5 border-b dark:border-gray-800">
+    <div
+      class="max-w-4xl mx-auto w-full flex items-center justify-between pb-5 border-b dark:border-gray-800"
+    >
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xl shadow-sm transition-colors">
+        <div
+          class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xl shadow-sm transition-colors"
+        >
           E
         </div>
         <div>
           <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">
             Edu<span class="text-primary transition-colors">CRM</span> Dastlabki Sozlash
           </h1>
-          <p class="text-xs text-gray-400">Muassasa yo'nalishi va parametrlarini belgilash ustasi</p>
+          <p class="text-xs text-gray-400">
+            Muassasa yo'nalishi va parametrlarini belgilash ustasi
+          </p>
         </div>
       </div>
 
-      <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-md border dark:border-gray-700 hidden sm:block">
+      <div
+        class="text-xs font-semibold text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-md border dark:border-gray-700 hidden sm:block"
+      >
         Universal Platforma v1.0.1
       </div>
     </div>
 
     <!-- Main Wizard Card -->
-    <div class="max-w-4xl mx-auto w-full my-6 bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 shadow-sm flex flex-col min-h-[580px]">
+    <div
+      class="max-w-4xl mx-auto w-full my-6 bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 shadow-sm flex flex-col min-h-[580px]"
+    >
       <!-- Step Indicator Bar -->
       <div class="p-4 sm:px-6 border-b dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/80">
         <div class="grid grid-cols-5 gap-2 sm:gap-3">
@@ -28,15 +40,15 @@
             v-for="(st, idx) in steps"
             :key="st.id"
             type="button"
-            @click="goToStep(idx + 1)"
             class="flex items-center gap-2.5 p-2.5 rounded-lg text-left text-xs sm:text-sm transition cursor-pointer"
             :class="[
               currentStep === idx + 1
                 ? 'bg-primary/10 text-primary font-bold border border-primary/30'
                 : currentStep > idx + 1
-                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-medium'
-                : 'text-gray-400 opacity-70'
+                  ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-medium'
+                  : 'text-gray-400 opacity-70',
             ]"
+            @click="goToStep(idx + 1)"
           >
             <div
               class="w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 font-bold"
@@ -44,8 +56,8 @@
                 currentStep === idx + 1
                   ? 'bg-primary text-white shadow-sm'
                   : currentStep > idx + 1
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-500',
               ]"
             >
               <Icon v-if="currentStep > idx + 1" icon="solar:check-read-linear" class="text-sm" />
@@ -61,83 +73,128 @@
         <!-- STEP 1: BUSINESS TYPE -->
         <div v-if="currentStep === 1" class="space-y-5">
           <div>
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">1. Muassasa turini tanlang</h2>
-            <p class="text-sm text-gray-400 mt-1">Tizim menyulari va funksiyalari tanlangan yo'nalishga qarab avtomatik moslashadi</p>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+              1. Muassasa turini tanlang
+            </h2>
+            <p class="text-sm text-gray-400 mt-1">
+              Tizim menyulari va funksiyalari tanlangan yo'nalishga qarab avtomatik moslashadi
+            </p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
             <!-- 1. Course Center -->
             <div
-              @click="selectBusinessType('COURSE_CENTER')"
               class="p-5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between space-y-4 hover:shadow-sm"
               :class="[
                 form.businessType === 'COURSE_CENTER'
                   ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600',
               ]"
+              @click="selectBusinessType('COURSE_CENTER')"
             >
               <div class="space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-2xl">
+                <div
+                  class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-2xl"
+                >
                   <Icon icon="ph:student-fill" />
                 </div>
-                <h3 class="font-bold text-base text-gray-800 dark:text-gray-100">O'quv Markazi / IT Akademiya</h3>
+                <h3 class="font-bold text-base text-gray-800 dark:text-gray-100">
+                  O'quv Markazi / IT Akademiya
+                </h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                  Til markazlari, o'quv kurslari, IT maktablar va abituriyent tayyorlov markazlari uchun.
+                  Til markazlari, o'quv kurslari, IT maktablar va abituriyent tayyorlov markazlari
+                  uchun.
                 </p>
               </div>
-              <div class="text-xs font-bold flex items-center justify-between pt-3 border-t dark:border-gray-700">
-                <span>{{ form.businessType === 'COURSE_CENTER' ? 'Tanlandi' : 'Tanlash' }}</span>
-                <Icon :icon="form.businessType === 'COURSE_CENTER' ? 'solar:check-circle-bold' : 'solar:circle-linear'" class="text-xl" />
+              <div
+                class="text-xs font-bold flex items-center justify-between pt-3 border-t dark:border-gray-700"
+              >
+                <span>{{ form.businessType === "COURSE_CENTER" ? "Tanlandi" : "Tanlash" }}</span>
+                <Icon
+                  :icon="
+                    form.businessType === 'COURSE_CENTER'
+                      ? 'solar:check-circle-bold'
+                      : 'solar:circle-linear'
+                  "
+                  class="text-xl"
+                />
               </div>
             </div>
 
             <!-- 2. Private School -->
             <div
-              @click="selectBusinessType('SCHOOL')"
               class="p-5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between space-y-4 hover:shadow-sm"
               :class="[
                 form.businessType === 'SCHOOL'
                   ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600',
               ]"
+              @click="selectBusinessType('SCHOOL')"
             >
               <div class="space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl">
+                <div
+                  class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl"
+                >
                   <Icon icon="solar:buildings-3-bold" />
                 </div>
-                <h3 class="font-bold text-base text-gray-800 dark:text-gray-100">Xususiy Maktab / Litsey</h3>
+                <h3 class="font-bold text-base text-gray-800 dark:text-gray-100">
+                  Xususiy Maktab / Litsey
+                </h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                   1–11 sinflar, fanlar, shartnomalar, jurnal, oshxona va transport xizmatlari.
                 </p>
               </div>
-              <div class="text-xs font-bold flex items-center justify-between pt-3 border-t dark:border-gray-700">
-                <span>{{ form.businessType === 'SCHOOL' ? 'Tanlandi' : 'Tanlash' }}</span>
-                <Icon :icon="form.businessType === 'SCHOOL' ? 'solar:check-circle-bold' : 'solar:circle-linear'" class="text-xl" />
+              <div
+                class="text-xs font-bold flex items-center justify-between pt-3 border-t dark:border-gray-700"
+              >
+                <span>{{ form.businessType === "SCHOOL" ? "Tanlandi" : "Tanlash" }}</span>
+                <Icon
+                  :icon="
+                    form.businessType === 'SCHOOL'
+                      ? 'solar:check-circle-bold'
+                      : 'solar:circle-linear'
+                  "
+                  class="text-xl"
+                />
               </div>
             </div>
 
             <!-- 3. Kindergarten -->
             <div
-              @click="selectBusinessType('KINDERGARTEN')"
               class="p-5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between space-y-4 hover:shadow-sm"
               :class="[
                 form.businessType === 'KINDERGARTEN'
                   ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600',
               ]"
+              @click="selectBusinessType('KINDERGARTEN')"
             >
               <div class="space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl">
+                <div
+                  class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl"
+                >
                   <Icon icon="solar:smile-circle-bold" />
                 </div>
-                <h3 class="font-bold text-base text-gray-800 dark:text-gray-100">Xususiy Bog'cha</h3>
+                <h3 class="font-bold text-base text-gray-800 dark:text-gray-100">
+                  Xususiy Bog'cha
+                </h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                  Kichik yosh guruhlari, ovqatlanish nazorati, oylik to'lov va ota-onalar xabarnomalari.
+                  Kichik yosh guruhlari, ovqatlanish nazorati, oylik to'lov va ota-onalar
+                  xabarnomalari.
                 </p>
               </div>
-              <div class="text-xs font-bold flex items-center justify-between pt-3 border-t dark:border-gray-700">
-                <span>{{ form.businessType === 'KINDERGARTEN' ? 'Tanlandi' : 'Tanlash' }}</span>
-                <Icon :icon="form.businessType === 'KINDERGARTEN' ? 'solar:check-circle-bold' : 'solar:circle-linear'" class="text-xl" />
+              <div
+                class="text-xs font-bold flex items-center justify-between pt-3 border-t dark:border-gray-700"
+              >
+                <span>{{ form.businessType === "KINDERGARTEN" ? "Tanlandi" : "Tanlash" }}</span>
+                <Icon
+                  :icon="
+                    form.businessType === 'KINDERGARTEN'
+                      ? 'solar:check-circle-bold'
+                      : 'solar:circle-linear'
+                  "
+                  class="text-xl"
+                />
               </div>
             </div>
           </div>
@@ -146,13 +203,19 @@
         <!-- STEP 2: PROFILE & GLOBAL BRAND COLOR -->
         <div v-if="currentStep === 2" class="space-y-5 max-w-2xl">
           <div>
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">2. Tashkilot ma'lumotlari & Brend rangi</h2>
-            <p class="text-sm text-gray-400 mt-1">Muassasa nomi va butun tizimning asosiy rangini tanlang</p>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+              2. Tashkilot ma'lumotlari & Brend rangi
+            </h2>
+            <p class="text-sm text-gray-400 mt-1">
+              Muassasa nomi va butun tizimning asosiy rangini tanlang
+            </p>
           </div>
 
           <div class="space-y-4 pt-2 text-sm">
             <div>
-              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Muassasa nomi *</label>
+              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5"
+                >Muassasa nomi *</label
+              >
               <input
                 v-model="form.organizationName"
                 type="text"
@@ -163,7 +226,9 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Aloqa telefoni</label>
+                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5"
+                  >Aloqa telefoni</label
+                >
                 <input
                   v-model="form.phone"
                   type="text"
@@ -172,7 +237,9 @@
                 />
               </div>
               <div>
-                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Asosiy Valyuta</label>
+                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5"
+                  >Asosiy Valyuta</label
+                >
                 <select
                   v-model="form.currency"
                   class="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-900 rounded-lg outline-none focus:border-primary transition"
@@ -184,7 +251,9 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Manzil</label>
+              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5"
+                >Manzil</label
+              >
               <input
                 v-model="form.address"
                 type="text"
@@ -203,13 +272,21 @@
                   v-for="color in colorPresets"
                   :key="color.hex"
                   type="button"
-                  @click="applyColor(color.hex)"
                   class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform hover:scale-105 shadow-sm border-2 cursor-pointer"
-                  :class="form.primaryColor === color.hex ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-primary' : 'border-transparent'"
+                  :class="
+                    form.primaryColor === color.hex
+                      ? 'border-gray-900 dark:border-white ring-2 ring-offset-2 ring-primary'
+                      : 'border-transparent'
+                  "
                   :style="{ backgroundColor: color.hex }"
                   :title="color.name"
+                  @click="applyColor(color.hex)"
                 >
-                  <Icon v-if="form.primaryColor === color.hex" icon="solar:check-read-bold" class="text-white text-base drop-shadow" />
+                  <Icon
+                    v-if="form.primaryColor === color.hex"
+                    icon="solar:check-read-bold"
+                    class="text-white text-base drop-shadow"
+                  />
                 </button>
               </div>
             </div>
@@ -219,24 +296,30 @@
         <!-- STEP 3: MODULES -->
         <div v-if="currentStep === 3" class="space-y-5">
           <div>
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">3. Kerakli modullarni yoqish</h2>
-            <p class="text-sm text-gray-400 mt-1">Faqat muassasangizga kerakli modullarni belgilang (boshqalari interfeysda yashiriladi)</p>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+              3. Kerakli modullarni yoqish
+            </h2>
+            <p class="text-sm text-gray-400 mt-1">
+              Faqat muassasangizga kerakli modullarni belgilang (boshqalari interfeysda yashiriladi)
+            </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
             <div
               v-for="mod in availableModules"
               :key="mod.id"
-              @click="toggleModule(mod.id)"
               class="p-4 rounded-xl border cursor-pointer transition flex items-center justify-between gap-3 select-none hover:shadow-xs"
               :class="[
                 form.enabledModules.includes(mod.id)
                   ? 'bg-primary/5 border-primary/40'
-                  : 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 opacity-60'
+                  : 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 opacity-60',
               ]"
+              @click="toggleModule(mod.id)"
             >
               <div class="flex items-center gap-3 min-w-0">
-                <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0 transition-colors">
+                <div
+                  class="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xl shrink-0 transition-colors"
+                >
                   <Icon :icon="mod.icon" />
                 </div>
                 <div class="truncate">
@@ -257,13 +340,21 @@
         <!-- STEP 4: INTEGRATIONS -->
         <div v-if="currentStep === 4" class="space-y-5 max-w-2xl">
           <div>
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">4. SMS va To'lov integratsiyalari</h2>
-            <p class="text-sm text-gray-400 mt-1">Ushbu maydonlarni to'ldirish ixtiyoriy, keyinroq ham kiritish mumkin</p>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+              4. SMS va To'lov integratsiyalari
+            </h2>
+            <p class="text-sm text-gray-400 mt-1">
+              Ushbu maydonlarni to'ldirish ixtiyoriy, keyinroq ham kiritish mumkin
+            </p>
           </div>
 
           <div class="space-y-4 pt-1 text-sm">
-            <div class="p-4 bg-gray-50 dark:bg-gray-700/40 rounded-xl border dark:border-gray-600 space-y-3">
-              <div class="flex items-center gap-2.5 text-sm font-bold text-gray-800 dark:text-gray-200">
+            <div
+              class="p-4 bg-gray-50 dark:bg-gray-700/40 rounded-xl border dark:border-gray-600 space-y-3"
+            >
+              <div
+                class="flex items-center gap-2.5 text-sm font-bold text-gray-800 dark:text-gray-200"
+              >
                 <Icon icon="solar:chat-round-dots-bold" class="text-xl text-primary" />
                 <span>Eskiz.uz SMS Provayder</span>
               </div>
@@ -283,8 +374,12 @@
               </div>
             </div>
 
-            <div class="p-4 bg-gray-50 dark:bg-gray-700/40 rounded-xl border dark:border-gray-600 space-y-3">
-              <div class="flex items-center gap-2.5 text-sm font-bold text-gray-800 dark:text-gray-200">
+            <div
+              class="p-4 bg-gray-50 dark:bg-gray-700/40 rounded-xl border dark:border-gray-600 space-y-3"
+            >
+              <div
+                class="flex items-center gap-2.5 text-sm font-bold text-gray-800 dark:text-gray-200"
+              >
                 <Icon icon="solar:card-bold" class="text-xl text-green-600" />
                 <span>Payme / Click Savdo hisobi</span>
               </div>
@@ -309,14 +404,20 @@
         <!-- STEP 5: ADMIN & FINISH -->
         <div v-if="currentStep === 5" class="space-y-5 max-w-2xl">
           <div>
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">5. Bosh Administrator (SuperAdmin)</h2>
-            <p class="text-sm text-gray-400 mt-1">Tizimga kirish uchun bosh administrator hisobini tasdiqlang</p>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+              5. Bosh Administrator (SuperAdmin)
+            </h2>
+            <p class="text-sm text-gray-400 mt-1">
+              Tizimga kirish uchun bosh administrator hisobini tasdiqlang
+            </p>
           </div>
 
           <div class="space-y-4 pt-1 text-sm">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Ism *</label>
+                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5"
+                  >Ism *</label
+                >
                 <input
                   v-model="form.adminFirstName"
                   type="text"
@@ -325,7 +426,9 @@
                 />
               </div>
               <div>
-                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Familiya *</label>
+                <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5"
+                  >Familiya *</label
+                >
                 <input
                   v-model="form.adminLastName"
                   type="text"
@@ -336,7 +439,9 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Telefon raqam (Login) *</label>
+              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5"
+                >Telefon raqam (Login) *</label
+              >
               <input
                 v-model="form.adminPhone"
                 type="text"
@@ -346,7 +451,9 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">Parol *</label>
+              <label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5"
+                >Parol *</label
+              >
               <input
                 v-model="form.adminPassword"
                 type="password"
@@ -357,8 +464,8 @@
 
             <label class="flex items-center gap-3 pt-2 cursor-pointer select-none">
               <input
-                type="checkbox"
                 v-model="form.seedDemoData"
+                type="checkbox"
                 class="w-4 h-4 rounded text-primary focus:ring-primary"
               />
               <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
@@ -370,12 +477,14 @@
       </div>
 
       <!-- Footer Buttons (Larger & Spacious) -->
-      <div class="p-5 sm:px-8 border-t dark:border-gray-700 flex items-center justify-between bg-gray-50/60 dark:bg-gray-800/60">
+      <div
+        class="p-5 sm:px-8 border-t dark:border-gray-700 flex items-center justify-between bg-gray-50/60 dark:bg-gray-800/60"
+      >
         <button
           v-if="currentStep > 1"
           type="button"
-          @click="prevStep"
           class="px-6 py-2.5 text-sm font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg transition flex items-center gap-2 cursor-pointer"
+          @click="prevStep"
         >
           <Icon icon="solar:arrow-left-linear" class="text-base" />
           <span>Orqaga</span>
@@ -385,8 +494,8 @@
         <button
           v-if="currentStep < totalSteps"
           type="button"
-          @click="nextStep"
           class="px-7 py-2.5 text-sm font-bold bg-primary hover:bg-primary/90 text-white rounded-lg transition shadow-sm flex items-center gap-2 cursor-pointer"
+          @click="nextStep"
         >
           <span>Keyingisi</span>
           <Icon icon="solar:arrow-right-linear" class="text-base" />
@@ -395,9 +504,9 @@
         <button
           v-else
           type="button"
-          @click="submitSetup"
           :disabled="submitting"
           class="px-8 py-3 text-sm font-bold bg-primary hover:bg-primary/90 text-white rounded-lg transition shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          @click="submitSetup"
         >
           <Icon v-if="submitting" icon="eos-icons:loading" class="animate-spin text-base" />
           <Icon v-else icon="solar:check-circle-bold" class="text-base" />
@@ -415,9 +524,11 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import { useTenantStore } from "@/store/tenant";
-import { setPrimaryColor, loadPrimaryColor } from "@/helper/theme";
+
 import BRAND_CONFIG from "@/config/brand.config";
+import { THEME_COLOR_PRESETS, THEME_COLORS } from "@/constants/colors.constants";
+import { loadPrimaryColor, setPrimaryColor } from "@/helper/theme";
+import { useTenantStore } from "@/store/tenant";
 
 export default {
   name: "SetupWizard",
@@ -434,23 +545,56 @@ export default {
         { id: 4, title: "Integratsiyalar" },
         { id: 5, title: "Administrator" },
       ],
-      colorPresets: [
-        { name: "Klassik Indigo (Asl rang)", hex: "#4F46E5" },
-        { name: "Moviy Ko'k", hex: "#2563eb" },
-        { name: "Zumrad Yashil", hex: "#059669" },
-        { name: "Binafsha", hex: "#7c3aed" },
-        { name: "Qizil", hex: "#e11d48" },
-        { name: "Oltin / Qahrabo", hex: "#d97706" },
-      ],
+      colorPresets: [...THEME_COLOR_PRESETS],
       availableModules: [
-        { id: "LEADS", name: "Sotuv Voronkasi (Kanban)", desc: "Murojaatlar va qabul jarayoni", icon: "solar:tuning-square-2-bold" },
-        { id: "STUDENTS", name: "O'quvchilar Boshqaruvi", desc: "O'quvchilar bazasi va profillari", icon: "ph:student-fill" },
-        { id: "COURSES", name: "Kurslar & Guruhlar / Sinflar", desc: "O'quv reja va guruhlar", icon: "solar:book-bookmark-bold" },
-        { id: "ATTENDANCE", name: "Davomat Tizimi", desc: "Kunlik va oylik davomat", icon: "fluent:calendar-checkmark-24-filled" },
-        { id: "FINANCE", name: "Moliya & Kassa", desc: "To'lovlar va kassa hisoboti", icon: "solar:wallet-money-bold" },
-        { id: "CONTRACTS", name: "Shartnomalar Moduli", desc: "O'quv shartnomalari va grafiklar", icon: "solar:document-text-bold" },
-        { id: "SERVICES", name: "Oshxona & Transport", desc: "Qo'shimcha maktab xizmatlari", icon: "solar:bus-bold" },
-        { id: "SMS", name: "SMS Xabarnomalar", desc: "Eskiz.uz orqali SMS jo'natish", icon: "solar:chat-round-dots-bold" },
+        {
+          id: "LEADS",
+          name: "Sotuv Voronkasi (Kanban)",
+          desc: "Murojaatlar va qabul jarayoni",
+          icon: "solar:tuning-square-2-bold",
+        },
+        {
+          id: "STUDENTS",
+          name: "O'quvchilar Boshqaruvi",
+          desc: "O'quvchilar bazasi va profillari",
+          icon: "ph:student-fill",
+        },
+        {
+          id: "COURSES",
+          name: "Kurslar & Guruhlar / Sinflar",
+          desc: "O'quv reja va guruhlar",
+          icon: "solar:book-bookmark-bold",
+        },
+        {
+          id: "ATTENDANCE",
+          name: "Davomat Tizimi",
+          desc: "Kunlik va oylik davomat",
+          icon: "fluent:calendar-checkmark-24-filled",
+        },
+        {
+          id: "FINANCE",
+          name: "Moliya & Kassa",
+          desc: "To'lovlar va kassa hisoboti",
+          icon: "solar:wallet-money-bold",
+        },
+        {
+          id: "CONTRACTS",
+          name: "Shartnomalar Moduli",
+          desc: "O'quv shartnomalari va grafiklar",
+          icon: "solar:document-text-bold",
+        },
+        {
+          id: "SERVICES",
+          name: "Oshxona & Transport",
+          desc: "Qo'shimcha maktab xizmatlari",
+          icon: "solar:bus-bold",
+        },
+        {
+          id: "SMS",
+          name: "SMS Xabarnomalar",
+          desc: "Eskiz.uz orqali SMS jo'natish",
+          icon: "solar:chat-round-dots-bold",
+        },
       ],
       form: {
         businessType: "COURSE_CENTER",
@@ -458,7 +602,7 @@ export default {
         phone: "+998901234567",
         address: "Toshkent shahri",
         currency: "UZS",
-        primaryColor: "#4F46E5",
+        primaryColor: THEME_COLORS.PRIMARY,
         enabledModules: [
           "LEADS",
           "STUDENTS",

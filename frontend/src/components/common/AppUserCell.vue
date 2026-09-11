@@ -1,9 +1,7 @@
 <template>
   <div
     class="flex items-center gap-2.5 min-w-0 select-none"
-    :class="[
-      isClickable ? 'cursor-pointer group' : ''
-    ]"
+    :class="[isClickable ? 'cursor-pointer group' : '']"
     @click="handleClick"
   >
     <!-- Avatar (Rasm yoki Bosh harflar) -->
@@ -14,7 +12,7 @@
         isClickable ? 'group-hover:scale-105' : '',
         image && !imageError
           ? 'bg-gray-100 dark:bg-gray-800'
-          : 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary'
+          : 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary',
       ]"
     >
       <img
@@ -31,7 +29,7 @@
     <div class="min-w-0 flex-1 leading-tight">
       <div class="flex items-center gap-1.5 flex-wrap">
         <!-- Agar to prop berilgan bo'lsa router-link -->
-        <router-link
+        <RouterLink
           v-if="to"
           :to="to"
           class="font-semibold text-gray-900 dark:text-gray-100 hover:text-primary transition-colors line-clamp-1"
@@ -39,7 +37,7 @@
           @click.stop
         >
           {{ displayName }}
-        </router-link>
+        </RouterLink>
 
         <!-- Oddiy matn yoki bosiladigan nom -->
         <span
@@ -49,7 +47,7 @@
             sizeClasses.name,
             isClickable
               ? 'text-gray-900 dark:text-gray-100 group-hover:text-primary'
-              : 'text-gray-900 dark:text-gray-100'
+              : 'text-gray-900 dark:text-gray-100',
           ]"
         >
           {{ displayName }}
@@ -58,10 +56,7 @@
         <!-- Ixtiyoriy status badge (masalan: Nofaol, Arxiv) -->
         <span
           v-if="badge"
-          :class="[
-            'px-1.5 py-0.5 rounded text-[10px] font-bold border shrink-0',
-            badgeClasses
-          ]"
+          :class="['px-1.5 py-0.5 rounded text-[10px] font-bold border shrink-0', badgeClasses]"
         >
           {{ badge }}
         </span>
@@ -87,50 +82,50 @@ export default {
     // Foydalanuvchi to'liq F.I.SH
     name: {
       type: String,
-      default: ""
+      default: "",
     },
     // Rasm URL manzili
     image: {
       type: String,
-      default: ""
+      default: "",
     },
     // Qo'shimcha matn (ID, telefon, lavozim)
     subtitle: {
       type: String,
-      default: ""
+      default: "",
     },
     // router-link yo'nalishi
     to: {
       type: [String, Object],
-      default: null
+      default: null,
     },
     // O'lchami: 'sm' | 'md' | 'lg'
     size: {
       type: String,
       default: "md",
-      validator: (val) => ["sm", "md", "lg"].includes(val)
+      validator: (val) => ["sm", "md", "lg"].includes(val),
     },
     // Status badge matni
     badge: {
       type: String,
-      default: ""
+      default: "",
     },
     // Badge turi
     badgeVariant: {
       type: String,
       default: "neutral",
-      validator: (val) => ["danger", "warning", "success", "info", "neutral"].includes(val)
+      validator: (val) => ["danger", "warning", "success", "info", "neutral"].includes(val),
     },
     // Bosiluvchanlik (kursorni pointer qilish)
     clickable: {
       type: Boolean,
-      default: null
-    }
+      default: null,
+    },
   },
   emits: ["click"],
   data() {
     return {
-      imageError: false
+      imageError: false,
     };
   },
   computed: {
@@ -154,18 +149,18 @@ export default {
         case "sm":
           return {
             avatar: "w-7 h-7 text-[11px]",
-            name: "text-xs"
+            name: "text-xs",
           };
         case "lg":
           return {
             avatar: "w-10 h-10 text-sm",
-            name: "text-base"
+            name: "text-base",
           };
         case "md":
         default:
           return {
             avatar: "w-8 h-8 text-xs",
-            name: "text-xs sm:text-sm"
+            name: "text-xs sm:text-sm",
           };
       }
     },
@@ -183,14 +178,14 @@ export default {
         default:
           return "bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700";
       }
-    }
+    },
   },
   methods: {
     handleClick(event) {
       if (this.isClickable) {
         this.$emit("click", event);
       }
-    }
-  }
+    },
+  },
 };
 </script>

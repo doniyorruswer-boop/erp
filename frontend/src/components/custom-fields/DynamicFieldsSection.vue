@@ -5,7 +5,9 @@
       :key="groupName"
       class="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-200 dark:border-gray-700/60"
     >
-      <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3.5 flex items-center gap-2">
+      <h4
+        class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3.5 flex items-center gap-2"
+      >
         <span class="w-1.5 h-3.5 bg-primary rounded-full"></span>
         {{ groupName || "Qo'shimcha ma'lumotlar" }}
       </h4>

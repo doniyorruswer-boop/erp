@@ -1,5 +1,7 @@
 <template>
-  <div class="app-table-component bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs overflow-hidden font-lexend">
+  <div
+    class="app-table-component bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs overflow-hidden font-lexend"
+  >
     <!-- 1. Ixtiyoriy Top Toolbar (Faqat title, searchable yoki headerActions berilsa chiziladi) -->
     <div
       v-if="hasTopToolbar"
@@ -10,7 +12,10 @@
         <div v-if="title">
           <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
             <span>{{ title }}</span>
-            <span v-if="processedData" class="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+            <span
+              v-if="processedData"
+              class="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20"
+            >
               {{ processedData.length }} ta
             </span>
           </h3>
@@ -23,15 +28,15 @@
             <Icon icon="solar:magnifer-linear" class="text-base" />
           </span>
           <input
-            type="text"
             v-model="internalSearch"
+            type="text"
             :placeholder="searchPlaceholder"
             class="w-full pl-9 pr-8 h-9 sm:h-9.5 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-gray-800 dark:text-gray-100 placeholder-gray-400 transition shadow-2xs"
           />
           <button
             v-if="internalSearch"
-            @click="internalSearch = ''"
             class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
+            @click="internalSearch = ''"
           >
             <Icon icon="solar:close-circle-bold" class="text-base" />
           </button>
@@ -42,7 +47,10 @@
       <div class="flex items-center gap-2.5 w-full md:w-auto justify-end flex-wrap">
         <slot name="headerActions" />
 
-        <div v-if="showPerPage" class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+        <div
+          v-if="showPerPage"
+          class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"
+        >
           <span>Ko'rsatish:</span>
           <select
             v-model="internalPerPage"
@@ -73,13 +81,13 @@
         <slot
           name="bulkActions"
           :selected="selectedRows"
-          :selectedKeys="selectedKeys"
-          :clearSelection="clearSelection"
+          :selected-keys="selectedKeys"
+          :clear-selection="clearSelection"
         />
         <button
           type="button"
-          @click="clearSelection"
           class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition cursor-pointer px-2 py-1 rounded"
+          @click="clearSelection"
         >
           Bekor qilish
         </button>
@@ -90,14 +98,16 @@
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse font-lexend">
         <thead>
-          <tr class="bg-gray-50/80 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-xs uppercase font-bold tracking-wider select-none">
+          <tr
+            class="bg-gray-50/80 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-xs uppercase font-bold tracking-wider select-none"
+          >
             <!-- Selectable Checkbox ustuni -->
             <th v-if="selectable" class="py-3.5 px-4 w-10 text-center">
               <input
                 type="checkbox"
                 :checked="isAllSelected"
-                @change="toggleSelectAll"
                 class="rounded border-gray-300 text-primary focus:ring-primary cursor-pointer w-4 h-4"
+                @change="toggleSelectAll"
               />
             </th>
 
@@ -112,16 +122,39 @@
               :key="col.key"
               :class="[
                 col.thClass || 'py-3.5 px-4',
-                col.sortable ? 'cursor-pointer hover:text-primary transition-colors select-none group/th' : '',
+                col.sortable
+                  ? 'cursor-pointer hover:text-primary transition-colors select-none group/th'
+                  : '',
               ]"
               @click="col.sortable && handleSort(col.key)"
             >
-              <div class="flex items-center gap-1.5" :class="col.align === 'right' ? 'justify-end' : col.align === 'center' ? 'justify-center' : 'justify-start'">
+              <div
+                class="flex items-center gap-1.5"
+                :class="
+                  col.align === 'right'
+                    ? 'justify-end'
+                    : col.align === 'center'
+                      ? 'justify-center'
+                      : 'justify-start'
+                "
+              >
                 <span>{{ col.label }}</span>
                 <span v-if="col.sortable" class="text-xs text-gray-400 shrink-0">
-                  <Icon v-if="sortBy === col.key && sortOrder === 'asc'" icon="solar:arrow-up-linear" class="text-primary font-bold text-sm" />
-                  <Icon v-else-if="sortBy === col.key && sortOrder === 'desc'" icon="solar:arrow-down-linear" class="text-primary font-bold text-sm" />
-                  <Icon v-else icon="solar:sort-vertical-linear" class="opacity-30 group-hover/th:opacity-80 text-sm transition-opacity" />
+                  <Icon
+                    v-if="sortBy === col.key && sortOrder === 'asc'"
+                    icon="solar:arrow-up-linear"
+                    class="text-primary font-bold text-sm"
+                  />
+                  <Icon
+                    v-else-if="sortBy === col.key && sortOrder === 'desc'"
+                    icon="solar:arrow-down-linear"
+                    class="text-primary font-bold text-sm"
+                  />
+                  <Icon
+                    v-else
+                    icon="solar:sort-vertical-linear"
+                    class="opacity-30 group-hover/th:opacity-80 text-sm transition-opacity"
+                  />
                 </span>
               </div>
             </th>
@@ -147,14 +180,19 @@
             <td :colspan="totalColumnsCount" class="py-12 text-center">
               <slot name="empty">
                 <div class="max-w-sm mx-auto text-center space-y-2">
-                  <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700/60 mx-auto flex items-center justify-center text-gray-400 mb-2">
+                  <div
+                    class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700/60 mx-auto flex items-center justify-center text-gray-400 mb-2"
+                  >
                     <Icon icon="solar:folder-error-bold" class="text-2xl" />
                   </div>
                   <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                     {{ emptyText }}
                   </p>
                   <p v-if="emptyDescription || internalSearch" class="text-xs text-gray-400">
-                    {{ emptyDescription || (internalSearch ? "Qidiruv so'zini o'zgartirib ko'ring" : '') }}
+                    {{
+                      emptyDescription ||
+                      (internalSearch ? "Qidiruv so'zini o'zgartirib ko'ring" : "")
+                    }}
                   </p>
                 </div>
               </slot>
@@ -177,8 +215,8 @@
               <input
                 type="checkbox"
                 :checked="isRowSelected(row, idx)"
-                @change="toggleSelectRow(row, idx)"
                 class="rounded border-gray-300 text-primary focus:ring-primary cursor-pointer w-4 h-4"
+                @change="toggleSelectRow(row, idx)"
               />
             </td>
 
@@ -194,7 +232,11 @@
               :class="col.tdClass || 'py-3.5 px-4'"
             >
               <slot :name="`cell(${col.key})`" :row="row" :value="row[col.key]" :index="idx">
-                {{ row[col.key] !== undefined && row[col.key] !== null && row[col.key] !== '' ? row[col.key] : '—' }}
+                {{
+                  row[col.key] !== undefined && row[col.key] !== null && row[col.key] !== ""
+                    ? row[col.key]
+                    : "—"
+                }}
               </slot>
             </td>
 
@@ -222,8 +264,9 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
+import AppPagination from "@/components/common/AppPagination.vue";
 import LoadingSpinner from "@/components/common/LoadingSpinner.vue";
-import AppPagination from "@/components/AppPagination.vue";
 
 export default {
   name: "AppTable",
@@ -331,7 +374,16 @@ export default {
       default: "",
     },
   },
-  emits: ["update:modelValue", "update:page", "page-change", "selection-change", "sort", "row-click"],
+  emits: [
+    "update:modelValue",
+    "update:page",
+    "page-change",
+    "selection-change",
+    "sort",
+    "row-click",
+    "row-select",
+    "select-all",
+  ],
   data() {
     return {
       internalSearch: "",
@@ -342,40 +394,9 @@ export default {
       selectedKeys: [...this.modelValue],
     };
   },
-  watch: {
-    page(val) {
-      if (typeof val === "number" && val > 0 && val !== this.currentPage) {
-        this.currentPage = val;
-      }
-    },
-    currentPage(val) {
-      this.$emit("update:page", val);
-      this.$emit("page-change", val);
-    },
-    perPage(val) {
-      this.internalPerPage = val;
-    },
-    internalPerPage() {
-      this.currentPage = 1;
-    },
-    modelValue(val) {
-      this.selectedKeys = [...(val || [])];
-    },
-    data() {
-      // Yangi data kelganda sahifani tekshirish
-      if (this.currentPage > this.totalPages) {
-        this.currentPage = Math.max(1, this.totalPages);
-      }
-    },
-  },
   computed: {
     hasTopToolbar() {
-      return (
-        this.searchable ||
-        this.showPerPage ||
-        !!this.$slots.headerActions ||
-        !!this.title
-      );
+      return this.searchable || this.showPerPage || !!this.$slots.headerActions || !!this.title;
     },
     normalizedColumns() {
       const nonSortableKeys = [
@@ -420,11 +441,7 @@ export default {
         result = result.filter((item) => {
           return this.normalizedColumns.some((col) => {
             const val = item[col.key];
-            return (
-              val !== undefined &&
-              val !== null &&
-              String(val).toLowerCase().includes(query)
-            );
+            return val !== undefined && val !== null && String(val).toLowerCase().includes(query);
           });
         });
       }
@@ -439,9 +456,20 @@ export default {
           if (valB === null || valB === undefined || valB === "") return -1;
 
           // Sonlar yoki valyuta qiymatlarini solishtirish (masalan: 4000000 yoki "4 700 000 so'm")
-          const numA = typeof valA === "number" ? valA : parseFloat(String(valA).replace(/\s/g, "").replace(/,/g, "."));
-          const numB = typeof valB === "number" ? valB : parseFloat(String(valB).replace(/\s/g, "").replace(/,/g, "."));
-          if (!isNaN(numA) && !isNaN(numB) && typeof valA !== "boolean" && !/^\+?\d{9,13}$/.test(String(valA).trim())) {
+          const numA =
+            typeof valA === "number"
+              ? valA
+              : parseFloat(String(valA).replace(/\s/g, "").replace(/,/g, "."));
+          const numB =
+            typeof valB === "number"
+              ? valB
+              : parseFloat(String(valB).replace(/\s/g, "").replace(/,/g, "."));
+          if (
+            !isNaN(numA) &&
+            !isNaN(numB) &&
+            typeof valA !== "boolean" &&
+            !/^\+?\d{9,13}$/.test(String(valA).trim())
+          ) {
             return this.sortOrder === "asc" ? numA - numB : numB - numA;
           }
 
@@ -484,10 +512,7 @@ export default {
       return (this.currentPage - 1) * this.internalPerPage + 1;
     },
     paginationEnd() {
-      return Math.min(
-        this.currentPage * this.internalPerPage,
-        this.processedData.length
-      );
+      return Math.min(this.currentPage * this.internalPerPage, this.processedData.length);
     },
     isAllSelected() {
       if (this.paginatedData.length === 0) return false;
@@ -499,6 +524,32 @@ export default {
       return (this.data || []).filter((row, idx) =>
         this.selectedKeys.includes(this.getRowKey(row, idx))
       );
+    },
+  },
+  watch: {
+    page(val) {
+      if (typeof val === "number" && val > 0 && val !== this.currentPage) {
+        this.currentPage = val;
+      }
+    },
+    currentPage(val) {
+      this.$emit("update:page", val);
+      this.$emit("page-change", val);
+    },
+    perPage(val) {
+      this.internalPerPage = val;
+    },
+    internalPerPage() {
+      this.currentPage = 1;
+    },
+    modelValue(val) {
+      this.selectedKeys = [...(val || [])];
+    },
+    data() {
+      // Yangi data kelganda sahifani tekshirish
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = Math.max(1, this.totalPages);
+      }
     },
   },
   methods: {
@@ -522,19 +573,11 @@ export default {
     },
     toggleSelectAll() {
       if (this.isAllSelected) {
-        const pageKeys = this.paginatedData.map((row, idx) =>
-          this.getRowKey(row, idx)
-        );
-        this.selectedKeys = this.selectedKeys.filter(
-          (k) => !pageKeys.includes(k)
-        );
+        const pageKeys = this.paginatedData.map((row, idx) => this.getRowKey(row, idx));
+        this.selectedKeys = this.selectedKeys.filter((k) => !pageKeys.includes(k));
       } else {
-        const pageKeys = this.paginatedData.map((row, idx) =>
-          this.getRowKey(row, idx)
-        );
-        this.selectedKeys = Array.from(
-          new Set([...this.selectedKeys, ...pageKeys])
-        );
+        const pageKeys = this.paginatedData.map((row, idx) => this.getRowKey(row, idx));
+        this.selectedKeys = Array.from(new Set([...this.selectedKeys, ...pageKeys]));
       }
       this.$emit("update:modelValue", this.selectedKeys);
       this.$emit("selection-change", this.selectedRows);

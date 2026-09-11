@@ -1,12 +1,12 @@
 <template>
-  <!-- Global tepa o'ng burchakdagi ToastContainer ga yo'naltirilgan -->
+  <div v-if="false" />
 </template>
 
 <script>
 import toast from "@/utils/toast";
 
 export default {
-  name: "Alert",
+  name: "AppAlert",
   props: {
     message: {
       type: String,

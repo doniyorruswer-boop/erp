@@ -3,18 +3,9 @@
     <div class="flex shadow rounded-md h-screen">
       <div class="bg-white dark:bg-gray-900 w-full overflow-y-auto">
         <form @submit.prevent="handleLogin">
-          <div
-            class="form-body lg:max-w-xl mx-auto lg:p-20 p-8 lg:mt-20 mt-5 space-y-8"
-          >
-            <div
-              class="form-head cursor-pointer"
-              @click="$router.push('/')"
-            >
-              <img
-                src="../../../assets/logo/logo.svg"
-                :alt="$brand.name"
-                class="w-10"
-              />
+          <div class="form-body lg:max-w-xl mx-auto lg:p-20 p-8 lg:mt-20 mt-5 space-y-8">
+            <div class="form-head cursor-pointer" @click="$router.push('/')">
+              <img src="../../../assets/logo/logo.svg" :alt="$brand.name" class="w-10" />
             </div>
             <div class="space-y-3">
               <h2 class="dark:text-white font-semibold text-gray-800 text-4xl">
@@ -35,11 +26,15 @@
                 <div class="font-bold">Kirish rad etildi</div>
                 <div class="mt-0.5 leading-relaxed">{{ errorMessage }}</div>
                 <button
-                  v-if="errorMessage.includes('bloklangan') || errorMessage.includes('bloklandi') || errorMessage.includes('vaqtincha')"
+                  v-if="
+                    errorMessage.includes('bloklangan') ||
+                    errorMessage.includes('bloklandi') ||
+                    errorMessage.includes('vaqtincha')
+                  "
                   type="button"
-                  @click="unlockAccount"
                   :disabled="unlocking"
                   class="mt-2.5 inline-flex items-center gap-1 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-xs transition disabled:opacity-50"
+                  @click="unlockAccount"
                 >
                   <Icon icon="solar:lock-unlocked-bold" class="w-3.5 h-3.5" />
                   {{ unlocking ? "Chiqarilmoqda..." : "Hisobni hoziroq blokdan chiqarish" }}
@@ -50,10 +45,10 @@
             <div class="space-y-5">
               <div class="relative z-0 w-full mb-6 group">
                 <input
+                  id="floating_email"
                   v-model="email"
                   type="text"
                   name="floating_email"
-                  id="floating_email"
                   class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
                   placeholder=" "
                   required
@@ -66,10 +61,10 @@
               </div>
               <div class="relative z-0 w-full mb-6 group">
                 <input
+                  id="floating_password"
                   v-model="password"
                   type="password"
                   name="floating_password"
-                  id="floating_password"
                   class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
                   placeholder=" "
                   required
@@ -101,8 +96,8 @@
               </div>
               <button
                 type="button"
-                @click="$router.push('/auth/forgot-password')"
                 class="text-sm dark:text-white hover:text-primary text-gray-700"
+                @click="$router.push('/auth/forgot-password')"
               >
                 Parolni unutdingizmi?
               </button>
@@ -118,8 +113,8 @@
             <p class="dark:text-white text-center text-gray-700">
               Profilingiz yo'qmi?<button
                 type="button"
-                @click="$router.push('/auth/register')"
                 class="ml-2 text-primary"
+                @click="$router.push('/auth/register')"
               >
                 Ro'yxatdan o'tish
               </button>
@@ -133,10 +128,11 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import { authApi } from "@/api/services";
+
 import api from "@/api/client";
-import BRAND_CONFIG from "@/config/brand.config";
 import { authenticateParent } from "@/api/schoolParentsData";
+import BRAND_CONFIG from "@/config/brand.config";
+import { useAuthStore } from "@/store/auth";
 
 export default {
   name: "Login",
@@ -159,6 +155,8 @@ export default {
         const cleanEmail = (this.email || "").trim();
         const cleanPassword = (this.password || "").trim();
 
+        const authStore = useAuthStore();
+
         // 1. Ota-onalar hisobi orqali kirish tekshiruvi (Faollik/blok holati)
         const parentAuth = authenticateParent(cleanEmail, cleanPassword);
         if (parentAuth && parentAuth.found) {
@@ -171,31 +169,28 @@ export default {
           }
 
           // Faol ota-ona profiliga muvaffaqiyatli kirish
-          localStorage.setItem("userRole", "PARENT");
+          authStore.setAuth({
+            token: "parent-session-token",
+            userRole: "PARENT",
+            user: parentAuth.parent,
+          });
           localStorage.setItem("parentUser", JSON.stringify(parentAuth.parent));
           if (this.$toast) {
-            this.$toast.success(
-              `Xush kelibsiz, ${parentAuth.parent.fullName}!`,
-              "Shaxsiy kabinet"
-            );
+            this.$toast.success(`Xush kelibsiz, ${parentAuth.parent.fullName}!`, "Shaxsiy kabinet");
           }
           this.$router.push("/school/parents");
           return;
         }
 
         // 2. Tizim xodimlari va administratorlar kirishi
-        const res = await authApi.login(cleanEmail, cleanPassword);
+        const res = await authStore.login(cleanEmail, cleanPassword);
         if (res && res.accessToken) {
-          localStorage.setItem("token", res.accessToken);
-          if (res.refreshToken) {
-            localStorage.setItem("refreshToken", res.refreshToken);
-          }
-          if (res.user) {
-            localStorage.setItem("user", JSON.stringify(res.user));
-            if (res.user.organization) {
-              localStorage.setItem("organization", JSON.stringify(res.user.organization));
-              localStorage.setItem("businessType", res.user.organization.businessType || "COURSE_CENTER");
-            }
+          if (res.user && res.user.organization) {
+            localStorage.setItem("organization", JSON.stringify(res.user.organization));
+            localStorage.setItem(
+              "businessType",
+              res.user.organization.businessType || "COURSE_CENTER"
+            );
           }
           this.$toast.success("Tizimga muvaffaqiyatli kirdingiz!", "Xush kelibsiz!");
           this.$router.push("/");
@@ -213,7 +208,10 @@ export default {
       try {
         const res = await api.post("/auth/unlock", { identifier: this.email });
         this.errorMessage = "";
-        this.$toast.success(res?.message || "Hisobingiz blokdan chiqarildi! Endi qayta kirishingiz mumkin.", "Blokdan chiqarildi");
+        this.$toast.success(
+          res?.message || "Hisobingiz blokdan chiqarildi! Endi qayta kirishingiz mumkin.",
+          "Blokdan chiqarildi"
+        );
       } catch (err) {
         const msg = err.response?.data?.message || "Blokdan chiqarishda xatolik yuz berdi";
         this.$toast.error(msg);

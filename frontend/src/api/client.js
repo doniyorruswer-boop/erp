@@ -1,7 +1,10 @@
-import { API_CONFIG, getApiBaseUrl } from '@/config/api.config';
+import { API_CONFIG, getApiBaseUrl } from "@/config/api.config";
+import { HTTP_METHODS, HTTP_STATUS } from "@/constants/http.constants";
+import { STORAGE_KEYS } from "@/constants/storage.constants";
+import { UI_MESSAGES } from "@/constants/ui.constants";
 
 function getToken() {
-  return localStorage.getItem('token');
+  return localStorage.getItem(STORAGE_KEYS.TOKEN);
 }
 
 let isRefreshing = false;
@@ -15,28 +18,28 @@ async function executeTokenRefresh() {
   isRefreshing = true;
   refreshPromise = (async () => {
     try {
-      const refreshToken = localStorage.getItem('refreshToken');
+      const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
       if (!refreshToken) return null;
 
-      const refreshRes = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const refreshRes = await fetch(`${getApiBaseUrl()}${API_CONFIG.ENDPOINTS.AUTH.REFRESH}`, {
+        method: HTTP_METHODS.POST,
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken }),
       });
 
       if (refreshRes.ok) {
         const data = await refreshRes.json();
         if (data.accessToken) {
-          localStorage.setItem('token', data.accessToken);
+          localStorage.setItem(STORAGE_KEYS.TOKEN, data.accessToken);
           if (data.refreshToken) {
-            localStorage.setItem('refreshToken', data.refreshToken);
+            localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken);
           }
           return data.accessToken;
         }
       }
       return null;
     } catch (e) {
-      console.warn('Avtomatik refresh muvaffaqiyatsiz bo\'ldi:', e);
+      console.warn("Avtomatik refresh muvaffaqiyatsiz bo'ldi:", e);
       return null;
     } finally {
       isRefreshing = false;
@@ -50,9 +53,9 @@ async function executeTokenRefresh() {
 async function request(endpoint, options = {}) {
   const token = getToken();
 
-  let orgId = '';
+  let orgId = "";
   try {
-    const rawOrg = localStorage.getItem('organization');
+    const rawOrg = localStorage.getItem(STORAGE_KEYS.ORGANIZATION);
     if (rawOrg) {
       const parsed = JSON.parse(rawOrg);
       if (parsed?.id) orgId = parsed.id;
@@ -60,9 +63,9 @@ async function request(endpoint, options = {}) {
   } catch (e) {}
 
   const headers = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...(orgId ? { 'x-organization-id': orgId } : {}),
+    ...(orgId ? { "x-organization-id": orgId } : {}),
     ...options.headers,
   };
 
@@ -71,37 +74,37 @@ async function request(endpoint, options = {}) {
     headers,
   };
 
-  if (options.body && typeof options.body === 'object') {
+  if (options.body && typeof options.body === "object") {
     config.body = JSON.stringify(options.body);
   }
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT || 8000);
+    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
     const response = await fetch(`${getApiBaseUrl()}${endpoint}`, {
       ...config,
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
 
-    if (response.status === 401) {
-      if (!options._retry && !endpoint.startsWith('/auth/')) {
+    if (response.status === HTTP_STATUS.UNAUTHORIZED) {
+      if (!options._retry && !endpoint.startsWith("/auth/")) {
         const newToken = await executeTokenRefresh();
         if (newToken) {
           return request(endpoint, { ...options, _retry: true });
         }
       }
 
-      if (!endpoint.startsWith('/auth/')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        if (!window.location.pathname.startsWith('/auth')) {
-          window.location.href = '/auth/login';
+      if (!endpoint.startsWith("/auth/")) {
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
+        if (!window.location.pathname.startsWith("/auth")) {
+          window.location.href = API_CONFIG.ENDPOINTS.AUTH.LOGIN;
         }
-        throw new Error('Sessiya muddati tugadi. Iltimos, qayta kiring.');
+        throw new Error(UI_MESSAGES.SESSION_EXPIRED);
       } else {
-        let errorMsg = "Email yoki parol noto'g'ri";
+        let errorMsg = UI_MESSAGES.AUTH_INVALID_CREDENTIALS;
         let errorData = null;
         try {
           errorData = await response.json();
@@ -114,7 +117,7 @@ async function request(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-      let errorMessage = 'Xatolik yuz berdi';
+      let errorMessage = UI_MESSAGES.ACTION_ERROR;
       let errorData = null;
       try {
         errorData = await response.json();
@@ -127,7 +130,7 @@ async function request(endpoint, options = {}) {
       throw error;
     }
 
-    if (response.status === 204) return null;
+    if (response.status === HTTP_STATUS.NO_CONTENT) return null;
 
     return await response.json();
   } catch (err) {
@@ -137,10 +140,12 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
-  get: (endpoint, options) => request(endpoint, { ...options, method: 'GET' }),
-  post: (endpoint, body, options) => request(endpoint, { ...options, method: 'POST', body }),
-  put: (endpoint, body, options) => request(endpoint, { ...options, method: 'PUT', body }),
-  delete: (endpoint, options) => request(endpoint, { ...options, method: 'DELETE' }),
+  get: (endpoint, options) => request(endpoint, { ...options, method: HTTP_METHODS.GET }),
+  post: (endpoint, body, options) =>
+    request(endpoint, { ...options, method: HTTP_METHODS.POST, body }),
+  put: (endpoint, body, options) =>
+    request(endpoint, { ...options, method: HTTP_METHODS.PUT, body }),
+  delete: (endpoint, options) => request(endpoint, { ...options, method: HTTP_METHODS.DELETE }),
 };
 
 export default api;

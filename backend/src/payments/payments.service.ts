@@ -1,9 +1,23 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Logger, Optional } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { WorkflowService } from '../workflow/workflow.service';
-import { PaymentMethod, PaymentStatus, AuditAction, TransactionType, InvoiceStatus } from '@prisma/client';
-import { BranchContext, buildBranchWhere, assertBranchAccess } from '../auth/branch-access';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+  Logger,
+  Optional,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { WorkflowService } from "../workflow/workflow.service";
+import {
+  PaymentMethod,
+  PaymentStatus,
+  AuditAction,
+  TransactionType,
+  InvoiceStatus,
+  Prisma,
+} from "@prisma/client";
+import { BranchContext, buildBranchWhere, assertBranchAccess } from "../auth/branch-access";
 
 @Injectable()
 export class PaymentsService {
@@ -12,7 +26,7 @@ export class PaymentsService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
-    @Optional() private workflowService?: WorkflowService,
+    @Optional() private workflowService?: WorkflowService
   ) {}
 
   private async ensureDefaultCashbox(orgId: string, branchId?: string) {
@@ -29,9 +43,9 @@ export class PaymentsService {
         data: {
           organizationId: orgId,
           branchId: branchId || null,
-          name: 'Asosiy Kassa',
-          code: 'MAIN_CASHBOX',
-          currency: 'UZS',
+          name: "Asosiy Kassa",
+          code: "MAIN_CASHBOX",
+          currency: "UZS",
           balance: 0,
           isDefault: true,
           isActive: true,
@@ -43,8 +57,16 @@ export class PaymentsService {
   }
 
   async findAll(
-    query: { studentId?: string; customerId?: string; method?: PaymentMethod; orgId: string; branchId?: string; page?: number; limit?: number },
-    branchCtx?: BranchContext,
+    query: {
+      studentId?: string;
+      customerId?: string;
+      method?: PaymentMethod;
+      orgId: string;
+      branchId?: string;
+      page?: number;
+      limit?: number;
+    },
+    branchCtx?: BranchContext
   ) {
     const page = query.page ? Number(query.page) : 1;
     const limit = query.limit ? Math.min(Number(query.limit), 100) : 50;
@@ -52,9 +74,11 @@ export class PaymentsService {
 
     const branchFilter = branchCtx
       ? buildBranchWhere(branchCtx, query.branchId)
-      : (query.branchId ? { branchId: query.branchId } : {});
+      : query.branchId
+        ? { branchId: query.branchId }
+        : {};
 
-    const where: any = {
+    const where: Prisma.PaymentWhereInput = {
       organizationId: query.orgId,
       studentId: query.studentId,
       customerId: query.customerId,
@@ -85,7 +109,7 @@ export class PaymentsService {
             select: { id: true, firstName: true, lastName: true },
           },
         },
-        orderBy: { paymentDate: 'desc' },
+        orderBy: { paymentDate: "desc" },
       }),
       this.prisma.payment.count({ where }),
     ]);
@@ -121,18 +145,23 @@ export class PaymentsService {
     return payment;
   }
 
-  async create(data: {
-    studentId?: string;
-    customerId?: string;
-    invoiceId?: string;
-    cashboxId?: string;
-    contractId?: string;
-    amount: number;
-    method?: PaymentMethod;
-    notes?: string;
-    receivedById?: string;
-    branchId?: string;
-  }, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async create(
+    data: {
+      studentId?: string;
+      customerId?: string;
+      invoiceId?: string;
+      cashboxId?: string;
+      contractId?: string;
+      amount: number;
+      method?: PaymentMethod;
+      notes?: string;
+      receivedById?: string;
+      branchId?: string;
+    },
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     let student = null;
     let customer = null;
 
@@ -141,7 +170,8 @@ export class PaymentsService {
       student = await this.prisma.student.findFirst({
         where: { id: data.studentId, organizationId: orgId, deletedAt: null },
       });
-      if (!student) throw new BadRequestException("Talaba topilmadi yoki ushbu tashkilotga tegishli emas");
+      if (!student)
+        throw new BadRequestException("Talaba topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     // Cross-tenant verification: Customer must belong to orgId
@@ -149,7 +179,8 @@ export class PaymentsService {
       customer = await this.prisma.customer.findFirst({
         where: { id: data.customerId, organizationId: orgId, deletedAt: null },
       });
-      if (!customer) throw new BadRequestException("Mijoz topilmadi yoki ushbu tashkilotga tegishli emas");
+      if (!customer)
+        throw new BadRequestException("Mijoz topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     // Resolve target branch and assert access
@@ -169,7 +200,8 @@ export class PaymentsService {
       const contract = await this.prisma.contract.findFirst({
         where: { id: data.contractId, organizationId: orgId },
       });
-      if (!contract) throw new BadRequestException("Shartnoma topilmadi yoki ushbu tashkilotga tegishli emas");
+      if (!contract)
+        throw new BadRequestException("Shartnoma topilmadi yoki ushbu tashkilotga tegishli emas");
       if (data.studentId && contract.studentId !== data.studentId) {
         throw new BadRequestException("Tanlangan shartnoma ushbu o'quvchiga tegishli emas");
       }
@@ -180,7 +212,8 @@ export class PaymentsService {
       const inv = await this.prisma.invoice.findFirst({
         where: { id: data.invoiceId, organizationId: orgId, deletedAt: null },
       });
-      if (!inv) throw new BadRequestException("Invoys topilmadi yoki ushbu tashkilotga tegishli emas");
+      if (!inv)
+        throw new BadRequestException("Invoys topilmadi yoki ushbu tashkilotga tegishli emas");
       if (targetBranchId && inv.branchId && targetBranchId !== inv.branchId) {
         throw new BadRequestException("Tanlangan hisob-faktura to'lov filialiga tegishli emas");
       }
@@ -192,7 +225,8 @@ export class PaymentsService {
       const cb = await this.prisma.cashbox.findFirst({
         where: { id: cashboxId, organizationId: orgId, deletedAt: null },
       });
-      if (!cb) throw new BadRequestException("Kassa topilmadi yoki ushbu tashkilotga tegishli emas");
+      if (!cb)
+        throw new BadRequestException("Kassa topilmadi yoki ushbu tashkilotga tegishli emas");
       if (targetBranchId && cb.branchId && targetBranchId !== cb.branchId) {
         throw new BadRequestException("Tanlangan kassa to'lov filialiga tegishli emas");
       }
@@ -201,7 +235,7 @@ export class PaymentsService {
       cashboxId = defaultCashbox.id;
     }
 
-    const receiptNumber = `RCP-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(100000 + Math.random() * 900000)}`;
+    const receiptNumber = `RCP-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.floor(100000 + Math.random() * 900000)}`;
 
     const payment = await this.prisma.$transaction(async (tx) => {
       const p = await tx.payment.create({
@@ -242,12 +276,17 @@ export class PaymentsService {
 
       // If invoiceId passed, allocate payment to invoice atomically with concurrency safety
       if (data.invoiceId) {
-        const invoice = await tx.invoice.findFirst({ where: { id: data.invoiceId, organizationId: orgId } });
+        const invoice = await tx.invoice.findFirst({
+          where: { id: data.invoiceId, organizationId: orgId },
+        });
         if (invoice) {
           const invTotal = Number(invoice.totalAmount);
           const invPaid = Number(invoice.paidAmount);
           const invRemaining = Math.max(0, invTotal - invPaid);
-          const allocationAmount = Math.min(Number(data.amount), invRemaining > 0 ? invRemaining : Number(data.amount));
+          const allocationAmount = Math.min(
+            Number(data.amount),
+            invRemaining > 0 ? invRemaining : Number(data.amount)
+          );
 
           await tx.paymentAllocation.create({
             data: {
@@ -257,7 +296,7 @@ export class PaymentsService {
             },
           });
 
-          const isFullyPaid = (invPaid + allocationAmount) >= invTotal;
+          const isFullyPaid = invPaid + allocationAmount >= invTotal;
           await tx.invoice.update({
             where: { id: data.invoiceId },
             data: {
@@ -284,7 +323,7 @@ export class PaymentsService {
             type: TransactionType.INCOME,
             amount: Number(data.amount),
             balanceAfter: updatedCashbox.balance,
-            description: `Kirim to'lovi (${receiptNumber}): ${data.notes || (student ? student.firstName + ' ' + student.lastName : 'Mijoz to\'lovi')}`,
+            description: `Kirim to'lovi (${receiptNumber}): ${data.notes || (student ? student.firstName + " " + student.lastName : "Mijoz to'lovi")}`,
           },
         });
       }
@@ -297,7 +336,7 @@ export class PaymentsService {
       branchId: data.branchId || undefined,
       userId,
       action: AuditAction.PAYMENT,
-      entityType: 'Payment',
+      entityType: "Payment",
       entityId: payment.id,
       after: payment,
     });
@@ -305,7 +344,7 @@ export class PaymentsService {
     if (this.workflowService) {
       try {
         await this.workflowService.processEvent(
-          'payment.created',
+          "payment.created",
           {
             id: payment.id,
             amount: payment.amount,
@@ -315,22 +354,30 @@ export class PaymentsService {
             method: payment.method,
             branchId: payment.branchId,
           },
-          orgId,
+          orgId
         );
-      } catch (err: any) {
-        this.logger.warn(`Workflow execution failed for payment.created: ${err.message}`);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.logger.warn(`Workflow execution failed for payment.created: ${msg}`);
       }
     }
 
     return payment;
   }
 
-  async update(id: string, data: { method?: PaymentMethod; notes?: string }, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async update(
+    id: string,
+    data: { method?: PaymentMethod; notes?: string },
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
     const oldPayment = await this.prisma.payment.findFirst({
       where: { id, organizationId: orgId, ...branchWhere },
     });
-    if (!oldPayment) throw new NotFoundException("To'lov topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!oldPayment)
+      throw new NotFoundException("To'lov topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     if (oldPayment.status !== PaymentStatus.PAID) {
       throw new BadRequestException("Bekor qilingan yoki qaytarilgan to'lovni tahrirlab bo'lmaydi");
@@ -349,7 +396,7 @@ export class PaymentsService {
       branchId: oldPayment.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Payment',
+      entityType: "Payment",
       entityId: id,
       before: oldPayment,
       after: updatedPayment,
@@ -358,12 +405,19 @@ export class PaymentsService {
     return updatedPayment;
   }
 
-  async voidPayment(id: string, reason: string | undefined, userId: string | undefined, orgId: string, branchCtx?: BranchContext) {
+  async voidPayment(
+    id: string,
+    reason: string | undefined,
+    userId: string | undefined,
+    orgId: string,
+    branchCtx?: BranchContext
+  ) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
     const oldPayment = await this.prisma.payment.findFirst({
       where: { id, organizationId: orgId, ...branchWhere },
     });
-    if (!oldPayment) throw new NotFoundException("To'lov topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!oldPayment)
+      throw new NotFoundException("To'lov topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     if (oldPayment.status === PaymentStatus.VOIDED) {
       throw new BadRequestException("Ushbu to'lov allaqachon bekor qilingan (VOIDED)");
@@ -409,7 +463,7 @@ export class PaymentsService {
             type: TransactionType.REFUND,
             amount: -Number(oldPayment.amount),
             balanceAfter: updatedCashbox.balance,
-            description: `To'lov bekor qilindi (Void): ${reason || 'Administrator tomonidan'}`,
+            description: `To'lov bekor qilindi (Void): ${reason || "Administrator tomonidan"}`,
           },
         });
       }
@@ -422,7 +476,7 @@ export class PaymentsService {
       branchId: oldPayment.branchId || undefined,
       userId,
       action: AuditAction.VOID,
-      entityType: 'Payment',
+      entityType: "Payment",
       entityId: id,
       before: oldPayment,
       after: voidedPayment,
@@ -436,32 +490,41 @@ export class PaymentsService {
     dtoOrReason: { reason?: string; amount?: number; cashboxId?: string } | string | undefined,
     userId: string | undefined,
     orgId: string,
-    branchCtx?: BranchContext,
+    branchCtx?: BranchContext
   ) {
-    const reason = typeof dtoOrReason === 'string' ? dtoOrReason : dtoOrReason?.reason;
-    const requestedAmount = typeof dtoOrReason === 'object' && dtoOrReason?.amount ? Number(dtoOrReason.amount) : undefined;
-    const requestedCashboxId = typeof dtoOrReason === 'object' && dtoOrReason?.cashboxId ? dtoOrReason.cashboxId : undefined;
+    const reason = typeof dtoOrReason === "string" ? dtoOrReason : dtoOrReason?.reason;
+    const requestedAmount =
+      typeof dtoOrReason === "object" && dtoOrReason?.amount
+        ? Number(dtoOrReason.amount)
+        : undefined;
+    const requestedCashboxId =
+      typeof dtoOrReason === "object" && dtoOrReason?.cashboxId ? dtoOrReason.cashboxId : undefined;
 
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
     const oldPayment = await this.prisma.payment.findFirst({
       where: { id, organizationId: orgId, ...branchWhere },
     });
-    if (!oldPayment) throw new NotFoundException("To'lov topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!oldPayment)
+      throw new NotFoundException("To'lov topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     if (oldPayment.status !== PaymentStatus.PAID) {
       throw new BadRequestException("Faqat to'langan (PAID) to'lovlarni qaytarish mumkin");
     }
 
-    const refundAmount = requestedAmount && requestedAmount > 0
-      ? Math.min(requestedAmount, Number(oldPayment.amount))
-      : Number(oldPayment.amount);
+    const refundAmount =
+      requestedAmount && requestedAmount > 0
+        ? Math.min(requestedAmount, Number(oldPayment.amount))
+        : Number(oldPayment.amount);
 
     let targetCashboxId = requestedCashboxId || oldPayment.cashboxId;
     if (requestedCashboxId) {
       const cb = await this.prisma.cashbox.findFirst({
         where: { id: requestedCashboxId, organizationId: orgId, deletedAt: null },
       });
-      if (!cb) throw new BadRequestException("Tanlangan kassa topilmadi yoki ushbu tashkilotga tegishli emas");
+      if (!cb)
+        throw new BadRequestException(
+          "Tanlangan kassa topilmadi yoki ushbu tashkilotga tegishli emas"
+        );
       if (branchCtx && cb.branchId) {
         assertBranchAccess(branchCtx, cb.branchId);
       }
@@ -504,7 +567,7 @@ export class PaymentsService {
             type: TransactionType.REFUND,
             amount: -refundAmount,
             balanceAfter: updatedCashbox.balance,
-            description: `Pul qaytarildi (Refund ${refundAmount} UZS): ${reason || 'Mijoz talabi'}`,
+            description: `Pul qaytarildi (Refund ${refundAmount} UZS): ${reason || "Mijoz talabi"}`,
           },
         });
       }
@@ -517,7 +580,7 @@ export class PaymentsService {
       branchId: oldPayment.branchId || undefined,
       userId,
       action: AuditAction.REFUND,
-      entityType: 'Payment',
+      entityType: "Payment",
       entityId: id,
       before: oldPayment,
       after: refundedPayment,
@@ -541,7 +604,13 @@ export class PaymentsService {
     });
 
     const monthlyIncome = await this.prisma.payment.aggregate({
-      where: { organizationId: orgId, status: PaymentStatus.PAID, deletedAt: null, paymentDate: { gte: startOfMonth }, ...branchWhere },
+      where: {
+        organizationId: orgId,
+        status: PaymentStatus.PAID,
+        deletedAt: null,
+        paymentDate: { gte: startOfMonth },
+        ...branchWhere,
+      },
       _sum: { amount: true },
     });
 
@@ -554,7 +623,7 @@ export class PaymentsService {
         phone: true,
         balance: true,
       },
-      orderBy: { balance: 'asc' },
+      orderBy: { balance: "asc" },
       take: 10,
     });
 

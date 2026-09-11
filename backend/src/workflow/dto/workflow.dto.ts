@@ -1,5 +1,13 @@
-import { IsString, IsNotEmpty, IsOptional, IsBoolean, IsArray, IsObject, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsBoolean,
+  IsArray,
+  IsObject,
+  ValidateNested,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 export class WorkflowConditionDto {
   @IsString()
@@ -8,10 +16,10 @@ export class WorkflowConditionDto {
 
   @IsString()
   @IsNotEmpty()
-  operator: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'contains' | 'in';
+  operator: "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "contains" | "in";
 
   @IsNotEmpty()
-  value: any;
+  value: unknown;
 }
 
 export type WorkflowCondition = WorkflowConditionDto;
@@ -19,11 +27,11 @@ export type WorkflowCondition = WorkflowConditionDto;
 export class WorkflowActionDto {
   @IsString()
   @IsNotEmpty()
-  type: 'CREATE_TASK' | 'SEND_NOTIFICATION' | 'UPDATE_STATUS' | 'WEBHOOK';
+  type: "CREATE_TASK" | "SEND_NOTIFICATION" | "UPDATE_STATUS" | "WEBHOOK";
 
   @IsObject()
   @IsOptional()
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
 }
 
 export type WorkflowAction = WorkflowActionDto;
@@ -94,5 +102,5 @@ export class TriggerEventDto {
   event: string;
 
   @IsObject()
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
 }

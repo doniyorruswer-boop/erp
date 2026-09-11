@@ -4,7 +4,7 @@
     <DashboardHeaderBar
       :selected-month="selectedMonth"
       :academic-year="selectedAcademicYear"
-      @update:selectedMonth="selectMonth"
+      @update:selected-month="selectMonth"
       @date-range-change="onDateRangeChange"
       @open-download-modal="isDownloadModalOpen = true"
       @open-settings-modal="isSettingsModalOpen = true"
@@ -21,10 +21,7 @@
     />
 
     <!-- 3. Kunlik Davomat Tahlili (Maktab va Bog'chalar uchun eng muhim ko'rsatkich) -->
-    <AttendanceWidget
-      v-if="widgetSettings.attendance"
-      :summary="statsData.attendanceSummary"
-    />
+    <AttendanceWidget v-if="widgetSettings.attendance" :summary="statsData.attendanceSummary" />
 
     <!-- 4. Oylik Operatsion Hodisalar Hisoblagichlari (Yangi lidlar, sinov darslari, shartnomalar, o'quvchilar...) -->
     <MonthlyEventCounters
@@ -74,9 +71,7 @@
         v-if="widgetSettings.topDebtors"
         :class="widgetSettings.financialCharts ? 'lg:col-span-1' : 'lg:col-span-3'"
       >
-        <TopDebtorsWidget
-          :debtors="topDebtorsList"
-        />
+        <TopDebtorsWidget :debtors="topDebtorsList" />
       </div>
     </div>
 
@@ -99,22 +94,13 @@
     </div>
 
     <!-- 10. O'qituvchilar / Tarbiyachilar Yuklamasi -->
-    <TopTeachersWidget
-      v-if="widgetSettings.topTeachers"
-      :teachers="statsData.topTeachers"
-    />
+    <TopTeachersWidget v-if="widgetSettings.topTeachers" :teachers="statsData.topTeachers" />
 
     <!-- 11. So'nggi 10 ta To'lov Jadvali -->
-    <RecentPaymentsWidget
-      v-if="widgetSettings.recentPayments"
-      :payments="recentPaymentsList"
-    />
+    <RecentPaymentsWidget v-if="widgetSettings.recentPayments" :payments="recentPaymentsList" />
 
     <!-- Modallar -->
-    <DownloadWidgetModal
-      v-model="isDownloadModalOpen"
-      :target-month="currentMonthLabel"
-    />
+    <DownloadWidgetModal v-model="isDownloadModalOpen" :target-month="currentMonthLabel" />
 
     <WidgetSettingsModal
       v-model="isSettingsModalOpen"
@@ -122,32 +108,29 @@
       @save="onSaveWidgetSettings"
     />
 
-    <FunnelStageModal
-      v-model="isStageModalOpen"
-      :stage-info="selectedStageInfo"
-    />
+    <FunnelStageModal v-model="isStageModalOpen" :stage-info="selectedStageInfo" />
   </div>
 </template>
 
 <script>
-import DashboardHeaderBar from "@/components/dashboard/DashboardHeaderBar.vue";
-import FinancialKpiCards from "@/components/dashboard/FinancialKpiCards.vue";
-import MonthlyEventCounters from "@/components/dashboard/MonthlyEventCounters.vue";
-import SalesFunnelWidget from "@/components/dashboard/SalesFunnelWidget.vue";
-import ClassOccupancyWidget from "@/components/dashboard/ClassOccupancyWidget.vue";
-import MonthlyRevenueChartWidget from "@/components/dashboard/MonthlyRevenueChartWidget.vue";
-import TopDebtorsWidget from "@/components/dashboard/TopDebtorsWidget.vue";
-import RecentPaymentsWidget from "@/components/dashboard/RecentPaymentsWidget.vue";
-import AttendanceWidget from "@/components/dashboard/AttendanceWidget.vue";
-import TodayScheduleWidget from "@/components/dashboard/TodayScheduleWidget.vue";
-import PaymentMethodsWidget from "@/components/dashboard/PaymentMethodsWidget.vue";
-import ExpenseCategoriesWidget from "@/components/dashboard/ExpenseCategoriesWidget.vue";
-import TopTeachersWidget from "@/components/dashboard/TopTeachersWidget.vue";
-import DownloadWidgetModal from "@/components/dashboard/DownloadWidgetModal.vue";
-import WidgetSettingsModal from "@/components/dashboard/WidgetSettingsModal.vue";
-import FunnelStageModal from "@/components/dashboard/FunnelStageModal.vue";
-import { formatUZS, formatShortNumber } from "@/helper/formatters";
 import { dashboardApi } from "@/api/services";
+import AttendanceWidget from "@/components/dashboard/AttendanceWidget.vue";
+import ClassOccupancyWidget from "@/components/dashboard/ClassOccupancyWidget.vue";
+import DashboardHeaderBar from "@/components/dashboard/DashboardHeaderBar.vue";
+import DownloadWidgetModal from "@/components/dashboard/DownloadWidgetModal.vue";
+import ExpenseCategoriesWidget from "@/components/dashboard/ExpenseCategoriesWidget.vue";
+import FinancialKpiCards from "@/components/dashboard/FinancialKpiCards.vue";
+import FunnelStageModal from "@/components/dashboard/FunnelStageModal.vue";
+import MonthlyEventCounters from "@/components/dashboard/MonthlyEventCounters.vue";
+import MonthlyRevenueChartWidget from "@/components/dashboard/MonthlyRevenueChartWidget.vue";
+import PaymentMethodsWidget from "@/components/dashboard/PaymentMethodsWidget.vue";
+import RecentPaymentsWidget from "@/components/dashboard/RecentPaymentsWidget.vue";
+import SalesFunnelWidget from "@/components/dashboard/SalesFunnelWidget.vue";
+import TodayScheduleWidget from "@/components/dashboard/TodayScheduleWidget.vue";
+import TopDebtorsWidget from "@/components/dashboard/TopDebtorsWidget.vue";
+import TopTeachersWidget from "@/components/dashboard/TopTeachersWidget.vue";
+import WidgetSettingsModal from "@/components/dashboard/WidgetSettingsModal.vue";
+import { formatShortNumber, formatUZS } from "@/helper/formatters";
 
 export default {
   name: "UniversalUnifiedDashboard",
@@ -179,12 +162,22 @@ export default {
       },
     },
   },
-  created() {
-    this.loadSavedWidgetSettings();
-  },
   data() {
     const now = new Date();
-    const monthKeys = ["Yan", "Fev", "Mar", "Apr", "May", "Iyun", "Iyul", "Avg", "Sen", "Okt", "Noy", "Dek"];
+    const monthKeys = [
+      "Yan",
+      "Fev",
+      "Mar",
+      "Apr",
+      "May",
+      "Iyun",
+      "Iyul",
+      "Avg",
+      "Sen",
+      "Okt",
+      "Noy",
+      "Dek",
+    ];
     const curMonthKey = monthKeys[now.getMonth()] || "Sen";
 
     let initialWidgetSettings = {
@@ -320,6 +313,9 @@ export default {
       return months[this.selectedMonth] || "Sentabr oyi";
     },
   },
+  created() {
+    this.loadSavedWidgetSettings();
+  },
   async mounted() {
     this.loadSavedWidgetSettings();
     await this.fetchDashboardData();
@@ -379,7 +375,10 @@ export default {
       try {
         localStorage.setItem("eduhub_widget_settings", JSON.stringify(newSettings));
         if (this.$toast && typeof this.$toast.success === "function") {
-          this.$toast.success("Vidjetlar sozlamalari muvaffaqiyatli saqlandi!", "Sozlamalar saqlandi");
+          this.$toast.success(
+            "Vidjetlar sozlamalari muvaffaqiyatli saqlandi!",
+            "Sozlamalar saqlandi"
+          );
         }
       } catch (e) {
         console.warn("Could not save widget settings", e);

@@ -3,37 +3,48 @@
     <!-- Breadcrumb & Header -->
     <div class="flex items-center justify-between flex-wrap gap-4">
       <div>
-        <Breadcrumb :items="[{ title: 'O\'quvchilar', to: '/students' }, { title: 'O\'quvchini qo\'shish' }]" />
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">O'quvchini qo'shish</h1>
+        <Breadcrumb
+          :items="[{ title: 'O\'quvchilar', to: '/students' }, { title: 'O\'quvchini qo\'shish' }]"
+        />
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">
+          O'quvchini qo'shish
+        </h1>
       </div>
 
       <div class="flex items-center gap-2.5">
-        <router-link
+        <RouterLink
           to="/students"
           class="px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition"
         >
           Bekor qilish
-        </router-link>
+        </RouterLink>
         <button
           type="button"
-          @click="submitStudentForm"
           :disabled="saving"
           class="px-6 py-2 text-xs font-semibold bg-primary hover:bg-primary/90 text-white rounded-md shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+          @click="submitStudentForm"
         >
           <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-base" />
           <Icon v-else icon="solar:diskette-bold" class="text-base" />
-          <span>{{ saving ? 'Saqlanmoqda...' : 'Saqlash' }}</span>
+          <span>{{ saving ? "Saqlanmoqda..." : "Saqlash" }}</span>
         </button>
       </div>
     </div>
 
     <!-- Alert Toast -->
-    <Alert v-if="alertMessage" :message="alertMessage" :type="alertType" @close="alertMessage = ''" />
+    <Alert
+      v-if="alertMessage"
+      :message="alertMessage"
+      :type="alertType"
+      @close="alertMessage = ''"
+    />
 
     <!-- Form Container Card -->
-    <form @submit.prevent="submitStudentForm" class="space-y-6">
+    <form class="space-y-6" @submit.prevent="submitStudentForm">
       <!-- SECTION 1: Asosiy Ma'lumotlar -->
-      <div class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4">
+      <div
+        class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4"
+      >
         <!-- Row 1: Passport, Enrolled Date, Group -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <FormInput
@@ -102,13 +113,25 @@
               O'quvchi fotosi
             </label>
             <div
-              @click="triggerPhotoUpload"
               class="border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary rounded-md p-3 text-center cursor-pointer transition bg-gray-50/50 dark:bg-gray-900/40 flex flex-col items-center justify-center min-h-[88px]"
+              @click="triggerPhotoUpload"
             >
-              <input type="file" ref="photoInput" @change="onPhotoSelected" class="hidden" accept="image/*" />
-              <img v-if="photoPreview" :src="photoPreview" class="w-12 h-12 rounded-full object-cover mb-1 border border-primary" />
+              <input
+                ref="photoInput"
+                type="file"
+                class="hidden"
+                accept="image/*"
+                @change="onPhotoSelected"
+              />
+              <img
+                v-if="photoPreview"
+                :src="photoPreview"
+                class="w-12 h-12 rounded-full object-cover mb-1 border border-primary"
+              />
               <Icon v-else icon="solar:upload-track-2-linear" class="text-xl text-gray-400 mb-1" />
-              <span class="text-[11px] text-gray-400">Faylni bu yerga olib tashlang yoki bosing</span>
+              <span class="text-[11px] text-gray-400"
+                >Faylni bu yerga olib tashlang yoki bosing</span
+              >
             </div>
           </div>
 
@@ -146,21 +169,31 @@
       </div>
 
       <!-- SECTION 2: Qo'shimcha Ma'lumotlar -->
-      <div class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4">
-        <h3 class="font-bold text-sm text-gray-800 dark:text-gray-100 pb-2 border-b dark:border-gray-700">
+      <div
+        class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4"
+      >
+        <h3
+          class="font-bold text-sm text-gray-800 dark:text-gray-100 pb-2 border-b dark:border-gray-700"
+        >
           Qo'shimcha ma'lumotlar
         </h3>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- O'qish tili -->
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">O'qish tili</label>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >O'qish tili</label
+            >
             <div class="space-y-1.5 text-xs">
-              <label v-for="lang in ['O\'zbekcha', 'Ruscha', 'Inglizcha', 'Tojikcha', 'Qozoqcha']" :key="lang" class="flex items-center gap-2 text-gray-700 dark:text-gray-300 cursor-pointer">
+              <label
+                v-for="lang in ['O\'zbekcha', 'Ruscha', 'Inglizcha', 'Tojikcha', 'Qozoqcha']"
+                :key="lang"
+                class="flex items-center gap-2 text-gray-700 dark:text-gray-300 cursor-pointer"
+              >
                 <input
+                  v-model="form.studyLanguages"
                   type="checkbox"
                   :value="lang"
-                  v-model="form.studyLanguages"
                   class="rounded text-primary focus:ring-primary h-3.5 w-3.5 cursor-pointer"
                 />
                 <span>{{ lang }}</span>
@@ -196,13 +229,19 @@
 
           <!-- Dars kunlari -->
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Dars kunlari</label>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Dars kunlari</label
+            >
             <div class="space-y-1 text-xs">
-              <label v-for="day in ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya']" :key="day" class="flex items-center gap-2 text-gray-700 dark:text-gray-300 cursor-pointer">
+              <label
+                v-for="day in ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya']"
+                :key="day"
+                class="flex items-center gap-2 text-gray-700 dark:text-gray-300 cursor-pointer"
+              >
                 <input
+                  v-model="form.studyDays"
                   type="checkbox"
                   :value="day"
-                  v-model="form.studyDays"
                   class="rounded text-primary focus:ring-primary h-3.5 w-3.5 cursor-pointer"
                 />
                 <span>{{ day }}</span>
@@ -230,7 +269,9 @@
               ]"
             />
             <div>
-              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Izoh</label>
+              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >Izoh</label
+              >
               <textarea
                 v-model="form.notes"
                 rows="2"
@@ -243,8 +284,12 @@
       </div>
 
       <!-- SECTION 3: Sinov Darsi Bo'yicha Ma'lumotlar -->
-      <div class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4">
-        <h3 class="font-bold text-sm text-gray-800 dark:text-gray-100 pb-2 border-b dark:border-gray-700">
+      <div
+        class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4"
+      >
+        <h3
+          class="font-bold text-sm text-gray-800 dark:text-gray-100 pb-2 border-b dark:border-gray-700"
+        >
           Sinov darsi bo'yicha ma'lumotlar
         </h3>
 
@@ -269,8 +314,12 @@
       </div>
 
       <!-- SECTION 4: Ota-ona Ma'lumotlari -->
-      <div class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4">
-        <h3 class="font-bold text-sm text-gray-800 dark:text-gray-100 pb-2 border-b dark:border-gray-700">
+      <div
+        class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4"
+      >
+        <h3
+          class="font-bold text-sm text-gray-800 dark:text-gray-100 pb-2 border-b dark:border-gray-700"
+        >
           Ota-ona ma'lumotlari
         </h3>
 
@@ -301,8 +350,12 @@
       </div>
 
       <!-- SECTION 5: O'quvchi Manzili -->
-      <div class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4">
-        <h3 class="font-bold text-sm text-gray-800 dark:text-gray-100 pb-2 border-b dark:border-gray-700">
+      <div
+        class="card bg-white dark:bg-gray-800 p-5 rounded-lg border dark:border-gray-700 shadow-sm space-y-4"
+      >
+        <h3
+          class="font-bold text-sm text-gray-800 dark:text-gray-100 pb-2 border-b dark:border-gray-700"
+        >
           O'quvchi manzili
         </h3>
 
@@ -319,7 +372,9 @@
             placeholder="Masalan: Yunusobod tumani"
           />
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Doimiy manzil</label>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >Doimiy manzil</label
+            >
             <textarea
               v-model="form.address"
               rows="2"
@@ -332,12 +387,12 @@
 
       <!-- Bottom Form Submit Action -->
       <div class="flex items-center justify-end gap-3 pt-2">
-        <router-link
+        <RouterLink
           to="/students"
           class="px-5 py-2.5 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition"
         >
           Bekor qilish
-        </router-link>
+        </RouterLink>
         <button
           type="submit"
           :disabled="saving"
@@ -345,7 +400,7 @@
         >
           <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-base" />
           <Icon v-else icon="solar:diskette-bold" class="text-base" />
-          <span>{{ saving ? 'Saqlanmoqda...' : 'Saqlash' }}</span>
+          <span>{{ saving ? "Saqlanmoqda..." : "Saqlash" }}</span>
         </button>
       </div>
     </form>
@@ -354,13 +409,14 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import Breadcrumb from "@/components/Breadcrumb.vue";
+
+import { coursesApi, groupsApi, studentsApi, usersApi } from "@/api/services";
 import Alert from "@/components/Alert.vue";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import FormDatePicker from "@/components/FormDatePicker.vue";
 import FormInput from "@/components/FormInput.vue";
 import FormSelect from "@/components/FormSelect.vue";
-import FormDatePicker from "@/components/FormDatePicker.vue";
-import { studentsApi, coursesApi, groupsApi, usersApi } from "@/api/services";
-import { validateForm, rules, formatPhone } from "@/utils/validators";
+import { formatPhone, rules, validateForm } from "@/utils/validators";
 
 export default {
   name: "StudentCreate",
@@ -447,7 +503,7 @@ export default {
         { value: "", label: "Guruhni tanlang (ixtiyoriy)" },
         ...this.groups.map((g) => ({
           value: g.id,
-          label: `${g.name || g.title} (${g.course?.name || 'Kurs'})`,
+          label: `${g.name || g.title} (${g.course?.name || "Kurs"})`,
         })),
       ];
     },

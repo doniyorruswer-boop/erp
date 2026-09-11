@@ -1,16 +1,16 @@
 <template>
-  <vmodal
+  <Vmodal
     :model-value="modelValue"
-    @update:model-value="handleClose"
     title="Qo'shish"
     subtitle="Tanlangan vaqtga yangi dars jadvalini kiritish"
     icon="solar:add-circle-bold"
     icon-bg-class="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary"
     width="max-w-xl"
     :hide-button="true"
+    @update:model-value="handleClose"
   >
     <template #body>
-      <form @submit.prevent="handleSave" class="space-y-4 text-left p-1 font-lexend">
+      <form class="space-y-4 text-left p-1 font-lexend" @submit.prevent="handleSave">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <!-- 1. Dars sanasi (Disabled: dars jadvali katakchasiga qat'iy biriktirilgan) -->
           <div class="space-y-1.5">
@@ -184,21 +184,20 @@
 
     <template #footer>
       <div class="flex items-center justify-end gap-2.5 w-full">
-        <AppButton variant="secondary" @click="handleClose">
-          Bekor qilish
-        </AppButton>
+        <AppButton variant="secondary" @click="handleClose"> Bekor qilish </AppButton>
         <AppButton variant="primary" icon="solar:check-circle-bold" @click="handleSave">
           Saqlash
         </AppButton>
       </div>
     </template>
-  </vmodal>
+  </Vmodal>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import vmodal from "@/components/modal.vue";
-import AppButton from "@/components/AppButton.vue";
+
+import AppButton from "@/components/common/AppButton.vue";
+import vmodal from "@/components/common/AppModal.vue";
 
 export default {
   name: "ClassLessonAddModal",

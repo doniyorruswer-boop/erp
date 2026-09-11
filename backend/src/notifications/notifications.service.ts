@@ -1,18 +1,18 @@
-import { Injectable, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { NotificationChannel, NotificationStatus } from '@prisma/client';
-import { InAppProvider } from './providers/in-app.provider';
-import { TelegramProvider } from './providers/telegram.provider';
-import { EmailProvider } from './providers/email.provider';
-import { SmsProvider } from './providers/sms.provider';
-import { NotificationProvider } from './providers/notification-provider.interface';
+import { Injectable, NotFoundException, Logger, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { NotificationChannel, NotificationStatus, Prisma } from "@prisma/client";
+import { InAppProvider } from "./providers/in-app.provider";
+import { TelegramProvider } from "./providers/telegram.provider";
+import { EmailProvider } from "./providers/email.provider";
+import { SmsProvider } from "./providers/sms.provider";
+import { NotificationProvider } from "./providers/notification-provider.interface";
 import {
   SendNotificationDto,
   SendEventNotificationDto,
   QueryNotificationDto,
   CreateNotificationTemplateDto,
   UpdateNotificationTemplateDto,
-} from './dto/notification.dto';
+} from "./dto/notification.dto";
 
 @Injectable()
 export class NotificationsService {
@@ -24,7 +24,7 @@ export class NotificationsService {
     private inAppProvider: InAppProvider,
     private telegramProvider: TelegramProvider,
     private emailProvider: EmailProvider,
-    private smsProvider: SmsProvider,
+    private smsProvider: SmsProvider
   ) {
     this.providers = new Map<NotificationChannel, NotificationProvider>([
       [NotificationChannel.IN_APP, inAppProvider],
@@ -34,10 +34,10 @@ export class NotificationsService {
     ]);
   }
 
-  private interpolate(template: string, variables: Record<string, any>): string {
+  private interpolate(template: string, variables: Record<string, unknown>): string {
     let result = template;
     for (const [key, value] of Object.entries(variables || {})) {
-      result = result.replace(new RegExp(`{{\\s*${key}\\s*}}`, 'g'), String(value));
+      result = result.replace(new RegExp(`{{\\s*${key}\\s*}}`, "g"), String(value));
     }
     return result;
   }
@@ -66,10 +66,12 @@ export class NotificationsService {
       },
     };
 
-    return defaults[event] || {
-      title: 'Tizim bildirishnomasi',
-      body: 'Siz uchun yangi bildirishnoma mavjud.',
-    };
+    return (
+      defaults[event] || {
+        title: "Tizim bildirishnomasi",
+        body: "Siz uchun yangi bildirishnoma mavjud.",
+      }
+    );
   }
 
   async send(data: SendNotificationDto, orgId: string) {
@@ -85,21 +87,26 @@ export class NotificationsService {
       const user = await this.prisma.user.findFirst({
         where: { id: data.userId, organizationId: orgId, deletedAt: null },
       });
-      if (!user) throw new BadRequestException('Foydalanuvchi topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!user)
+        throw new BadRequestException(
+          "Foydalanuvchi topilmadi yoki ushbu tashkilotga tegishli emas"
+        );
     }
 
     if (data.studentId) {
       const student = await this.prisma.student.findFirst({
         where: { id: data.studentId, organizationId: orgId, deletedAt: null },
       });
-      if (!student) throw new BadRequestException('Talaba topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!student)
+        throw new BadRequestException("Talaba topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     if (data.customerId) {
       const customer = await this.prisma.customer.findFirst({
         where: { id: data.customerId, organizationId: orgId, deletedAt: null },
       });
-      if (!customer) throw new BadRequestException('Mijoz topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!customer)
+        throw new BadRequestException("Mijoz topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     // 1. Create Notification record
@@ -144,8 +151,12 @@ export class NotificationsService {
         channel,
         status,
         recipient: data.recipient,
-        payload: { title: data.title, body: data.body, metadata: data.metadata } as any,
-        response: result.response as any,
+        payload: {
+          title: data.title,
+          body: data.body,
+          metadata: data.metadata,
+        } as unknown as Prisma.InputJsonValue,
+        response: (result.response || {}) as unknown as Prisma.InputJsonValue,
         error: result.error || null,
       },
     });
@@ -154,9 +165,10 @@ export class NotificationsService {
   }
 
   async sendEvent(data: SendEventNotificationDto, orgId: string) {
-    const channels = data.channels && data.channels.length > 0
-      ? data.channels
-      : [NotificationChannel.IN_APP, NotificationChannel.TELEGRAM];
+    const channels =
+      data.channels && data.channels.length > 0
+        ? data.channels
+        : [NotificationChannel.IN_APP, NotificationChannel.TELEGRAM];
 
     const results = [];
 
@@ -191,7 +203,7 @@ export class NotificationsService {
           customerId: data.customerId,
           metadata: data.variables,
         },
-        orgId,
+        orgId
       );
 
       results.push(sendRes);
@@ -216,9 +228,9 @@ export class NotificationsService {
           studentId: query?.studentId,
         },
         include: {
-          logs: { take: 1, orderBy: { createdAt: 'desc' } },
+          logs: { take: 1, orderBy: { createdAt: "desc" } },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 50,
       }),
       this.prisma.notification.count({
@@ -242,7 +254,7 @@ export class NotificationsService {
     const notif = await this.prisma.notification.findFirst({
       where: { id, organizationId: orgId, deletedAt: null },
     });
-    if (!notif) throw new NotFoundException('Bildirishnoma topilmadi');
+    if (!notif) throw new NotFoundException("Bildirishnoma topilmadi");
 
     return this.prisma.notification.update({
       where: { id },
@@ -272,7 +284,7 @@ export class NotificationsService {
   async getTemplates(orgId: string) {
     return this.prisma.notificationTemplate.findMany({
       where: { organizationId: orgId, deletedAt: null },
-      orderBy: { code: 'asc' },
+      orderBy: { code: "asc" },
     });
   }
 
@@ -290,7 +302,7 @@ export class NotificationsService {
     const existing = await this.prisma.notificationTemplate.findFirst({
       where: { id, organizationId: orgId },
     });
-    if (!existing) throw new NotFoundException('Shablon topilmadi');
+    if (!existing) throw new NotFoundException("Shablon topilmadi");
 
     return this.prisma.notificationTemplate.update({
       where: { id },
@@ -302,7 +314,7 @@ export class NotificationsService {
     const existing = await this.prisma.notificationTemplate.findFirst({
       where: { id, organizationId: orgId },
     });
-    if (!existing) throw new NotFoundException('Shablon topilmadi');
+    if (!existing) throw new NotFoundException("Shablon topilmadi");
 
     return this.prisma.notificationTemplate.update({
       where: { id },

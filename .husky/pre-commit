@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+
+echo "=================================================="
+echo "🛡️  [EduHub Pre-Commit] Running Automated Quality Gates..."
+echo "=================================================="
+
+# 1 & 2. Run lint-staged (ESLint & Prettier on staged files)
+echo "📋 [1/4 & 2/4] Running ESLint & Prettier on staged files..."
+npx lint-staged || {
+  echo "❌ ESLint / Prettier check failed! Broken code cannot be committed."
+  exit 1
+}
+
+# 3. TypeScript Typecheck
+echo "⚡ [3/4] Running TypeScript check (strict: true)..."
+npm run typecheck || {
+  echo "❌ TypeScript check failed! Type errors cannot be committed."
+  exit 1
+}
+
+# 4. Dependency Check (Circular dependencies and loops)
+echo "🔄 [4/4] Running circular dependency check (madge)..."
+npm run dependency-check || {
+  echo "❌ Circular dependency detected! Dependency loops cannot be committed."
+  exit 1
+}
+
+echo "=================================================="
+echo "✅ [EduHub Pre-Commit] All 4 quality gates passed! Commit approved."
+echo "=================================================="

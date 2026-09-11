@@ -56,9 +56,9 @@
           <!-- Ko'rish (solar:eye-linear) -->
           <button
             type="button"
-            @click.stop="$emit('view')"
             class="w-7 h-7 rounded-lg inline-flex items-center justify-center bg-blue-50/90 text-blue-600 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800 transition cursor-pointer shadow-2xs active:scale-95"
             title="Ko'rish va Davomat"
+            @click.stop="$emit('view')"
           >
             <Icon icon="solar:eye-linear" class="text-base" />
           </button>
@@ -66,9 +66,9 @@
           <!-- Tahrirlash (solar:pen-new-square-linear) -->
           <button
             type="button"
-            @click.stop="$emit('edit')"
             class="w-7 h-7 rounded-lg inline-flex items-center justify-center bg-primary/10 text-primary hover:bg-primary/20 dark:bg-primary/20 dark:text-primary border border-primary/30 transition cursor-pointer shadow-2xs active:scale-95"
             title="Tahrirlash"
+            @click.stop="$emit('edit')"
           >
             <Icon icon="solar:pen-new-square-linear" class="text-base" />
           </button>
@@ -76,9 +76,9 @@
           <!-- O'chirish (solar:trash-bin-trash-linear) -->
           <button
             type="button"
-            @click.stop="$emit('delete')"
             class="w-7 h-7 rounded-lg inline-flex items-center justify-center bg-rose-50/90 text-rose-600 hover:bg-rose-100 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition cursor-pointer shadow-2xs active:scale-95"
             title="Darsni o'chirish"
+            @click.stop="$emit('delete')"
           >
             <Icon icon="solar:trash-bin-trash-linear" class="text-base" />
           </button>

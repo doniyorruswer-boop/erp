@@ -1,5 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsArray, IsObject } from 'class-validator';
-import { BusinessType } from '@prisma/client';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsArray, IsObject } from "class-validator";
+import { BusinessType } from "@prisma/client";
 
 export class InitializeSetupDto {
   @IsString()
@@ -36,15 +36,35 @@ export class InitializeSetupDto {
 
   @IsObject()
   @IsOptional()
-  features?: Record<string, any>;
+  features?: Record<string, unknown>;
 
   @IsObject()
   @IsOptional()
-  terminology?: Record<string, any>;
+  terminology?: Record<string, unknown>;
 
   @IsObject()
   @IsOptional()
-  integrations?: Record<string, any>;
+  integrations?: Record<string, unknown>;
+
+  @IsString()
+  @IsOptional()
+  adminFirstName?: string;
+
+  @IsString()
+  @IsOptional()
+  adminLastName?: string;
+
+  @IsString()
+  @IsOptional()
+  adminEmail?: string;
+
+  @IsString()
+  @IsOptional()
+  adminPhone?: string;
+
+  @IsString()
+  @IsOptional()
+  adminPassword?: string;
 }
 
 export class UpdateConfigDto {
@@ -58,13 +78,13 @@ export class UpdateConfigDto {
 
   @IsObject()
   @IsOptional()
-  features?: Record<string, any>;
+  features?: Record<string, unknown>;
 
   @IsObject()
   @IsOptional()
-  terminology?: Record<string, any>;
+  terminology?: Record<string, unknown>;
 
   @IsObject()
   @IsOptional()
-  integrations?: Record<string, any>;
+  integrations?: Record<string, unknown>;
 }

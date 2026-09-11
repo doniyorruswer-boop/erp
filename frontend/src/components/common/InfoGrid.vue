@@ -1,8 +1,16 @@
 <template>
-  <div class="info-grid bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-5 shadow-sm">
-    <div v-if="title || $slots.headerAction" class="flex items-center justify-between pb-4 mb-4 border-b dark:border-gray-700">
+  <div
+    class="info-grid bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-5 shadow-sm"
+  >
+    <div
+      v-if="title || $slots.headerAction"
+      class="flex items-center justify-between pb-4 mb-4 border-b dark:border-gray-700"
+    >
       <div class="flex items-center gap-2.5">
-        <div v-if="icon" class="p-2 rounded-lg bg-primary/10 text-primary text-xl flex items-center justify-center">
+        <div
+          v-if="icon"
+          class="p-2 rounded-lg bg-primary/10 text-primary text-xl flex items-center justify-center"
+        >
           <Icon :icon="icon" />
         </div>
         <div>
@@ -26,7 +34,7 @@
         </span>
         <span class="text-sm font-semibold text-gray-800 dark:text-gray-100 break-words">
           <slot :name="`item-${item.key}`" :item="item">
-            {{ item.value || '-' }}
+            {{ item.value || "-" }}
           </slot>
         </span>
       </div>

@@ -9,25 +9,28 @@
         <input
           type="checkbox"
           :checked="isAllSelected"
-          @change="$emit('toggle-select-all')"
           class="w-4 h-4 rounded text-primary focus:ring-primary border-gray-300 cursor-pointer"
+          @change="$emit('toggle-select-all')"
         />
-        <span>Barcha o'quvchilarni tanlash ({{ selectedStudentIds.length }} / {{ totalStudents }})</span>
+        <span
+          >Barcha o'quvchilarni tanlash ({{ selectedStudentIds.length }} /
+          {{ totalStudents }})</span
+        >
       </div>
       <div class="flex items-center gap-2">
         <button
           type="button"
           :disabled="selectedStudentIds.length === 0"
-          @click="$emit('bulk-action', 'transfer')"
           class="px-3.5 py-1.5 bg-white dark:bg-gray-800 border rounded-lg font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 disabled:opacity-50 text-sm cursor-pointer"
+          @click="$emit('bulk-action', 'transfer')"
         >
           Boshqa sinfga ko'chirish
         </button>
         <button
           type="button"
           :disabled="selectedStudentIds.length === 0"
-          @click="$emit('bulk-action', 'payment-sheet')"
           class="px-3.5 py-1.5 bg-white dark:bg-gray-800 border rounded-lg font-semibold text-emerald-600 hover:bg-emerald-50 disabled:opacity-50 text-sm cursor-pointer"
+          @click="$emit('bulk-action', 'payment-sheet')"
         >
           To'lov varaqasini chiqarish
         </button>
@@ -40,8 +43,6 @@
       :data="students"
       :selectable="isBulkTableMode"
       :model-value="selectedStudentIds"
-      @row-select="(key) => $emit('toggle-select', key)"
-      @select-all="() => $emit('toggle-select-all')"
       :show-index="true"
       index-label="#"
       :per-page="perPage"
@@ -50,15 +51,13 @@
       empty-text="Filtr bo'yicha hech qanday o'quvchi topilmadi."
       empty-description="Iltimos, filtrlarni o'zgartiring yoki tozalash tugmasini bosing."
       row-class="cursor-pointer group hover:bg-primary/[0.03]"
+      @row-select="(key) => $emit('toggle-select', key)"
+      @select-all="() => $emit('toggle-select-all')"
       @row-click="$emit('student-click', $event)"
     >
       <!-- FISH va ID (Universal AppUserCell - 1-rasm standarti) -->
       <template #cell(fullName)="{ row: st }">
-        <AppUserCell
-          :name="st.fullName"
-          :image="st.avatar"
-          :subtitle="'ID: ' + st.studentId"
-        />
+        <AppUserCell :name="st.fullName" :image="st.avatar" :subtitle="'ID: ' + st.studentId" />
       </template>
 
       <!-- PASPORT / GUVOHNOMA va JSHSHIR (Universal AppDocCell) -->
@@ -96,7 +95,9 @@
             {{ st.classType }}
           </div>
           <div class="mt-1">
-            <span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+            <span
+              class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
+            >
               {{ st.language }}
             </span>
           </div>
@@ -115,7 +116,10 @@
 
       <!-- QABUL BUYRUG'I va Sanasi -->
       <template #cell(orderNumber)="{ row: st }">
-        <div class="font-medium text-gray-800 dark:text-gray-200 text-xs truncate max-w-[170px]" :title="st.orderNumber">
+        <div
+          class="font-medium text-gray-800 dark:text-gray-200 text-xs truncate max-w-[170px]"
+          :title="st.orderNumber"
+        >
           {{ st.orderNumber }}
         </div>
         <div class="text-xs text-gray-400 font-medium mt-0.5">
@@ -126,7 +130,10 @@
       <!-- Amallar (O'ng strelka) -->
       <template #actions>
         <div class="text-center text-gray-400 group-hover:text-primary transition-colors">
-          <Icon icon="solar:alt-arrow-right-linear" class="text-lg transform group-hover:translate-x-0.5 transition-transform" />
+          <Icon
+            icon="solar:alt-arrow-right-linear"
+            class="text-lg transform group-hover:translate-x-0.5 transition-transform"
+          />
         </div>
       </template>
     </AppTable>
@@ -134,18 +141,19 @@
     <!-- Jadval pastki qatori va Paginatsiya (AppPagination orqali) -->
     <AppPagination
       :model-value="currentPage"
-      @update:model-value="$emit('update:currentPage', $event)"
       :total-items="totalStudents"
       :per-page="perPage"
       item-label="o'quvchi"
+      @update:model-value="$emit('update:currentPage', $event)"
     />
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import AppTable from "@/components/AppTable.vue";
-import AppPagination from "@/components/AppPagination.vue";
+
+import AppPagination from "@/components/common/AppPagination.vue";
+import AppTable from "@/components/common/AppTable.vue";
 
 export default {
   name: "SchoolClassStudentsTable",
@@ -184,28 +192,6 @@ export default {
       default: 10,
     },
   },
-  data() {
-    return {
-      tableColumns: [
-        { key: "fullName", label: "FISH", thClass: "py-3.5 px-4 min-w-[210px]" },
-        { key: "passport", label: "PASPORT / GUVOHNOMA", thClass: "py-3.5 px-4 min-w-[180px]" },
-        { key: "birthDate", label: "TUG'ILGAN SANA", thClass: "py-3.5 px-4 min-w-[140px]" },
-        { key: "parentName", label: "OTA-ONA / VASIY", thClass: "py-3.5 px-4 min-w-[180px]" },
-        { key: "className", label: "SINF", align: "center", thClass: "py-3.5 px-4 text-center min-w-[110px]" },
-        { key: "classType", label: "SINF TURI", align: "center", thClass: "py-3.5 px-4 text-center min-w-[130px]" },
-        { key: "shift", label: "SMENA", thClass: "py-3.5 px-4 min-w-[150px]" },
-        { key: "orderNumber", label: "QABUL BUYRUG'I", thClass: "py-3.5 px-4 min-w-[180px]" },
-      ],
-    };
-  },
-  computed: {
-    isAllSelected() {
-      return (
-        this.totalStudents > 0 &&
-        this.selectedStudentIds.length === this.totalStudents
-      );
-    },
-  },
   emits: [
     "toggle-select",
     "toggle-select-all",
@@ -213,5 +199,34 @@ export default {
     "update:currentPage",
     "bulk-action",
   ],
+  data() {
+    return {
+      tableColumns: [
+        { key: "fullName", label: "FISH", thClass: "py-3.5 px-4 min-w-[210px]" },
+        { key: "passport", label: "PASPORT / GUVOHNOMA", thClass: "py-3.5 px-4 min-w-[180px]" },
+        { key: "birthDate", label: "TUG'ILGAN SANA", thClass: "py-3.5 px-4 min-w-[140px]" },
+        { key: "parentName", label: "OTA-ONA / VASIY", thClass: "py-3.5 px-4 min-w-[180px]" },
+        {
+          key: "className",
+          label: "SINF",
+          align: "center",
+          thClass: "py-3.5 px-4 text-center min-w-[110px]",
+        },
+        {
+          key: "classType",
+          label: "SINF TURI",
+          align: "center",
+          thClass: "py-3.5 px-4 text-center min-w-[130px]",
+        },
+        { key: "shift", label: "SMENA", thClass: "py-3.5 px-4 min-w-[150px]" },
+        { key: "orderNumber", label: "QABUL BUYRUG'I", thClass: "py-3.5 px-4 min-w-[180px]" },
+      ],
+    };
+  },
+  computed: {
+    isAllSelected() {
+      return this.totalStudents > 0 && this.selectedStudentIds.length === this.totalStudents;
+    },
+  },
 };
 </script>

@@ -2,10 +2,7 @@
   <div class="school-classes-page p-4 font-lexend space-y-4">
     <!-- 1. Breadcrumb -->
     <Breadcrumb
-      :items="[
-        { title: 'Ta\'lim', to: '/school/classes' },
-        { title: tenantStore.classesLabel }
-      ]"
+      :items="[{ title: 'Ta\'lim', to: '/school/classes' }, { title: tenantStore.classesLabel }]"
     />
 
     <!-- 2. Header Section (Sinflar sarlavhasi, ta'rifi va amallar tugmalari) -->
@@ -13,7 +10,11 @@
       <div>
         <div class="flex items-center gap-3">
           <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">
-            {{ viewMode === 'archived' ? 'Arxivlangan ' + tenantStore.classesLabel.toLowerCase() : tenantStore.classesLabel }}
+            {{
+              viewMode === "archived"
+                ? "Arxivlangan " + tenantStore.classesLabel.toLowerCase()
+                : tenantStore.classesLabel
+            }}
           </h1>
           <span
             v-if="viewMode === 'archived'"
@@ -22,7 +23,6 @@
             Arxiv rejimi
           </span>
         </div>
-        
       </div>
 
       <!-- O'ng tomondagi tugmalar (Kanban AppButton komponenti bilan) -->
@@ -33,7 +33,9 @@
           :icon="viewMode === 'archived' ? 'solar:arrow-left-linear' : 'solar:archive-linear'"
           @click="toggleArchiveView"
         >
-          {{ viewMode === 'archived' ? 'Faol sinflarga qaytish' : `Arxiv (${archivedList.length})` }}
+          {{
+            viewMode === "archived" ? "Faol sinflarga qaytish" : `Arxiv (${archivedList.length})`
+          }}
         </AppButton>
 
         <!-- Ommaviy amallar tugmasi -->
@@ -43,7 +45,7 @@
           :icon="isBulkMode ? 'solar:close-circle-bold' : 'solar:check-square-linear'"
           @click="toggleBulkMode"
         >
-          {{ isBulkMode ? 'Ommaviyni yopish' : 'Ommaviy' }}
+          {{ isBulkMode ? "Ommaviyni yopish" : "Ommaviy" }}
         </AppButton>
 
         <!-- Yangi sinf ochish tugmasi: CRM Primary rangi -->
@@ -60,22 +62,30 @@
     </div>
 
     <!-- Ommaviy Tanlov Boshqaruv Paneli (Kattalashtirilgan va qulay qilingan) -->
-    <transition enter-active-class="transition duration-200 ease-out" enter-from-class="transform -translate-y-2 opacity-0" enter-to-class="transform translate-y-0 opacity-100">
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="transform -translate-y-2 opacity-0"
+      enter-to-class="transform translate-y-0 opacity-100"
+    >
       <div
         v-if="isBulkMode && viewMode === 'active'"
         class="bg-indigo-50/95 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/70 rounded-2xl p-4 sm:p-5 flex items-center justify-between flex-wrap gap-4 shadow-sm"
       >
         <div class="flex items-center gap-3.5">
-          <label class="flex items-center gap-3 text-sm sm:text-base font-bold text-indigo-950 dark:text-indigo-100 cursor-pointer select-none">
+          <label
+            class="flex items-center gap-3 text-sm sm:text-base font-bold text-indigo-950 dark:text-indigo-100 cursor-pointer select-none"
+          >
             <input
               type="checkbox"
               :checked="isAllSelected"
-              @change="toggleSelectAll"
               class="w-5 h-5 rounded-md text-primary focus:ring-primary/30 border-gray-300 dark:border-gray-600 cursor-pointer accent-primary"
+              @change="toggleSelectAll"
             />
             <span>Barchasini tanlash ({{ currentList.length }})</span>
           </label>
-          <span class="text-xs sm:text-sm bg-indigo-200/80 dark:bg-indigo-800/80 text-indigo-900 dark:text-indigo-100 font-bold px-3 py-1 rounded-full shadow-2xs">
+          <span
+            class="text-xs sm:text-sm bg-indigo-200/80 dark:bg-indigo-800/80 text-indigo-900 dark:text-indigo-100 font-bold px-3 py-1 rounded-full shadow-2xs"
+          >
             {{ selectedIds.length }} ta tanlandi
           </span>
         </div>
@@ -112,39 +122,57 @@
           </AppButton>
         </div>
       </div>
-    </transition>
+    </Transition>
 
     <!-- Bo'sh holat (agar sinflar ro'yxati bo'sh bo'lsa) -->
     <div
       v-if="currentList.length === 0"
       class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-12 text-center space-y-3"
     >
-      <div class="w-14 h-14 mx-auto rounded-full bg-gray-100 dark:bg-gray-700/60 flex items-center justify-center text-gray-400">
-        <Icon :icon="viewMode === 'archived' ? 'solar:archive-linear' : 'solar:users-group-two-rounded-bold'" class="text-3xl" />
+      <div
+        class="w-14 h-14 mx-auto rounded-full bg-gray-100 dark:bg-gray-700/60 flex items-center justify-center text-gray-400"
+      >
+        <Icon
+          :icon="
+            viewMode === 'archived' ? 'solar:archive-linear' : 'solar:users-group-two-rounded-bold'
+          "
+          class="text-3xl"
+        />
       </div>
       <h3 class="text-base font-bold text-gray-800 dark:text-gray-200">
-        {{ viewMode === 'archived' ? 'Arxivlangan ' + tenantStore.classesLabel.toLowerCase() + ' mavjud emas' : 'Hozircha birorta ham ' + tenantStore.classLabel.toLowerCase() + ' mavjud emas' }}
+        {{
+          viewMode === "archived"
+            ? "Arxivlangan " + tenantStore.classesLabel.toLowerCase() + " mavjud emas"
+            : "Hozircha birorta ham " + tenantStore.classLabel.toLowerCase() + " mavjud emas"
+        }}
       </h3>
       <p class="text-xs text-gray-400 max-w-sm mx-auto">
-        {{ viewMode === 'archived' ? 'Arxivlangan ' + tenantStore.classesLabel.toLowerCase() + ' shu yerda saqlanadi va istalgan vaqtda qayta tiklanishi mumkin.' : 'Yangi ' + tenantStore.classLabel.toLowerCase() + ' qo\'shish uchun yuqoridagi \'' + tenantStore.newClassButtonLabel + '\' tugmasini bosing.' }}
+        {{
+          viewMode === "archived"
+            ? "Arxivlangan " +
+              tenantStore.classesLabel.toLowerCase() +
+              " shu yerda saqlanadi va istalgan vaqtda qayta tiklanishi mumkin."
+            : "Yangi " +
+              tenantStore.classLabel.toLowerCase() +
+              " qo'shish uchun yuqoridagi '" +
+              tenantStore.newClassButtonLabel +
+              "' tugmasini bosing."
+        }}
       </p>
     </div>
 
     <!-- 3. Sinflar Kartochkalari Gridi (4 ta ustun - Rasm namunasidagi 18 ta sinf) -->
-    <div
-      v-else
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-    >
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       <div
         v-for="cls in currentList"
         :key="cls.id"
-        @click="handleCardClick(cls)"
         :class="[
           'bg-white dark:bg-gray-800 border rounded-xl p-4 sm:p-5 transition-all cursor-pointer flex flex-col justify-between group shadow-2xs relative select-none',
           selectedIds.includes(cls.id)
             ? 'border-primary ring-2 ring-primary/30 bg-primary/[0.02]'
-            : 'border-gray-200 dark:border-gray-700 hover:border-primary/60 dark:hover:border-primary/60 hover:shadow-md'
+            : 'border-gray-200 dark:border-gray-700 hover:border-primary/60 dark:hover:border-primary/60 hover:shadow-md',
         ]"
+        @click="handleCardClick(cls)"
       >
         <div>
           <!-- Yuqori qator: Sinf nomi va Sig'imi (28/25) -->
@@ -155,15 +183,21 @@
                 v-if="isBulkMode"
                 type="checkbox"
                 :checked="selectedIds.includes(cls.id)"
-                @click.stop="toggleSelect(cls.id)"
                 class="w-5 h-5 mt-0.5 rounded-md text-primary focus:ring-primary border-gray-300 shrink-0 cursor-pointer accent-primary"
+                @click.stop="toggleSelect(cls.id)"
               />
               <div class="min-w-0">
-                <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors truncate">
+                <h3
+                  class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors truncate"
+                >
                   {{ cls.name }}
                 </h3>
                 <p class="text-xs text-gray-400 dark:text-gray-500 font-medium mt-0.5">
-                  {{ cls.academicYear }} · {{ cls.stageLabel || (tenantStore.isSchool ? cls.parallel + '-bosqich' : cls.parallel) }}
+                  {{ cls.academicYear }} ·
+                  {{
+                    cls.stageLabel ||
+                    (tenantStore.isSchool ? cls.parallel + "-bosqich" : cls.parallel)
+                  }}
                 </p>
               </div>
             </div>
@@ -175,8 +209,8 @@
                 cls.studentsCount === 0
                   ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25'
                   : cls.studentsCount >= cls.capacity
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
-                  : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25'
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25'
+                    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25',
               ]"
             >
               <Icon icon="solar:users-group-two-rounded-bold" class="text-sm" />
@@ -210,8 +244,13 @@
         </div>
 
         <!-- Pastki qator: Ustoz yoki Arxiv amallari -->
-        <div class="mt-4 pt-2.5 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between gap-2 text-xs">
-          <div v-if="cls.teacherName" class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 min-w-0">
+        <div
+          class="mt-4 pt-2.5 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between gap-2 text-xs"
+        >
+          <div
+            v-if="cls.teacherName"
+            class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 min-w-0"
+          >
             <Icon icon="solar:square-academic-cap-bold" class="text-sm text-primary shrink-0" />
             <span class="truncate font-medium">{{ cls.teacherName }}</span>
           </div>
@@ -220,109 +259,135 @@
           </div>
 
           <!-- Arxiv rejimida qayta tiklash tugmasi -->
-          <div v-if="viewMode === 'archived'" class="flex items-center gap-1.5 shrink-0" @click.stop>
+          <div
+            v-if="viewMode === 'archived'"
+            class="flex items-center gap-1.5 shrink-0"
+            @click.stop
+          >
             <button
               type="button"
-              @click="restoreClass(cls.id)"
               class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-400 text-[11px] font-bold border border-emerald-200 dark:border-emerald-800 transition"
               title="Faol sinflar ro'yxatiga qaytarish"
+              @click="restoreClass(cls.id)"
             >
               Qayta tiklash
             </button>
           </div>
 
           <!-- Faol rejimda tezkor amallar (faqat ommaviy rejim bo'lmaganda) -->
-          <div v-else-if="!isBulkMode" class="flex items-center gap-1 shrink-0 text-gray-400 group-hover:text-primary transition-colors">
+          <div
+            v-else-if="!isBulkMode"
+            class="flex items-center gap-1 shrink-0 text-gray-400 group-hover:text-primary transition-colors"
+          >
             <span class="text-[11px] font-medium hidden group-hover:inline">Ko'rish</span>
-            <Icon icon="solar:arrow-right-linear" class="text-sm transform group-hover:translate-x-0.5 transition-transform" />
+            <Icon
+              icon="solar:arrow-right-linear"
+              class="text-sm transform group-hover:translate-x-0.5 transition-transform"
+            />
           </div>
         </div>
       </div>
     </div>
 
     <!-- 4. Pastki ko'rsatkich satri -->
-    <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium py-3 border-t border-gray-200 dark:border-gray-700/80">
-      <span>Ko'rsatilgan: {{ currentList.length }} ta {{ tenantStore.classLabel.toLowerCase() }}</span>
+    <div
+      class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium py-3 border-t border-gray-200 dark:border-gray-700/80"
+    >
+      <span
+        >Ko'rsatilgan: {{ currentList.length }} ta {{ tenantStore.classLabel.toLowerCase() }}</span
+      >
       <span class="text-[11px] text-gray-400">EduCRM Ta'lim Moduli</span>
     </div>
 
-        <!-- 5. Yangi sinf/guruh qo'shish modali (EduCRM Standard Modal) -->
-    <CreateClassModal
-      v-model="showAddModal"
-      @created="handleClassCreated"
-    />
+    <!-- 5. Yangi sinf/guruh qo'shish modali (EduCRM Standard Modal) -->
+    <CreateClassModal v-model="showAddModal" @created="handleClassCreated" />
 
     <!-- Confirm Delete Modal (Aynan Kanban'dagi vmodal) -->
-    <vmodal
+    <Vmodal
       ref="deleteConfirmModal"
-      :hideButton="true"
+      :hide-button="true"
       :title="`${tenantStore.classLabel}ni o'chirish`"
       subtitle="O'chirishni tasdiqlang"
-      btnTextSubmit="Tasdiqlash va O'chirish"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-red-600"
+      btn-text-submit="Tasdiqlash va O'chirish"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-red-600"
       @submit="executeBulkDelete"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:trash-bin-trash-bold" class="text-3xl text-red-500 mb-2" />
       </template>
-      <template v-slot:body>
+      <template #body>
         <div class="space-y-3.5 text-xs text-left">
-          <div class="p-3.5 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-200">
+          <div
+            class="p-3.5 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-900 dark:text-red-200"
+          >
             <p class="font-bold text-sm leading-snug">
-              {{ selectedIds.length > 1 ? `Tanlangan ${selectedIds.length} ta ${tenantStore.classLabel.toLowerCase()}ni o'chirishni tasdiqlaysizmi?` : `Tanlangan ${tenantStore.classLabel.toLowerCase()}ni o'chirishni tasdiqlaysizmi?` }}
+              {{
+                selectedIds.length > 1
+                  ? `Tanlangan ${selectedIds.length} ta ${tenantStore.classLabel.toLowerCase()}ni o'chirishni tasdiqlaysizmi?`
+                  : `Tanlangan ${tenantStore.classLabel.toLowerCase()}ni o'chirishni tasdiqlaysizmi?`
+              }}
             </p>
             <p class="mt-1 text-gray-500 dark:text-gray-400">
-              Iltimos, e'tiborli bo'ling. Ushbu amalni ortga qaytarib bo'lmaydi va unga tegishli barcha ma'lumotlar o'chiriladi.
+              Iltimos, e'tiborli bo'ling. Ushbu amalni ortga qaytarib bo'lmaydi va unga tegishli
+              barcha ma'lumotlar o'chiriladi.
             </p>
           </div>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- Confirm Archive Modal (Kanban uslubidagi vmodal) -->
-    <vmodal
+    <Vmodal
       ref="archiveConfirmModal"
-      :hideButton="true"
+      :hide-button="true"
       title="Arxivga o'tkazish"
       subtitle="Tanlangan elementlarni arxivga o'tkazish"
-      btnTextSubmit="Tasdiqlash va Arxivlash"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-primary"
+      btn-text-submit="Tasdiqlash va Arxivlash"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-primary"
       @submit="executeBulkArchive"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:archive-bold" class="text-3xl text-primary mb-2" />
       </template>
-      <template v-slot:body>
+      <template #body>
         <div class="space-y-3.5 text-xs text-left">
-          <div class="p-3.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200">
+          <div
+            class="p-3.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200"
+          >
             <p class="font-bold text-sm leading-snug">
-              {{ selectedIds.length > 1 ? `Tanlangan ${selectedIds.length} ta ${tenantStore.classLabel.toLowerCase()}ni arxivga o'tkazishni tasdiqlaysizmi?` : `Tanlangan ${tenantStore.classLabel.toLowerCase()}ni arxivga o'tkazishni tasdiqlaysizmi?` }}
+              {{
+                selectedIds.length > 1
+                  ? `Tanlangan ${selectedIds.length} ta ${tenantStore.classLabel.toLowerCase()}ni arxivga o'tkazishni tasdiqlaysizmi?`
+                  : `Tanlangan ${tenantStore.classLabel.toLowerCase()}ni arxivga o'tkazishni tasdiqlaysizmi?`
+              }}
             </p>
             <p class="mt-1 text-gray-500 dark:text-gray-400">
-              Tanlangan elementlar arxivga o'tkaziladi. Istalgan vaqtda ularni arxivdan qayta tiklashingiz mumkin.
+              Tanlangan elementlar arxivga o'tkaziladi. Istalgan vaqtda ularni arxivdan qayta
+              tiklashingiz mumkin.
             </p>
           </div>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import CreateClassModal from "@/components/school/CreateClassModal.vue";
-import vmodal from "@/components/modal.vue";
-import { toast } from "@/utils/toast";
-import { useTenantStore } from "@/store/tenant";
+
 import {
-  loadSchoolClasses,
-  saveSchoolClasses,
   loadArchivedClasses,
+  loadSchoolClasses,
   saveArchivedClasses,
+  saveSchoolClasses,
 } from "@/api/schoolClassesData";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import vmodal from "@/components/common/AppModal.vue";
+import CreateClassModal from "@/components/school/CreateClassModal.vue";
+import { useTenantStore } from "@/store/tenant";
+import { toast } from "@/utils/toast";
 
 export default {
   name: "SchoolClassesView",
@@ -346,6 +411,14 @@ export default {
       archivedList: [],
     };
   },
+  computed: {
+    currentList() {
+      return this.viewMode === "archived" ? this.archivedList : this.classList;
+    },
+    isAllSelected() {
+      return this.currentList.length > 0 && this.selectedIds.length === this.currentList.length;
+    },
+  },
   watch: {
     "tenantStore.businessType": {
       immediate: true,
@@ -354,17 +427,6 @@ export default {
         this.archivedList = loadArchivedClasses(newType);
         this.selectedIds = [];
       },
-    },
-  },
-  computed: {
-    currentList() {
-      return this.viewMode === "archived" ? this.archivedList : this.classList;
-    },
-    isAllSelected() {
-      return (
-        this.currentList.length > 0 &&
-        this.selectedIds.length === this.currentList.length
-      );
     },
   },
   methods: {
@@ -429,7 +491,9 @@ export default {
     },
     bulkExport() {
       if (this.selectedIds.length === 0) return;
-      toast.info(`${this.selectedIds.length} ta ${this.tenantStore.classLabel.toLowerCase()} ma'lumotlari Excel formatida tayyorlanmoqda...`);
+      toast.info(
+        `${this.selectedIds.length} ta ${this.tenantStore.classLabel.toLowerCase()} ma'lumotlari Excel formatida tayyorlanmoqda...`
+      );
       setTimeout(() => {
         toast.success("Excel fayl muvaffaqiyatli yuklab olindi!");
       }, 1000);
@@ -459,7 +523,9 @@ export default {
         this.classList.push(cls);
         saveSchoolClasses(this.classList, this.tenantStore.businessType);
         saveArchivedClasses(this.archivedList, this.tenantStore.businessType);
-        toast.success(`"${cls.name}" faol ${this.tenantStore.classesLabel.toLowerCase()} ro'yxatiga qaytarildi!`);
+        toast.success(
+          `"${cls.name}" faol ${this.tenantStore.classesLabel.toLowerCase()} ro'yxatiga qaytarildi!`
+        );
       }
     },
     handleClassCreated(newCls) {

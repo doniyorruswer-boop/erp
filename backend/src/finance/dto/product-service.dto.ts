@@ -1,5 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsBoolean } from 'class-validator';
-import { ItemType } from '@prisma/client';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsNumber, IsBoolean } from "class-validator";
+import { ItemType } from "@prisma/client";
 
 export class CreateProductServiceDto {
   @IsString()
@@ -27,7 +27,7 @@ export class CreateProductServiceDto {
   taxRate?: number;
 
   @IsOptional()
-  customFields?: any;
+  customFields?: Record<string, unknown>;
 
   @IsString()
   @IsOptional()
@@ -64,7 +64,7 @@ export class UpdateProductServiceDto {
   isActive?: boolean;
 
   @IsOptional()
-  customFields?: any;
+  customFields?: Record<string, unknown>;
 
   @IsString()
   @IsOptional()

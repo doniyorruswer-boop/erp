@@ -1,5 +1,7 @@
 <template>
-  <div class="stats-card-component card bg-white dark:bg-gray-800 p-4 rounded-md border dark:border-gray-700 shadow-sm flex items-center justify-between font-lexend">
+  <div
+    class="stats-card-component card bg-white dark:bg-gray-800 p-4 rounded-md border dark:border-gray-700 shadow-sm flex items-center justify-between font-lexend"
+  >
     <div>
       <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">{{ title }}</p>
       <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mt-1" :class="valueClass">
@@ -7,11 +9,7 @@
       </h3>
       <p v-if="subtext" class="text-[11px] text-gray-400 mt-0.5">{{ subtext }}</p>
     </div>
-    <div
-      v-if="icon"
-      class="p-3 rounded-full text-2xl shrink-0"
-      :class="iconBgColor"
-    >
+    <div v-if="icon" class="p-3 rounded-full text-2xl shrink-0" :class="iconBgColor">
       <Icon :icon="icon" />
     </div>
   </div>

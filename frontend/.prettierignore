@@ -1,0 +1,7 @@
+dist/
+node_modules/
+public/
+test-results/
+playwright-report/
+storybook-static/
+package-lock.json

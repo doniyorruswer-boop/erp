@@ -1,5 +1,5 @@
 <template>
-  <div class="form-select-component font-lexend relative" ref="dropdownRef">
+  <div ref="dropdownRef" class="form-select-component font-lexend relative">
     <!-- Form Label -->
     <label v-if="label" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
       {{ label }}
@@ -9,39 +9,47 @@
     <!-- Custom Select Trigger Button -->
     <div
       ref="triggerRef"
-      @click="toggleDropdown"
       :class="[
         'w-full h-11 text-xs sm:text-sm rounded-xl border flex items-center justify-between transition bg-white dark:bg-gray-900 cursor-pointer shadow-2xs px-3.5 select-none',
-        isOpen ? 'border-primary ring-2 ring-primary/20' : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600',
+        isOpen
+          ? 'border-primary ring-2 ring-primary/20'
+          : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600',
         error ? 'border-red-500 ring-2 ring-red-500/20' : '',
-        disabled ? 'bg-gray-100 dark:bg-gray-800 opacity-60 cursor-not-allowed pointer-events-none' : ''
+        disabled
+          ? 'bg-gray-100 dark:bg-gray-800 opacity-60 cursor-not-allowed pointer-events-none'
+          : '',
       ]"
+      @click="toggleDropdown"
     >
       <!-- Left side: Optional Icon + Selected Label -->
       <div class="flex items-center gap-2 min-w-0 flex-1">
-        <Icon
-          v-if="icon"
-          :icon="icon"
-          class="text-gray-400 text-base shrink-0"
-        />
+        <Icon v-if="icon" :icon="icon" class="text-gray-400 text-base shrink-0" />
         <span
           :class="[
             'truncate font-medium',
-            selectedOption ? 'text-gray-800 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'
+            selectedOption
+              ? 'text-gray-800 dark:text-gray-100'
+              : 'text-gray-400 dark:text-gray-500',
           ]"
         >
-          {{ selectedOption ? selectedOption.label : (placeholder || "Tanlang...") }}
+          {{ selectedOption ? selectedOption.label : placeholder || "Tanlang..." }}
         </span>
       </div>
 
       <!-- Right side: Clear Button + Animated Chevron -->
       <div class="flex items-center gap-1.5 shrink-0 ml-2">
         <button
-          v-if="clearable && modelValue !== '' && modelValue !== null && modelValue !== undefined && !disabled"
+          v-if="
+            clearable &&
+            modelValue !== '' &&
+            modelValue !== null &&
+            modelValue !== undefined &&
+            !disabled
+          "
           type="button"
-          @click.stop="clearSelection"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-0.5 rounded transition cursor-pointer"
           title="Tozalash"
+          @click.stop="clearSelection"
         >
           <Icon icon="solar:close-circle-linear" class="text-sm" />
         </button>
@@ -69,15 +77,18 @@
           @click.stop
         >
           <!-- Search Input if items > 5 or searchable is true -->
-          <div v-if="isSearchable" class="p-2 border-b dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/40">
+          <div
+            v-if="isSearchable"
+            class="p-2 border-b dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/40"
+          >
             <div class="relative">
               <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-gray-400">
                 <Icon icon="ei:search" class="text-base" />
               </span>
               <input
                 ref="searchInput"
-                type="text"
                 v-model="searchQuery"
+                type="text"
                 placeholder="Qidirish..."
                 class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:border-primary"
                 @click.stop
@@ -90,13 +101,13 @@
             <div
               v-for="opt in filteredOptions"
               :key="opt.value"
-              @click="selectOption(opt)"
               :class="[
                 'px-3 py-2 rounded-xl cursor-pointer flex items-center justify-between transition',
                 isSelected(opt)
                   ? 'bg-primary text-white font-bold shadow-xs'
-                  : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60'
+                  : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60',
               ]"
+              @click="selectOption(opt)"
             >
               <div class="flex items-center gap-2 truncate">
                 <Icon v-if="opt.icon" :icon="opt.icon" class="text-sm shrink-0" />
@@ -187,8 +198,8 @@ export default {
         }
         if (typeof opt === "object") {
           return {
-            value: opt.value !== undefined ? opt.value : (opt.id !== undefined ? opt.id : opt),
-            label: opt.label !== undefined ? opt.label : (opt.name || opt.title || String(opt.value)),
+            value: opt.value !== undefined ? opt.value : opt.id !== undefined ? opt.id : opt,
+            label: opt.label !== undefined ? opt.label : opt.name || opt.title || String(opt.value),
             icon: opt.icon || null,
           };
         }
@@ -203,9 +214,9 @@ export default {
       if (this.modelValue === "" || this.modelValue === null || this.modelValue === undefined) {
         return null;
       }
-      return this.normalizedOptions.find(
-        (opt) => String(opt.value) === String(this.modelValue)
-      ) || null;
+      return (
+        this.normalizedOptions.find((opt) => String(opt.value) === String(this.modelValue)) || null
+      );
     },
     isSearchable() {
       if (this.searchable !== null) return this.searchable;
@@ -214,9 +225,7 @@ export default {
     filteredOptions() {
       if (!this.searchQuery.trim()) return this.normalizedOptions;
       const q = this.searchQuery.toLowerCase();
-      return this.normalizedOptions.filter((opt) =>
-        opt.label.toLowerCase().includes(q)
-      );
+      return this.normalizedOptions.filter((opt) => opt.label.toLowerCase().includes(q));
     },
     dropdownStyle() {
       if (!this.inputRect) return {};

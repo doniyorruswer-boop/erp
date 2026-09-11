@@ -15,7 +15,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-08",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "12.04.2016"
+    birthDate: "12.04.2016",
   },
   {
     id: "st-sch-102",
@@ -31,7 +31,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-08",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "05.08.2009"
+    birthDate: "05.08.2009",
   },
   {
     id: "st-sch-103",
@@ -47,7 +47,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-07",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "19.01.2016"
+    birthDate: "19.01.2016",
   },
   {
     id: "st-sch-104",
@@ -63,7 +63,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-07",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "23.03.2015"
+    birthDate: "23.03.2015",
   },
   {
     id: "st-sch-105",
@@ -79,7 +79,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-05",
     status: "Faol",
     gender: "Ayol",
-    birthDate: "14.11.2012"
+    birthDate: "14.11.2012",
   },
   {
     id: "st-sch-106",
@@ -95,7 +95,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-03",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "02.06.2011"
+    birthDate: "02.06.2011",
   },
   {
     id: "st-sch-107",
@@ -111,7 +111,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-02",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "17.09.2017"
+    birthDate: "17.09.2017",
   },
   {
     id: "st-sch-108",
@@ -127,7 +127,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-01",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "30.05.2016"
+    birthDate: "30.05.2016",
   },
   {
     id: "st-sch-109",
@@ -143,7 +143,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-08-28",
     status: "Faol",
     gender: "Ayol",
-    birthDate: "11.12.2013"
+    birthDate: "11.12.2013",
   },
   {
     id: "st-sch-110",
@@ -159,7 +159,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-08-25",
     status: "Faol",
     gender: "Ayol",
-    birthDate: "08.02.2016"
+    birthDate: "08.02.2016",
   },
   {
     id: "st-sch-111",
@@ -175,7 +175,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-08-20",
     status: "Faol",
     gender: "Ayol",
-    birthDate: "27.10.2017"
+    birthDate: "27.10.2017",
   },
   {
     id: "st-sch-112",
@@ -191,7 +191,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-08-15",
     status: "Faol",
     gender: "Ayol",
-    birthDate: "15.03.2016"
+    birthDate: "15.03.2016",
   },
   {
     id: "st-sch-113",
@@ -207,7 +207,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-08-10",
     status: "Faol",
     gender: "Ayol",
-    birthDate: "22.07.2016"
+    birthDate: "22.07.2016",
   },
   {
     id: "st-sch-114",
@@ -223,7 +223,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-08",
     status: "Sinov",
     gender: "Erkak",
-    birthDate: "10.05.2014"
+    birthDate: "10.05.2014",
   },
   {
     id: "st-sch-115",
@@ -239,7 +239,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-07-15",
     status: "Faol",
     gender: "Ayol",
-    birthDate: "03.01.2010"
+    birthDate: "03.01.2010",
   },
   {
     id: "st-sch-116",
@@ -255,7 +255,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-06-20",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "18.09.2008"
+    birthDate: "18.09.2008",
   },
   {
     id: "st-sch-117",
@@ -271,7 +271,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-09-07",
     status: "Lid",
     gender: "Ayol",
-    birthDate: "25.11.2009"
+    birthDate: "25.11.2009",
   },
   {
     id: "st-sch-118",
@@ -287,7 +287,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-08-05",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "14.04.2015"
+    birthDate: "14.04.2015",
   },
   {
     id: "st-sch-119",
@@ -303,7 +303,7 @@ export const initialSchoolStudents = [
     createdAt: "2026-08-18",
     status: "Faol",
     gender: "Ayol",
-    birthDate: "05.12.2017"
+    birthDate: "05.12.2017",
   },
   {
     id: "st-sch-120",
@@ -319,23 +319,22 @@ export const initialSchoolStudents = [
     createdAt: "2026-07-22",
     status: "Faol",
     gender: "Erkak",
-    birthDate: "29.08.2014"
-  }
+    birthDate: "29.08.2014",
+  },
 ];
 
 const STORAGE_KEY = "educrm_school_students_list_v2";
+
+import { studentsApi } from "@/api/services";
+import { safeJsonParse } from "@/utils/storage";
 
 export function loadSchoolStudents() {
   if (typeof window !== "undefined" && window.localStorage) {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      } catch (e) {
-        console.error("Failed to parse school students:", e);
+      const parsed = safeJsonParse(saved, null);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
       }
     }
   }
@@ -348,6 +347,68 @@ export function saveSchoolStudents(list) {
   }
 }
 
+/**
+ * Maktab o'quvchilarini real backend PostgreSQL bazasi bilan sinxronlashtirish
+ */
+export async function syncSchoolStudentsWithBackend() {
+  try {
+    const res = await studentsApi.getAll({ limit: 100 });
+    const items = res?.items || (Array.isArray(res) ? res : null);
+    if (items && items.length > 0) {
+      const current = loadSchoolStudents();
+      const mapped = items.map((st) => {
+        const existing = current.find(
+          (c) =>
+            c.id === st.id ||
+            (st.phone && c.phone && c.phone.replace(/\D/g, "") === st.phone.replace(/\D/g, ""))
+        );
+        const fullName =
+          [st.firstName, st.lastName].filter(Boolean).join(" ") || existing?.fullName || "O'quvchi";
+        const group = st.groups?.[0]?.group || st.group;
+        return {
+          id: st.id,
+          studentId: st.studentCode || st.id.slice(0, 8),
+          fullName,
+          className: group?.name || existing?.className || "1-A",
+          stage: existing?.stage || "O'quvchi",
+          phone: st.phone || existing?.phone || "",
+          monthlyFee: Number(st.monthlyFee || existing?.monthlyFee || 4000000),
+          debt: Number(
+            st.debt !== undefined
+              ? st.debt
+              : st.balance < 0
+                ? Math.abs(st.balance)
+                : existing?.debt || 0
+          ),
+          parentName: st.parentName || existing?.parentName || "Ota-ona",
+          parentPhone: st.parentPhone || existing?.parentPhone || "",
+          createdAt: (st.createdAt || existing?.createdAt || new Date().toISOString()).slice(0, 10),
+          status: st.status === "ACTIVE" ? "Faol" : existing?.status || "Faol",
+          gender: st.gender || existing?.gender || "Erkak",
+          birthDate: st.birthDate || existing?.birthDate || "01.01.2015",
+          syncedWithBackend: true,
+        };
+      });
+
+      const backendIds = new Set(mapped.map((m) => m.id));
+      const backendPhones = new Set(
+        mapped.map((m) => (m.phone ? m.phone.replace(/\D/g, "") : "")).filter(Boolean)
+      );
+
+      const localOnly = current.filter(
+        (c) => !backendIds.has(c.id) && (!c.phone || !backendPhones.has(c.phone.replace(/\D/g, "")))
+      );
+      const merged = [...mapped, ...localOnly];
+
+      saveSchoolStudents(merged);
+      return merged;
+    }
+  } catch (err) {
+    console.warn("Maktab o'quvchilarini backenddan sinxronlashda xatolik:", err.message);
+  }
+  return loadSchoolStudents();
+}
+
 export function addSchoolStudent(student) {
   const current = loadSchoolStudents();
   const newStudent = {
@@ -357,19 +418,58 @@ export function addSchoolStudent(student) {
     status: student.stage || "Faol",
     debt: Number(student.debt || 0),
     monthlyFee: Number(student.monthlyFee || 4700000),
-    ...student
+    ...student,
   };
   current.unshift(newStudent);
   saveSchoolStudents(current);
+
+  // PostgreSQL backend bilan asinxron bog'lanish
+  try {
+    const parts = (student.fullName || "").trim().split(" ");
+    const firstName = parts[0] || "O'quvchi";
+    const lastName = parts.slice(1).join(" ") || "";
+    studentsApi
+      .create({
+        firstName,
+        lastName,
+        phone: student.phone ? student.phone.replace(/[^+\d]/g, "") : "+998900000000",
+        status: "ACTIVE",
+      })
+      .then((res) => {
+        if (res?.id) {
+          newStudent.id = res.id;
+          saveSchoolStudents(current);
+        }
+      })
+      .catch((e) => {
+        console.warn("Backendga o'quvchi yozishda xatolik:", e.message);
+      });
+  } catch (err) {
+    console.warn("API chaqirishda xatolik:", err.message);
+  }
+
   return newStudent;
 }
 
 export function updateSchoolStudent(id, updatedFields) {
   const current = loadSchoolStudents();
-  const index = current.findIndex(s => s.id === id);
+  const index = current.findIndex((s) => s.id === id);
   if (index !== -1) {
     current[index] = { ...current[index], ...updatedFields };
     saveSchoolStudents(current);
+
+    if (id && id.length > 20 && id.includes("-") && !id.startsWith("st-sch-")) {
+      const parts = (updatedFields.fullName || "").trim().split(" ");
+      const updatePayload = {};
+      if (parts[0]) updatePayload.firstName = parts[0];
+      if (parts.length > 1) updatePayload.lastName = parts.slice(1).join(" ");
+      if (updatedFields.phone) updatePayload.phone = updatedFields.phone.replace(/[^+\d]/g, "");
+
+      studentsApi.update(id, updatePayload).catch((e) => {
+        console.warn("Backendda o'quvchi tahrirlashda xatolik:", e.message);
+      });
+    }
+
     return current[index];
   }
   return null;
@@ -377,14 +477,21 @@ export function updateSchoolStudent(id, updatedFields) {
 
 export function deleteSchoolStudent(id) {
   const current = loadSchoolStudents();
-  const filtered = current.filter(s => s.id !== id);
+  const filtered = current.filter((s) => s.id !== id);
   saveSchoolStudents(filtered);
+
+  if (id && id.length > 20 && id.includes("-") && !id.startsWith("st-sch-")) {
+    studentsApi.delete(id).catch((e) => {
+      console.warn("Backenddan o'quvchi o'chirishda xatolik:", e.message);
+    });
+  }
+
   return filtered;
 }
 
-export function recordStudentPayment(studentId, amount, paymentType = "Naqd") {
+export function recordStudentPayment(studentId, amount, _paymentType = "Naqd") {
   const current = loadSchoolStudents();
-  const index = current.findIndex(s => s.id === studentId);
+  const index = current.findIndex((s) => s.id === studentId);
   if (index !== -1) {
     const currentDebt = current[index].debt || 0;
     const newDebt = Math.max(0, currentDebt - Number(amount));

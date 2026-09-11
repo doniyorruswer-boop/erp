@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend"
+  >
     <!-- Header -->
     <div class="flex items-center justify-between flex-wrap gap-2">
       <div>
@@ -35,11 +37,16 @@
         class="p-3 rounded-lg bg-gray-50/80 dark:bg-gray-700/30 border border-gray-200/80 dark:border-gray-700/60 flex items-center justify-between gap-3 hover:border-primary/40 transition"
       >
         <div class="flex items-center gap-3 min-w-0">
-          <div class="w-8 h-8 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+          <div
+            class="w-8 h-8 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-xs shrink-0"
+          >
             {{ getInitial(t.name) }}
           </div>
           <div class="min-w-0">
-            <div class="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-100 truncate" :title="t.name">
+            <div
+              class="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-100 truncate"
+              :title="t.name"
+            >
               {{ t.name }}
             </div>
             <div class="text-[11px] text-gray-500 dark:text-gray-400">
@@ -49,7 +56,9 @@
         </div>
 
         <div class="shrink-0">
-          <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+          <span
+            class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300"
+          >
             Faol
           </span>
         </div>

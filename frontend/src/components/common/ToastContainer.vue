@@ -1,6 +1,6 @@
 <template>
   <div class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
-    <transition-group name="toast-slide">
+    <TransitionGroup name="toast-slide">
       <div
         v-for="t in toasts"
         :key="t.id"
@@ -8,7 +8,11 @@
         :class="getToastClasses(t.type)"
       >
         <div class="shrink-0 mt-0.5">
-          <Icon :icon="getToastIcon(t.type)" class="w-5 h-5 sm:w-6 sm:h-6" :class="getIconColorClass(t.type)" />
+          <Icon
+            :icon="getToastIcon(t.type)"
+            class="w-5 h-5 sm:w-6 sm:h-6"
+            :class="getIconColorClass(t.type)"
+          />
         </div>
         <div class="flex-1 min-w-0 pr-1">
           <h4 class="text-xs sm:text-sm font-bold text-gray-900 dark:text-white leading-tight">
@@ -19,18 +23,19 @@
           </p>
         </div>
         <button
-          @click="removeToast(t.id)"
           class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition cursor-pointer p-0.5"
+          @click="removeToast(t.id)"
         >
           <Icon icon="solar:close-circle-linear" class="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </div>
-    </transition-group>
+    </TransitionGroup>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
+
 import { toast } from "@/utils/toast";
 
 export default {

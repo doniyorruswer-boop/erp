@@ -6,13 +6,11 @@ export const initialSchoolParents = [
     fullName: "Abdullayev Bobur",
     phone: "+998 (90) 218-65-50",
     login: "abdullayev.bobur.ota",
-    children: [
-      { id: "ch-101", name: "Abdullayeva Nozima", className: "2-B" }
-    ],
+    children: [{ id: "ch-101", name: "Abdullayeva Nozima", className: "2-B" }],
     lastLogin: null,
     createdAt: "2026-09-08",
     status: "active",
-    telegram: "@abdullayev_bobur"
+    telegram: "@abdullayev_bobur",
   },
   {
     id: "par-2",
@@ -21,116 +19,100 @@ export const initialSchoolParents = [
     login: "abdullayev.elyor.ota",
     children: [
       { id: "ch-102", name: "Abdullayeva Maftuna", className: "1-A" },
-      { id: "ch-103", name: "Abdullayev Bobur", className: "5-A" }
+      { id: "ch-103", name: "Abdullayev Bobur", className: "5-A" },
     ],
     lastLogin: "06/07/2026 11:57",
     createdAt: "2026-09-07",
     status: "active",
-    telegram: "@elyor_abdullayev"
+    telegram: "@elyor_abdullayev",
   },
   {
     id: "par-3",
     fullName: "Abdullayev Husan",
     phone: "+998 (90) 754-35-80",
     login: "abdullayev.husan.ota",
-    children: [
-      { id: "ch-104", name: "Abdullayev Ali", className: "1-B" }
-    ],
+    children: [{ id: "ch-104", name: "Abdullayev Ali", className: "1-B" }],
     lastLogin: null,
     createdAt: "2026-09-06",
     status: "active",
-    telegram: "@husan_abd"
+    telegram: "@husan_abd",
   },
   {
     id: "par-4",
     fullName: "Abdullayev Jaloliddin",
     phone: "+998 (90) 466-29-25",
     login: "abdullayev.jaloliddin.ota",
-    children: [
-      { id: "ch-105", name: "Abdullayeva Dildora", className: "5-A" }
-    ],
+    children: [{ id: "ch-105", name: "Abdullayeva Dildora", className: "5-A" }],
     lastLogin: null,
     createdAt: "2026-09-05",
     status: "active",
-    telegram: ""
+    telegram: "",
   },
   {
     id: "par-5",
     fullName: "Abdullayev Mirjalol",
     phone: "+998 (90) 396-29-34",
     login: "abdullayev.mirjalol.ota",
-    children: [
-      { id: "ch-106", name: "Abdullayeva Nozima", className: "2-B" }
-    ],
+    children: [{ id: "ch-106", name: "Abdullayeva Nozima", className: "2-B" }],
     lastLogin: null,
     createdAt: "2026-09-04",
     status: "active",
-    telegram: ""
+    telegram: "",
   },
   {
     id: "par-6",
     fullName: "Abdullayev Muhammad",
     phone: "+998 (90) 705-00-94",
     login: "abdullayev.muhammad.ota",
-    children: [
-      { id: "ch-107", name: "Abdullayev Shoxrux", className: "2-B" }
-    ],
+    children: [{ id: "ch-107", name: "Abdullayev Shoxrux", className: "2-B" }],
     lastLogin: null,
     createdAt: "2026-09-03",
     status: "active",
-    telegram: "@muhammad_ota"
+    telegram: "@muhammad_ota",
   },
   {
     id: "par-7",
     fullName: "Abdullayev Qodir",
     phone: "+998 (90) 398-26-90",
     login: "abdullayev.qodir.ota",
-    children: [
-      { id: "ch-108", name: "Abdullayeva Kumush", className: "2-A" }
-    ],
+    children: [{ id: "ch-108", name: "Abdullayeva Kumush", className: "2-A" }],
     lastLogin: null,
     createdAt: "2026-09-02",
     status: "active",
-    telegram: ""
+    telegram: "",
   },
   {
     id: "par-8",
     fullName: "Abdullayev Sayfiddin",
     phone: "+998 (90) 517-60-66",
     login: "abdullayev.sayfiddin.ota",
-    children: [
-      { id: "ch-109", name: "Abdullayeva Zilola", className: "4-B" }
-    ],
+    children: [{ id: "ch-109", name: "Abdullayeva Zilola", className: "4-B" }],
     lastLogin: null,
     createdAt: "2026-09-01",
     status: "active",
-    telegram: ""
+    telegram: "",
   },
   {
     id: "par-9",
     fullName: "Abdullayev Shoxrux",
     phone: "+998 (90) 214-75-49",
     login: "abdullayev.shoxrux.ota",
-    children: [
-      { id: "ch-110", name: "Abdullayev Ali", className: "7-A" }
-    ],
+    children: [{ id: "ch-110", name: "Abdullayev Ali", className: "7-A" }],
     lastLogin: null,
     createdAt: "2026-08-30",
     status: "active",
-    telegram: ""
+    telegram: "",
   },
   {
     id: "par-10",
     fullName: "Bekmirzayeva Gulnoza",
     phone: "+998 (93) 321-44-11",
     login: "bekmirzayeva.gulnoza.ona",
-    children: [
-      { id: "ch-111", name: "Bekmirzayev Shohjahon", className: "3-A" }
-    ],
+    children: [{ id: "ch-111", name: "Bekmirzayev Shohjahon", className: "3-A" }],
     lastLogin: "08/08/2026 09:30",
     createdAt: "2026-08-28",
     status: "active",
-    telegram: "@gulnoza_bek"
+    telegram: "@gulnoza_bek",
   },
   {
     id: "par-11",
@@ -139,65 +121,57 @@ export const initialSchoolParents = [
     login: "karimov.alisher.ota",
     children: [
       { id: "ch-112", name: "Karimova Madina", className: "6-B" },
-      { id: "ch-113", name: "Karimov Jasur", className: "8-A" }
+      { id: "ch-113", name: "Karimov Jasur", className: "8-A" },
     ],
     lastLogin: "02/09/2026 16:45",
     createdAt: "2026-08-25",
     status: "active",
-    telegram: "@alisher_karimov"
+    telegram: "@alisher_karimov",
   },
   {
     id: "par-12",
     fullName: "Xoliqova Nargiza",
     phone: "+998 (94) 620-33-77",
     login: "xoliqova.nargiza.ona",
-    children: [
-      { id: "ch-114", name: "Xoliqov Azizbek", className: "1-A" }
-    ],
+    children: [{ id: "ch-114", name: "Xoliqov Azizbek", className: "1-A" }],
     lastLogin: null,
     createdAt: "2026-08-20",
     status: "active",
-    telegram: ""
+    telegram: "",
   },
   {
     id: "par-13",
     fullName: "Qodirov Jamshid",
     phone: "+998 (91) 450-78-90",
     login: "qodirov.jamshid.ota",
-    children: [
-      { id: "ch-115", name: "Qodirova Laylo", className: "11-A" }
-    ],
+    children: [{ id: "ch-115", name: "Qodirova Laylo", className: "11-A" }],
     lastLogin: "01/09/2026 14:20",
     createdAt: "2026-08-15",
     status: "active",
-    telegram: "@jamshid_qodirov"
+    telegram: "@jamshid_qodirov",
   },
   {
     id: "par-14",
     fullName: "Rahmonov Sardor",
     phone: "+998 (90) 912-34-56",
     login: "rahmonov.sardor.ota",
-    children: [
-      { id: "ch-116", name: "Rahmonova Diyora", className: "9-A" }
-    ],
+    children: [{ id: "ch-116", name: "Rahmonova Diyora", className: "9-A" }],
     lastLogin: null,
     createdAt: "2026-08-10",
     status: "active",
-    telegram: ""
+    telegram: "",
   },
   {
     id: "par-15",
     fullName: "Tursunova Dilfuza",
     phone: "+998 (93) 111-22-33",
     login: "tursunova.dilfuza.ona",
-    children: [
-      { id: "ch-117", name: "Tursunov Shahzod", className: "10-A" }
-    ],
+    children: [{ id: "ch-117", name: "Tursunov Shahzod", className: "10-A" }],
     lastLogin: "05/09/2026 10:15",
     createdAt: "2026-08-05",
     status: "active",
-    telegram: "@dilfuza_tursunova"
-  }
+    telegram: "@dilfuza_tursunova",
+  },
 ];
 
 const STORAGE_KEY = "crm_school_parents_v1";
@@ -206,23 +180,23 @@ export function loadSchoolParents() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const initial = initialSchoolParents.map(p => ({ ...p, isActive: p.isActive !== false }));
+      const initial = initialSchoolParents.map((p) => ({ ...p, isActive: p.isActive !== false }));
       saveSchoolParents(initial);
       return initial;
     }
     const data = JSON.parse(raw);
     if (Array.isArray(data) && data.length) {
-      const normalized = data.map(p => ({
+      const normalized = data.map((p) => ({
         ...p,
-        isActive: p.isActive !== undefined ? Boolean(p.isActive) : true
+        isActive: p.isActive !== undefined ? Boolean(p.isActive) : true,
       }));
       return normalized;
     }
-    const initial = initialSchoolParents.map(p => ({ ...p, isActive: p.isActive !== false }));
+    const initial = initialSchoolParents.map((p) => ({ ...p, isActive: p.isActive !== false }));
     return initial;
   } catch (e) {
     console.error("loadSchoolParents error:", e);
-    return initialSchoolParents.map(p => ({ ...p, isActive: p.isActive !== false }));
+    return initialSchoolParents.map((p) => ({ ...p, isActive: p.isActive !== false }));
   }
 }
 
@@ -251,7 +225,7 @@ export function addSchoolParent(parentData) {
     createdAt,
     status: "active",
     isActive: true,
-    telegram: parentData.telegram || ""
+    telegram: parentData.telegram || "",
   };
 
   list.unshift(newParent);
@@ -261,7 +235,7 @@ export function addSchoolParent(parentData) {
 
 export function updateSchoolParent(id, updatedFields) {
   const list = loadSchoolParents();
-  const idx = list.findIndex(p => p.id === id);
+  const idx = list.findIndex((p) => p.id === id);
   if (idx !== -1) {
     list[idx] = { ...list[idx], ...updatedFields };
     saveSchoolParents(list);
@@ -272,19 +246,21 @@ export function updateSchoolParent(id, updatedFields) {
 
 export function deleteSchoolParent(id) {
   const list = loadSchoolParents();
-  const filtered = list.filter(p => p.id !== id);
+  const filtered = list.filter((p) => p.id !== id);
   saveSchoolParents(filtered);
   return filtered;
 }
 
 export function linkChildToParent(parentId, childObj) {
   const list = loadSchoolParents();
-  const idx = list.findIndex(p => p.id === parentId);
+  const idx = list.findIndex((p) => p.id === parentId);
   if (idx !== -1) {
     const parent = list[idx];
     if (!parent.children) parent.children = [];
     // Dublikat bo'lmasligi uchun tekshirish
-    const exists = parent.children.some(c => c.name === childObj.name && c.className === childObj.className);
+    const exists = parent.children.some(
+      (c) => c.name === childObj.name && c.className === childObj.className
+    );
     if (!exists) {
       parent.children.push(childObj);
       saveSchoolParents(list);
@@ -296,9 +272,9 @@ export function linkChildToParent(parentId, childObj) {
 
 export function unlinkChildFromParent(parentId, childName) {
   const list = loadSchoolParents();
-  const idx = list.findIndex(p => p.id === parentId);
+  const idx = list.findIndex((p) => p.id === parentId);
   if (idx !== -1) {
-    list[idx].children = (list[idx].children || []).filter(c => c.name !== childName);
+    list[idx].children = (list[idx].children || []).filter((c) => c.name !== childName);
     saveSchoolParents(list);
     return list[idx];
   }
@@ -324,15 +300,12 @@ export function findParentByLoginOrPhone(identifier) {
     list.find((p) => {
       const pLogin = (p.login || "").toLowerCase().trim();
       const pPhoneDigits = (p.phone || "").replace(/\D/g, "");
-      return (
-        pLogin === clean ||
-        (digits && digits.length >= 7 && pPhoneDigits.includes(digits))
-      );
+      return pLogin === clean || (digits && digits.length >= 7 && pPhoneDigits.includes(digits));
     }) || null
   );
 }
 
-export function authenticateParent(identifier, password) {
+export function authenticateParent(identifier, _password) {
   const parent = findParentByLoginOrPhone(identifier);
   if (!parent) {
     return {
@@ -342,18 +315,13 @@ export function authenticateParent(identifier, password) {
   }
 
   // Faollik holatini tekshirish (Real boshqaruv)
-  if (
-    parent.isActive === false ||
-    parent.status === "inactive" ||
-    parent.status === "archived"
-  ) {
+  if (parent.isActive === false || parent.status === "inactive" || parent.status === "archived") {
     return {
       found: true,
       success: false,
       isBlocked: true,
       parent,
-      message:
-        "Hisobingiz nofaol holatda. Iltimos, ma'muriyatga murojaat qiling!",
+      message: "Hisobingiz nofaol holatda. Iltimos, ma'muriyatga murojaat qiling!",
     };
   }
 

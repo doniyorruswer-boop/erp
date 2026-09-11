@@ -1,6 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { NotificationChannel } from '@prisma/client';
-import { NotificationProvider, NotificationPayload, SendResult } from './notification-provider.interface';
+import { Injectable, Logger } from "@nestjs/common";
+import { NotificationChannel } from "@prisma/client";
+import {
+  NotificationProvider,
+  NotificationPayload,
+  SendResult,
+} from "./notification-provider.interface";
 
 @Injectable()
 export class TelegramProvider implements NotificationProvider {
@@ -12,7 +16,7 @@ export class TelegramProvider implements NotificationProvider {
     const chatId = payload.recipient;
 
     if (!chatId) {
-      return { success: false, error: 'Telegram chatId topilmadi' };
+      return { success: false, error: "Telegram chatId topilmadi" };
     }
 
     const text = `<b>${payload.title}</b>\n\n${payload.body}`;
@@ -20,12 +24,12 @@ export class TelegramProvider implements NotificationProvider {
     if (token && chatId) {
       try {
         const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             chat_id: chatId,
             text,
-            parse_mode: 'HTML',
+            parse_mode: "HTML",
           }),
         });
         const data = await response.json();
@@ -38,22 +42,27 @@ export class TelegramProvider implements NotificationProvider {
         } else {
           return { success: false, error: data.description };
         }
-      } catch (err: any) {
-        return { success: false, error: err.message };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        return { success: false, error: message };
       }
     }
 
     // Production mode without bot token -> Fail explicitly
-    if (process.env.NODE_ENV === 'production') {
-      this.logger.error(`[TELEGRAM ERROR] Productionda Telegram bot tokeni (TELEGRAM_BOT_TOKEN) topilmadi!`);
+    if (process.env.NODE_ENV === "production") {
+      this.logger.error(
+        `[TELEGRAM ERROR] Productionda Telegram bot tokeni (TELEGRAM_BOT_TOKEN) topilmadi!`
+      );
       return {
         success: false,
-        error: 'Telegram bot tokeni (TELEGRAM_BOT_TOKEN) topilmadi',
+        error: "Telegram bot tokeni (TELEGRAM_BOT_TOKEN) topilmadi",
       };
     }
 
     // Simulation / Sandbox mode for development
-    this.logger.log(`[TELEGRAM SIMULATION] Chat: ${chatId} | Title: ${payload.title} | Body: ${payload.body}`);
+    this.logger.log(
+      `[TELEGRAM SIMULATION] Chat: ${chatId} | Title: ${payload.title} | Body: ${payload.body}`
+    );
     return {
       success: true,
       messageId: `tg-sim-${Date.now()}`,

@@ -1,16 +1,16 @@
 <template>
-  <vmodal
+  <Vmodal
     :model-value="modelValue"
-    @update:model-value="handleClose"
     title="Darsni tahrirlash"
     subtitle="Mavjud dars ma'lumotlarini yangilash"
     icon="solar:pen-new-square-bold"
     icon-bg-class="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary"
     width="max-w-xl"
     :hide-button="true"
+    @update:model-value="handleClose"
   >
     <template #body>
-      <form @submit.prevent="handleSave" class="space-y-4 text-left p-1 font-lexend">
+      <form class="space-y-4 text-left p-1 font-lexend" @submit.prevent="handleSave">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <!-- 1. Dars sanasi (Disabled: dars jadvali katakchasiga qat'iy biriktirilgan) -->
           <div class="space-y-1.5">
@@ -187,13 +187,15 @@
           </label>
 
           <!-- Hozirgi holat nishoni -->
-          <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-between">
+          <div
+            class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-between"
+          >
             <div>
               <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium block">
                 Hozirgi holat
               </span>
               <span class="text-xs sm:text-sm font-bold text-emerald-800 dark:text-emerald-300">
-                {{ form.status || 'Rejalashtirilgan' }}
+                {{ form.status || "Rejalashtirilgan" }}
               </span>
             </div>
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -229,21 +231,20 @@
 
     <template #footer>
       <div class="flex items-center justify-end gap-2.5 w-full">
-        <AppButton variant="secondary" @click="handleClose">
-          Bekor qilish
-        </AppButton>
+        <AppButton variant="secondary" @click="handleClose"> Bekor qilish </AppButton>
         <AppButton variant="primary" icon="solar:diskette-bold" @click="handleSave">
           Saqlash
         </AppButton>
       </div>
     </template>
-  </vmodal>
+  </Vmodal>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import vmodal from "@/components/modal.vue";
-import AppButton from "@/components/AppButton.vue";
+
+import AppButton from "@/components/common/AppButton.vue";
+import vmodal from "@/components/common/AppModal.vue";
 
 export default {
   name: "ClassLessonEditModal",

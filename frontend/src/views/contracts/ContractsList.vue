@@ -7,14 +7,16 @@
     <div class="flex items-center justify-between flex-wrap gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Shartnomalar Boshqaruvi</h1>
-        <p class="text-sm text-gray-400">O'quv yili shartnomalari, to'lov grafiklari va shartnoma cheklari</p>
+        <p class="text-sm text-gray-400">
+          O'quv yili shartnomalari, to'lov grafiklari va shartnoma cheklari
+        </p>
       </div>
 
       <div class="flex items-center gap-2.5">
         <button
           type="button"
-          @click="openNewContractModal"
           class="border flex items-center text-sm gap-2 text-white bg-primary hover:bg-primary/90 rounded py-2.5 px-4 font-medium shadow-sm transition cursor-pointer"
+          @click="openNewContractModal"
         >
           <Icon icon="solar:document-add-bold" class="text-lg" />
           <span>Yangi Shartnoma</span>
@@ -24,9 +26,25 @@
 
     <!-- 3 Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <StatsCard title="Jami Shartnomalar" :value="`${contracts.length} ta`" icon="solar:document-text-bold" variant="primary" />
-      <StatsCard title="Umumiy Shartnoma Qiymati" :value="formatUZS(totalContractSum)" icon="solar:wallet-money-bold" variant="success" valueClass="text-green-600 dark:text-green-400" />
-      <StatsCard title="Faol Shartnomalar" :value="`${activeContractsCount} ta`" icon="solar:check-circle-bold" variant="purple" />
+      <StatsCard
+        title="Jami Shartnomalar"
+        :value="`${contracts.length} ta`"
+        icon="solar:document-text-bold"
+        variant="primary"
+      />
+      <StatsCard
+        title="Umumiy Shartnoma Qiymati"
+        :value="formatUZS(totalContractSum)"
+        icon="solar:wallet-money-bold"
+        variant="success"
+        value-class="text-green-600 dark:text-green-400"
+      />
+      <StatsCard
+        title="Faol Shartnomalar"
+        :value="`${activeContractsCount} ta`"
+        icon="solar:check-circle-bold"
+        variant="purple"
+      />
     </div>
 
     <!-- DataTable -->
@@ -37,10 +55,10 @@
       :data="contracts"
       :loading="loading"
       :searchable="true"
-      :showIndex="true"
-      :showPerPage="true"
-      searchPlaceholder="Shartnoma raqami yoki o'quvchi..."
-      rowKey="id"
+      :show-index="true"
+      :show-per-page="true"
+      search-placeholder="Shartnoma raqami yoki o'quvchi..."
+      row-key="id"
     >
       <template #cell(contractNumber)="{ row }">
         <span class="font-mono font-bold text-xs text-primary bg-primary/10 px-2 py-1 rounded">
@@ -57,9 +75,13 @@
       <template #cell(status)="{ row }">
         <span
           class="px-2.5 py-1 rounded-full text-xs font-semibold"
-          :class="row.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-gray-100 text-gray-600'"
+          :class="
+            row.status === 'ACTIVE'
+              ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400'
+              : 'bg-gray-100 text-gray-600'
+          "
         >
-          {{ row.status === 'ACTIVE' ? 'Faol' : 'Yopilgan' }}
+          {{ row.status === "ACTIVE" ? "Faol" : "Yopilgan" }}
         </span>
       </template>
     </DataTable>
@@ -68,9 +90,10 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
 import Breadcrumb from "@/components/Breadcrumb.vue";
+import DataTable from "@/components/common/AppTable.vue";
 import StatsCard from "@/components/StatsCard.vue";
-import DataTable from "@/components/DataTable.vue";
 
 export default {
   name: "ContractsList",
@@ -84,10 +107,42 @@ export default {
     return {
       loading: false,
       contracts: [
-        { id: "1", contractNumber: "EDU-2026-001", studentName: "Bobur Mirzayev", totalAmount: 7800000, discountAmount: 500000, startDate: "2026-09-01", status: "ACTIVE" },
-        { id: "2", contractNumber: "EDU-2026-002", studentName: "Madina Aliyeva", totalAmount: 18500000, discountAmount: 0, startDate: "2026-09-01", status: "ACTIVE" },
-        { id: "3", contractNumber: "EDU-2026-003", studentName: "Jasur Saidov", totalAmount: 6500000, discountAmount: 0, startDate: "2026-09-05", status: "ACTIVE" },
-        { id: "4", contractNumber: "EDU-2026-004", studentName: "Sardorbek Rahimov", totalAmount: 22000000, discountAmount: 1000000, startDate: "2026-09-01", status: "ACTIVE" },
+        {
+          id: "1",
+          contractNumber: "EDU-2026-001",
+          studentName: "Bobur Mirzayev",
+          totalAmount: 7800000,
+          discountAmount: 500000,
+          startDate: "2026-09-01",
+          status: "ACTIVE",
+        },
+        {
+          id: "2",
+          contractNumber: "EDU-2026-002",
+          studentName: "Madina Aliyeva",
+          totalAmount: 18500000,
+          discountAmount: 0,
+          startDate: "2026-09-01",
+          status: "ACTIVE",
+        },
+        {
+          id: "3",
+          contractNumber: "EDU-2026-003",
+          studentName: "Jasur Saidov",
+          totalAmount: 6500000,
+          discountAmount: 0,
+          startDate: "2026-09-05",
+          status: "ACTIVE",
+        },
+        {
+          id: "4",
+          contractNumber: "EDU-2026-004",
+          studentName: "Sardorbek Rahimov",
+          totalAmount: 22000000,
+          discountAmount: 1000000,
+          startDate: "2026-09-01",
+          status: "ACTIVE",
+        },
       ],
       columns: [
         { key: "contractNumber", label: "Shartnoma №", sortable: true },

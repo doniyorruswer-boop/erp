@@ -1,20 +1,25 @@
 <template>
-  <vmodal
+  <Vmodal
     :model-value="modelValue"
-    @update:model-value="close"
     :title="stageInfo?.label || 'Voronka'"
     :subtitle="'Ushbu bosqichdagi o\'quvchilar va ularning joriy holati'"
     icon="solar:filter-bold"
     width="max-w-2xl"
     :hide-button="true"
     body-class="p-0"
+    @update:model-value="close"
   >
     <!-- Body -->
     <template #body>
       <!-- Search & Filters -->
-      <div class="px-5 py-2.5 border-b border-gray-100 dark:border-gray-700/80 bg-white dark:bg-gray-800 flex items-center gap-3">
+      <div
+        class="px-5 py-2.5 border-b border-gray-100 dark:border-gray-700/80 bg-white dark:bg-gray-800 flex items-center gap-3"
+      >
         <div class="relative flex-1">
-          <Icon icon="solar:magnifer-linear" class="absolute left-2.5 top-2.5 text-gray-400 text-sm" />
+          <Icon
+            icon="solar:magnifer-linear"
+            class="absolute left-2.5 top-2.5 text-gray-400 text-sm"
+          />
           <input
             v-model="searchQuery"
             type="text"
@@ -26,10 +31,7 @@
 
       <!-- Table / List -->
       <div class="max-h-96 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700/60">
-        <div
-          v-if="filteredStudents.length === 0"
-          class="py-10 text-center text-gray-400 text-xs"
-        >
+        <div v-if="filteredStudents.length === 0" class="py-10 text-center text-gray-400 text-xs">
           O'quvchi topilmadi
         </div>
         <div
@@ -38,14 +40,20 @@
           class="px-5 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/40 transition"
         >
           <div class="flex items-center gap-3 min-w-0">
-            <div class="w-8 h-8 rounded bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0 border border-primary/20">
+            <div
+              class="w-8 h-8 rounded bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0 border border-primary/20"
+            >
               {{ s.name.charAt(0) }}
             </div>
             <div class="min-w-0">
-              <div class="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
+              <div
+                class="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 truncate"
+              >
                 {{ s.name }}
               </div>
-              <div class="text-[11px] text-gray-400 dark:text-gray-500 flex items-center gap-2 mt-0.5">
+              <div
+                class="text-[11px] text-gray-400 dark:text-gray-500 flex items-center gap-2 mt-0.5"
+              >
                 <span>{{ s.phone }}</span>
                 <span>•</span>
                 <span class="text-primary font-medium">{{ s.course }}</span>
@@ -72,19 +80,20 @@
       <div class="flex items-center justify-end w-full">
         <button
           type="button"
-          @click="close"
           class="py-2 px-4 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold transition cursor-pointer shadow-2xs bg-white dark:bg-gray-800"
+          @click="close"
         >
           Yopish
         </button>
       </div>
     </template>
-  </vmodal>
+  </Vmodal>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import vmodal from "@/components/modal.vue";
+
+import vmodal from "@/components/common/AppModal.vue";
 
 export default {
   name: "FunnelStageModal",

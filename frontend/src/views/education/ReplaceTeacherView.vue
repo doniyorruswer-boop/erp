@@ -3,7 +3,7 @@
     <Breadcrumb
       :items="[
         { title: 'O\'quv jarayoni', to: '/education/schedule' },
-        { title: 'O\'qituvchini almashtirish' }
+        { title: 'O\'qituvchini almashtirish' },
       ]"
     />
 
@@ -18,11 +18,7 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <AppButton
-          variant="primary"
-          icon="solar:add-circle-bold"
-          @click="showAddModal = true"
-        >
+        <AppButton variant="primary" icon="solar:add-circle-bold" @click="showAddModal = true">
           Almashtirish qo'shish
         </AppButton>
       </div>
@@ -54,7 +50,7 @@
         <AppStatusBadge :status="row.status" />
       </template>
 
-      <template #actions="{ row }">
+      <template #actions>
         <div class="flex items-center gap-1 justify-end">
           <button
             type="button"
@@ -78,13 +74,14 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
 import Breadcrumb from "@/components/Breadcrumb.vue";
-import AppTable from "@/components/AppTable.vue";
-import AppButton from "@/components/AppButton.vue";
-import AppDateCell from "@/components/AppDateCell.vue";
-import AppGroupBadge from "@/components/AppGroupBadge.vue";
-import AppUserCell from "@/components/AppUserCell.vue";
-import AppStatusBadge from "@/components/AppStatusBadge.vue";
+import AppButton from "@/components/common/AppButton.vue";
+import AppDateCell from "@/components/common/AppDateCell.vue";
+import AppGroupBadge from "@/components/common/AppGroupBadge.vue";
+import AppStatusBadge from "@/components/common/AppStatusBadge.vue";
+import AppTable from "@/components/common/AppTable.vue";
+import AppUserCell from "@/components/common/AppUserCell.vue";
 
 export default {
   name: "ReplaceTeacherView",

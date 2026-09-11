@@ -1,13 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { JobsService } from './jobs.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { NotificationsService } from '../notifications/notifications.service';
-import { JobStatus } from '@prisma/client';
+import { Test, TestingModule } from "@nestjs/testing";
+import { JobsService } from "./jobs.service";
+import { PrismaService } from "../prisma/prisma.service";
+import { NotificationsService } from "../notifications/notifications.service";
+import { JobStatus } from "@prisma/client";
 
-describe('JobsService (Unit Tests)', () => {
+type MockPrisma = Record<string, Record<string, jest.Mock>>;
+type MockNotifications = Record<string, jest.Mock>;
+
+describe("JobsService (Unit Tests)", () => {
   let service: JobsService;
-  let prisma: any;
-  let notificationsService: any;
+  let prisma: MockPrisma;
+  let notificationsService: MockNotifications;
 
   beforeEach(async () => {
     prisma = {
@@ -34,16 +37,16 @@ describe('JobsService (Unit Tests)', () => {
     service = module.get<JobsService>(JobsService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  it('should create a pending job in database and schedule execution', async () => {
+  it("should create a pending job in database and schedule execution", async () => {
     const mockCreatedJob = {
-      id: 'job-1',
-      organizationId: 'org-1',
-      type: 'NOTIFICATION',
-      payload: { event: 'TEST' },
+      id: "job-1",
+      organizationId: "org-1",
+      type: "NOTIFICATION",
+      payload: { event: "TEST" },
       status: JobStatus.PENDING,
       maxRetries: 3,
       attempts: 0,
@@ -54,18 +57,18 @@ describe('JobsService (Unit Tests)', () => {
     prisma.job.create.mockResolvedValue(mockCreatedJob);
 
     const job = await service.addJob(
-      { type: 'NOTIFICATION', payload: { event: 'TEST' }, delayMs: 1000 },
-      'org-1',
+      { type: "NOTIFICATION", payload: { event: "TEST" }, delayMs: 1000 },
+      "org-1"
     );
 
-    expect(job.id).toBe('job-1');
+    expect(job.id).toBe("job-1");
     expect(prisma.job.create).toHaveBeenCalled();
   });
 
-  it('should recover orphaned pending and processing jobs on bootstrap', async () => {
+  it("should recover orphaned pending and processing jobs on bootstrap", async () => {
     const orphanedJobs = [
       {
-        id: 'job-orphaned-1',
+        id: "job-orphaned-1",
         status: JobStatus.PENDING,
         runAt: new Date(Date.now() - 5000),
       },
@@ -80,7 +83,7 @@ describe('JobsService (Unit Tests)', () => {
         where: {
           status: { in: [JobStatus.PENDING, JobStatus.PROCESSING] },
         },
-      }),
+      })
     );
   });
 });

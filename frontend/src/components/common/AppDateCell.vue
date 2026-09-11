@@ -2,17 +2,15 @@
   <div class="inline-flex flex-col whitespace-nowrap text-xs sm:text-sm select-none">
     <template v-if="isValidDate">
       <div class="inline-flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
-        <Icon
-          v-if="showIcon"
-          icon="solar:calendar-linear"
-          class="text-xs text-gray-400 shrink-0"
-        />
+        <Icon v-if="showIcon" icon="solar:calendar-linear" class="text-xs text-gray-400 shrink-0" />
         <span class="font-medium text-xs">{{ formattedDate }}</span>
       </div>
 
       <!-- Ixtiyoriy yosh nishoni (Tug'ilgan sana uchun) -->
       <div v-if="showAge && age !== null" class="mt-0.5">
-        <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800">
+        <span
+          class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+        >
           {{ age }} yosh
         </span>
       </div>
@@ -27,29 +25,29 @@ import { Icon } from "@iconify/vue";
 export default {
   name: "AppDateCell",
   components: {
-    Icon
+    Icon,
   },
   props: {
     date: {
       type: [String, Date, Number],
-      default: ""
+      default: "",
     },
     withTime: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showAge: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showIcon: {
       type: Boolean,
-      default: false
+      default: false,
     },
     emptyText: {
       type: String,
-      default: "—"
-    }
+      default: "—",
+    },
   },
   computed: {
     dateObj() {
@@ -97,7 +95,7 @@ export default {
         age--;
       }
       return age >= 0 && age < 120 ? age : null;
-    }
-  }
+    },
+  },
 };
 </script>

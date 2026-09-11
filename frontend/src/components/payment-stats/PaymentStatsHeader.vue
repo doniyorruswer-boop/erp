@@ -10,7 +10,9 @@
       <!-- 3-rasm: Standart Dropdown komponenti (kengligi moslashgan, qatorga sig'adigan) -->
       <Dropdown placement="right" width="w-64 min-w-max">
         <template #button>
-          <div class="py-2 px-3.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-100 hover:border-primary flex items-center gap-2 transition cursor-pointer shadow-2xs">
+          <div
+            class="py-2 px-3.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-100 hover:border-primary flex items-center gap-2 transition cursor-pointer shadow-2xs"
+          >
             <span>{{ selectedYearLabel }}</span>
             <Icon icon="solar:alt-arrow-down-linear" class="text-xs text-gray-400" />
           </div>
@@ -20,30 +22,38 @@
             <div
               v-for="opt in yearOptions"
               :key="opt.value"
-              @click="onYearChange(opt.value)"
               :class="[
                 'px-4 py-2.5 text-xs sm:text-sm cursor-pointer flex items-center justify-between gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition whitespace-nowrap',
-                year === opt.value ? 'text-primary font-bold bg-primary/5' : 'text-gray-700 dark:text-gray-200'
+                year === opt.value
+                  ? 'text-primary font-bold bg-primary/5'
+                  : 'text-gray-700 dark:text-gray-200',
               ]"
+              @click="onYearChange(opt.value)"
             >
               <span>{{ opt.label }}</span>
-              <Icon v-if="year === opt.value" icon="solar:check-circle-bold" class="text-primary text-sm shrink-0" />
+              <Icon
+                v-if="year === opt.value"
+                icon="solar:check-circle-bold"
+                class="text-primary text-sm shrink-0"
+              />
             </div>
           </div>
         </template>
       </Dropdown>
 
       <!-- 1 & 2-rasm: Kanbandagi bir xil ko'rinishdagi Tab Switcher komponenti -->
-      <div class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-md border dark:border-gray-700 text-xs">
+      <div
+        class="flex items-center bg-gray-100 dark:bg-gray-900 p-1 rounded-md border dark:border-gray-700 text-xs"
+      >
         <button
           type="button"
-          @click="$emit('update:tab', 'months')"
           :class="[
             'px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5',
             tab === 'months'
               ? 'bg-white dark:bg-gray-700 text-primary shadow-xs'
-              : 'text-gray-500 hover:text-gray-800 dark:text-gray-300'
+              : 'text-gray-500 hover:text-gray-800 dark:text-gray-300',
           ]"
+          @click="$emit('update:tab', 'months')"
         >
           <Icon icon="solar:calendar-bold" class="text-sm" />
           <span>Oylar bo'yicha</span>
@@ -51,15 +61,18 @@
 
         <button
           type="button"
-          @click="$emit('update:tab', 'classes')"
           :class="[
             'px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5',
             tab === 'classes'
               ? 'bg-white dark:bg-gray-700 text-primary shadow-xs'
-              : 'text-gray-500 hover:text-gray-800 dark:text-gray-300'
+              : 'text-gray-500 hover:text-gray-800 dark:text-gray-300',
           ]"
+          @click="$emit('update:tab', 'classes')"
         >
-          <Icon :icon="isSchool ? 'solar:buildings-3-bold' : 'solar:users-group-two-rounded-bold'" class="text-sm" />
+          <Icon
+            :icon="isSchool ? 'solar:buildings-3-bold' : 'solar:users-group-two-rounded-bold'"
+            class="text-sm"
+          />
           <span>{{ isSchool ? "Sinflar bo'yicha" : "Guruhlar bo'yicha" }}</span>
         </button>
       </div>
@@ -69,6 +82,7 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
 import Dropdown from "@/components/Dropdown.vue";
 
 export default {

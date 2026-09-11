@@ -1,15 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { AuditAction } from '@prisma/client';
-import { BranchContext, buildBranchWhere, assertBranchAccess } from '../auth/branch-access';
-import { CreateContractDto, UpdateContractDto, QueryContractDto } from './dto/contract.dto';
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { AuditAction, Prisma } from "@prisma/client";
+import { BranchContext, buildBranchWhere, assertBranchAccess } from "../auth/branch-access";
+import { CreateContractDto, UpdateContractDto, QueryContractDto } from "./dto/contract.dto";
 
 @Injectable()
 export class ContractsService {
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
   async findAll(query: QueryContractDto, orgId: string, branchCtx?: BranchContext) {
@@ -17,19 +17,25 @@ export class ContractsService {
     const limit = Math.min(Number(query.limit) || 20, 100);
     const skip = (page - 1) * limit;
 
-    const branchWhere = branchCtx ? buildBranchWhere(branchCtx, query.branchId) : (query.branchId ? { branchId: query.branchId } : {});
-    const branchFilter = branchWhere.branchId ? { student: { branchId: branchWhere.branchId } } : {};
+    const branchWhere = branchCtx
+      ? buildBranchWhere(branchCtx, query.branchId)
+      : query.branchId
+        ? { branchId: query.branchId }
+        : {};
+    const branchFilter = branchWhere.branchId
+      ? { student: { branchId: branchWhere.branchId } }
+      : {};
 
-    const where: any = {
+    const where: Prisma.ContractWhereInput = {
       organizationId: orgId,
-      status: query.status || { not: 'DELETED' },
+      status: query.status || { not: "DELETED" },
       studentId: query.studentId,
       ...branchFilter,
       OR: query.search
         ? [
-            { contractNumber: { contains: query.search, mode: 'insensitive' } },
-            { student: { firstName: { contains: query.search, mode: 'insensitive' } } },
-            { student: { lastName: { contains: query.search, mode: 'insensitive' } } },
+            { contractNumber: { contains: query.search, mode: "insensitive" } },
+            { student: { firstName: { contains: query.search, mode: "insensitive" } } },
+            { student: { lastName: { contains: query.search, mode: "insensitive" } } },
           ]
         : undefined,
     };
@@ -58,18 +64,18 @@ export class ContractsService {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       }),
       this.prisma.contract.count({ where }),
     ]);
 
-    const enrichedContracts = (contracts as any[]).map((c) => {
+    const enrichedContracts = contracts.map((c) => {
       const totalAmount = Number(c.totalAmount);
       const discountAmount = Number(c.discountAmount);
       const finalAmount = totalAmount - discountAmount;
       const paidAmount = (c.payments || [])
-        .filter((p: any) => p.status === 'PAID')
-        .reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+        .filter((p) => p.status === "PAID")
+        .reduce((sum: number, p) => sum + Number(p.amount), 0);
       const remainingAmount = Math.max(0, finalAmount - paidAmount);
 
       return {
@@ -93,10 +99,12 @@ export class ContractsService {
 
   async findOne(id: string, orgId: string, branchCtx?: BranchContext) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const branchFilter = branchWhere.branchId ? { student: { branchId: branchWhere.branchId } } : {};
+    const branchFilter = branchWhere.branchId
+      ? { student: { branchId: branchWhere.branchId } }
+      : {};
 
     const contract = await this.prisma.contract.findFirst({
-      where: { id, organizationId: orgId, status: { not: 'DELETED' }, ...branchFilter },
+      where: { id, organizationId: orgId, status: { not: "DELETED" }, ...branchFilter },
       include: {
         student: {
           include: {
@@ -107,21 +115,21 @@ export class ContractsService {
           },
         },
         payments: {
-          orderBy: { paymentDate: 'desc' },
+          orderBy: { paymentDate: "desc" },
         },
       },
     });
 
     if (!contract) {
-      throw new NotFoundException('Shartnoma topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+      throw new NotFoundException("Shartnoma topilmadi yoki ushbu filialga kirish huquqi yo'q");
     }
 
     const totalAmount = Number(contract.totalAmount);
     const discountAmount = Number(contract.discountAmount);
     const finalAmount = totalAmount - discountAmount;
-    const paidAmount = ((contract as any).payments || [])
-      .filter((p: any) => p.status === 'PAID')
-      .reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+    const paidAmount = (contract.payments || [])
+      .filter((p) => p.status === "PAID")
+      .reduce((sum: number, p) => sum + Number(p.amount), 0);
     const remainingAmount = Math.max(0, finalAmount - paidAmount);
 
     return {
@@ -139,7 +147,7 @@ export class ContractsService {
     });
 
     if (!student) {
-      throw new NotFoundException('O\'quvchi topilmadi yoki ushbu tashkilotga tegishli emas');
+      throw new NotFoundException("O'quvchi topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     // Resolve target branch from student or dto and assert access
@@ -150,7 +158,7 @@ export class ContractsService {
 
     // Cross-branch verification: Student's branch must match contract's branch
     if (student.branchId && dto.branchId && student.branchId !== dto.branchId) {
-      throw new BadRequestException('Shartnoma filiali o\'quvchining filiali bilan mos kelmadi');
+      throw new BadRequestException("Shartnoma filiali o'quvchining filiali bilan mos kelmadi");
     }
 
     // 2. Generate unique contract number if not provided
@@ -167,7 +175,7 @@ export class ContractsService {
         discountAmount: dto.discountAmount || 0,
         startDate: dto.startDate ? new Date(dto.startDate) : new Date(),
         endDate: dto.endDate ? new Date(dto.endDate) : null,
-        status: dto.status || 'ACTIVE',
+        status: dto.status || "ACTIVE",
         notes: dto.notes,
       },
       include: {
@@ -180,7 +188,7 @@ export class ContractsService {
       branchId: targetBranchId || undefined,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Contract',
+      entityType: "Contract",
       entityId: contract.id,
       after: contract,
     });
@@ -188,7 +196,13 @@ export class ContractsService {
     return contract;
   }
 
-  async update(id: string, dto: UpdateContractDto, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async update(
+    id: string,
+    dto: UpdateContractDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const contract = await this.findOne(id, orgId, branchCtx);
 
     const targetBranchId = dto.branchId || contract.student?.branchId || undefined;
@@ -214,7 +228,7 @@ export class ContractsService {
       branchId: targetBranchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Contract',
+      entityType: "Contract",
       entityId: id,
       before: contract,
       after: updated,
@@ -229,7 +243,7 @@ export class ContractsService {
     // Soft delete preserving contract history
     const softDeleted = await this.prisma.contract.update({
       where: { id },
-      data: { status: 'DELETED' },
+      data: { status: "DELETED" },
     });
 
     await this.auditService.log({
@@ -237,30 +251,32 @@ export class ContractsService {
       branchId: contract.student?.branchId || undefined,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Contract',
+      entityType: "Contract",
       entityId: id,
       before: contract,
       after: softDeleted,
     });
 
-    return { success: true, message: 'Shartnoma muvaffaqiyatli arxivlandi (soft delete)' };
+    return { success: true, message: "Shartnoma muvaffaqiyatli arxivlandi (soft delete)" };
   }
 
   async restore(id: string, orgId: string, userId?: string, branchCtx?: BranchContext) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const branchFilter = branchWhere.branchId ? { student: { branchId: branchWhere.branchId } } : {};
+    const branchFilter = branchWhere.branchId
+      ? { student: { branchId: branchWhere.branchId } }
+      : {};
 
     const contract = await this.prisma.contract.findFirst({
-      where: { id, organizationId: orgId, status: 'DELETED', ...branchFilter },
+      where: { id, organizationId: orgId, status: "DELETED", ...branchFilter },
     });
 
     if (!contract) {
-      throw new NotFoundException('O\'chirilgan shartnoma topilmadi');
+      throw new NotFoundException("O'chirilgan shartnoma topilmadi");
     }
 
     const restored = await this.prisma.contract.update({
       where: { id },
-      data: { status: 'ACTIVE' },
+      data: { status: "ACTIVE" },
     });
 
     await this.auditService.log({
@@ -268,7 +284,7 @@ export class ContractsService {
       branchId: contract.studentId ? undefined : undefined,
       userId,
       action: AuditAction.RESTORE,
-      entityType: 'Contract',
+      entityType: "Contract",
       entityId: id,
       after: restored,
     });

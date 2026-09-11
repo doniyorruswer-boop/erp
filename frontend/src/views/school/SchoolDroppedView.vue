@@ -2,10 +2,7 @@
   <div class="school-dropped-page p-4 font-lexend space-y-5">
     <!-- 1. Breadcrumb Navigatsiyasi -->
     <Breadcrumb
-      :items="[
-        { title: 'Ta\'lim', to: '/school/classes' },
-        { title: 'Chetlatilganlar' }
-      ]"
+      :items="[{ title: 'Ta\'lim', to: '/school/classes' }, { title: 'Chetlatilganlar' }]"
     />
 
     <!-- 2. Header Section (Sarlavha va amallar) -->
@@ -18,26 +15,20 @@
 
       <!-- O'ng tomondagi amallar -->
       <div class="flex items-center gap-2.5 flex-wrap">
-        <AppButton
-          variant="outline"
-          icon="ri:file-excel-2-line"
-          @click="exportToExcel"
-        >
+        <AppButton variant="outline" icon="ri:file-excel-2-line" @click="exportToExcel">
           Export Excel
         </AppButton>
 
-        <AppButton
-          variant="primary"
-          icon="solar:user-minus-bold"
-          @click="openExcludeModal"
-        >
+        <AppButton variant="primary" icon="solar:user-minus-bold" @click="openExcludeModal">
           O'quvchini chetlatish
         </AppButton>
       </div>
     </div>
 
     <!-- 3. Sana filtri paneli (Standart chiplar va AppDateRangePicker) -->
-    <div class="bg-white dark:bg-gray-800 p-3 sm:p-3.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+    <div
+      class="bg-white dark:bg-gray-800 p-3 sm:p-3.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs flex items-center justify-between flex-wrap gap-3"
+    >
       <!-- Chap tomondagi tezkor sana chiplari (Segmented pill andozasi) -->
       <div class="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
         <span class="text-gray-500 dark:text-gray-400 font-semibold mr-1">Chetlatilgan:</span>
@@ -46,13 +37,13 @@
             v-for="chip in dateChips"
             :key="chip.id"
             type="button"
-            @click="setDateChip(chip.id)"
             :class="[
               'px-2.5 py-1 rounded-md text-xs font-semibold transition cursor-pointer select-none',
               activeDateChip === chip.id
                 ? 'bg-white dark:bg-gray-800 text-primary shadow-2xs font-bold'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white',
             ]"
+            @click="setDateChip(chip.id)"
           >
             {{ chip.label }}
           </button>
@@ -64,18 +55,33 @@
         :start-date="dateFrom"
         :end-date="dateTo"
         align="right"
-        @update:startDate="val => { dateFrom = val; onCustomDateChange(); }"
-        @update:endDate="val => { dateTo = val; onCustomDateChange(); }"
+        @update:start-date="
+          (val) => {
+            dateFrom = val;
+            onCustomDateChange();
+          }
+        "
+        @update:end-date="
+          (val) => {
+            dateTo = val;
+            onCustomDateChange();
+          }
+        "
         @change="handleDateRangePickerChange"
       />
     </div>
 
     <!-- 4. Qidiruv va Filtrlar paneli -->
-    <div class="bg-white dark:bg-gray-800 p-3 sm:p-3.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+    <div
+      class="bg-white dark:bg-gray-800 p-3 sm:p-3.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs flex items-center justify-between flex-wrap gap-3"
+    >
       <div class="flex items-center gap-2.5 flex-wrap flex-1 min-w-[280px]">
         <!-- Qidiruv inputi -->
         <div class="relative w-full sm:w-72">
-          <Icon icon="solar:magnifer-linear" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
+          <Icon
+            icon="solar:magnifer-linear"
+            class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+          />
           <input
             v-model="searchQuery"
             type="text"
@@ -99,9 +105,9 @@
         <button
           v-if="isFiltered"
           type="button"
-          @click="resetAllFilters"
           class="h-9 sm:h-9.5 px-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-600 dark:text-gray-300 flex items-center gap-1.5 transition cursor-pointer"
           title="Filtrlarni tozalash"
+          @click="resetAllFilters"
         >
           <Icon icon="solar:restart-linear" class="text-sm" />
           <span>Tozalash</span>
@@ -111,10 +117,10 @@
 
     <!-- 5. Yagona Universal AppTable Komponenti -->
     <AppTable
+      v-model="selectedStudentIds"
       :columns="tableColumns"
       :data="filteredStudents"
       :selectable="true"
-      v-model="selectedStudentIds"
       :show-index="true"
       index-label="№"
       :per-page="perPage"
@@ -126,24 +132,24 @@
       <template #bulkActions>
         <button
           type="button"
-          @click="openBulkRestoreModal"
           class="px-3 py-1.5 rounded-lg border border-primary/30 bg-white dark:bg-gray-800 text-primary text-xs font-semibold hover:bg-primary hover:text-white transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          @click="openBulkRestoreModal"
         >
           <Icon icon="solar:restart-circle-bold" class="text-sm" />
           <span>Ommaviy qayta tiklash</span>
         </button>
         <button
           type="button"
-          @click="openBulkDeleteModal"
           class="px-3 py-1.5 rounded-lg border border-rose-300 bg-white dark:bg-gray-800 text-rose-600 text-xs font-semibold hover:bg-rose-600 hover:text-white transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          @click="openBulkDeleteModal"
         >
           <Icon icon="solar:trash-bin-2-linear" class="text-sm" />
           <span>O'chirish</span>
         </button>
         <button
           type="button"
-          @click="exportSelectedToExcel"
           class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          @click="exportSelectedToExcel"
         >
           <Icon icon="ri:file-excel-2-line" class="text-sm" />
           <span>Export Excel</span>
@@ -152,11 +158,7 @@
 
       <!-- F.I.SH ustuni (Universal AppUserCell - 1-rasm standarti) -->
       <template #cell(fullName)="{ row }">
-        <AppUserCell
-          :name="row.fullName"
-          :image="row.avatar"
-          @click="openDetail(row)"
-        />
+        <AppUserCell :name="row.fullName" :image="row.avatar" @click="openDetail(row)" />
       </template>
 
       <!-- Sinf ustuni (Universal AppGroupBadge) -->
@@ -187,9 +189,9 @@
           <!-- Tiklash (Primary rangda) -->
           <button
             type="button"
-            @click="initiateRestore(row)"
             class="h-8 px-3 rounded-lg bg-primary hover:bg-primary/90 active:bg-primary text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer select-none"
             title="O'quvchilar safiga qayta tiklash"
+            @click="initiateRestore(row)"
           >
             <Icon icon="solar:restart-circle-bold" class="text-sm" />
             <span>Qayta tiklash</span>
@@ -198,9 +200,9 @@
           <!-- O'chirish (Qizil rangda) -->
           <button
             type="button"
-            @click="initiateDelete(row)"
             class="h-8 px-3 rounded-lg bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer select-none"
             title="Butunlay o'chirish"
+            @click="initiateDelete(row)"
           >
             <Icon icon="solar:trash-bin-trash-bold" class="text-sm" />
             <span>O'chirish</span>
@@ -212,23 +214,25 @@
     <!-- 6. Modallar -->
 
     <!-- Qayta tiklash modali (vmodal) -->
-    <vmodal
+    <Vmodal
       ref="restoreModalRef"
-      :hideButton="true"
+      :hide-button="true"
       title="O'quvchini qayta tiklash"
       subtitle="O'quvchini faol holatga va sinf safiga qaytarish"
-      btnTextSubmit="Qayta tiklash"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-primary hover:bg-primary/90 text-white"
+      btn-text-submit="Qayta tiklash"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-primary hover:bg-primary/90 text-white"
       @submit="confirmRestore"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:restart-circle-bold" class="text-3xl text-primary mb-2" />
       </template>
 
-      <template v-slot:body>
+      <template #body>
         <div v-if="selectedStudentToRestore" class="space-y-4 text-left text-xs font-lexend">
-          <div class="p-3.5 bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-xl space-y-1">
+          <div
+            class="p-3.5 bg-primary/5 dark:bg-primary/10 border border-primary/20 rounded-xl space-y-1"
+          >
             <div class="font-bold text-sm text-gray-900 dark:text-white">
               {{ selectedStudentToRestore.fullName }}
             </div>
@@ -255,47 +259,53 @@
           </div>
 
           <p class="text-gray-500 dark:text-gray-400 text-[11px] leading-relaxed">
-            Tasdiqlangach, o'quvchi chetlatilganlar ro'yxatidan chiqariladi va faol o'quvchilar ro'yxatida ko'rina boshlaydi.
+            Tasdiqlangach, o'quvchi chetlatilganlar ro'yxatidan chiqariladi va faol o'quvchilar
+            ro'yxatida ko'rina boshlaydi.
           </p>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- Ommaviy qayta tiklash modali -->
-    <vmodal
+    <Vmodal
       ref="bulkRestoreModalRef"
-      :hideButton="true"
+      :hide-button="true"
       title="Ommaviy qayta tiklash"
       subtitle="Tanlangan o'quvchilarni faol saflarga qaytarish"
-      btnTextSubmit="Barchasini tiklash"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-primary hover:bg-primary/90 text-white"
+      btn-text-submit="Barchasini tiklash"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-primary hover:bg-primary/90 text-white"
       @submit="confirmBulkRestore"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:restart-circle-bold" class="text-3xl text-primary mb-2" />
       </template>
 
-      <template v-slot:body>
+      <template #body>
         <div class="space-y-3 text-left text-xs font-lexend">
           <p class="text-gray-700 dark:text-gray-200">
-            Haqiqatan ham tanlangan <b>{{ selectedStudentIds.length }}</b> ta o'quvchini faol saflarga qaytarmoqchimisiz?
+            Haqiqatan ham tanlangan <b>{{ selectedStudentIds.length }}</b> ta o'quvchini faol
+            saflarga qaytarmoqchimisiz?
           </p>
           <p class="text-[11px] text-gray-400">
             Har bir o'quvchi avvalgi sinfiga tiklanadi va holati «Faol»ga o'zgartiriladi.
           </p>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- Yakkama-yakka o'chirish tasdiq modali (AppConfirmModal) -->
     <AppConfirmModal
       ref="deleteConfirmModalRef"
       title="O'quvchini butunlay o'chirish"
-      :message="selectedStudentToDelete ? selectedStudentToDelete.fullName + ' ni tizimdan butunlay o\'chirmoqchimisiz?' : ''"
+      :message="
+        selectedStudentToDelete
+          ? selectedStudentToDelete.fullName + ' ni tizimdan butunlay o\'chirmoqchimisiz?'
+          : ''
+      "
       description="Ushbu amalni ortga qaytarib bo'lmaydi. O'quvchining barcha yozuvlari bazadan to'liq o'chiriladi."
-      confirmText="Ha, o'chirilsin"
-      cancelText="Bekor qilish"
+      confirm-text="Ha, o'chirilsin"
+      cancel-text="Bekor qilish"
       variant="danger"
       @confirm="confirmDelete"
     />
@@ -304,30 +314,34 @@
     <AppConfirmModal
       ref="bulkDeleteConfirmModalRef"
       title="Tanlangan o'quvchilarni o'chirish"
-      :message="'Tanlangan ' + selectedStudentIds.length + ' ta o\'quvchini butunlay o\'chirib tashlamoqchimisiz?'"
+      :message="
+        'Tanlangan ' +
+        selectedStudentIds.length +
+        ' ta o\'quvchini butunlay o\'chirib tashlamoqchimisiz?'
+      "
       description="Bu amal tanlangan barcha o'quvchilar yozuvlarini bazadan o'chiradi va uni ortga qaytarib bo'lmaydi."
-      confirmText="Ha, barchasi o'chirilsin"
-      cancelText="Bekor qilish"
+      confirm-text="Ha, barchasi o'chirilsin"
+      cancel-text="Bekor qilish"
       variant="danger"
       @confirm="confirmBulkDelete"
     />
 
     <!-- Qo'lda o'quvchini chetlatish modali -->
-    <vmodal
+    <Vmodal
       ref="excludeModalRef"
-      :hideButton="true"
+      :hide-button="true"
       title="O'quvchini chetlatish"
       subtitle="Faol o'quvchini chetlatilganlar ro'yxatiga o'tkazish"
-      btnTextSubmit="Chetlatish"
-      btnTextClose="Bekor qilish"
-      btnColorSubmit="bg-red-600 hover:bg-red-700 text-white"
+      btn-text-submit="Chetlatish"
+      btn-text-close="Bekor qilish"
+      btn-color-submit="bg-red-600 hover:bg-red-700 text-white"
       @submit="submitExclude"
     >
-      <template v-slot:Icon>
+      <template #Icon>
         <Icon icon="solar:user-minus-bold" class="text-3xl text-rose-600 mb-2" />
       </template>
 
-      <template v-slot:body>
+      <template #body>
         <div class="space-y-3.5 text-left text-xs font-lexend">
           <div>
             <label class="block font-semibold text-gray-700 dark:text-gray-300 mb-1">
@@ -339,11 +353,7 @@
               @change="onActiveStudentSelect"
             >
               <option value="" disabled>O'quvchini tanlang...</option>
-              <option
-                v-for="st in activeStudentsOptions"
-                :key="st.id"
-                :value="st.id"
-              >
+              <option v-for="st in activeStudentsOptions" :key="st.id" :value="st.id">
                 {{ st.fullName }} ({{ st.className }})
               </option>
             </select>
@@ -355,8 +365,8 @@
                 {{ tenantStore.classLabel }}
               </label>
               <input
-                type="text"
                 v-model="excludeForm.className"
+                type="text"
                 disabled
                 class="w-full h-9 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs outline-none"
               />
@@ -367,8 +377,8 @@
                 Chetlatilgan sana <span class="text-red-500">*</span>
               </label>
               <input
-                type="date"
                 v-model="excludeForm.droppedDate"
+                type="date"
                 class="w-full h-9 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-xs outline-none"
               />
             </div>
@@ -383,7 +393,9 @@
               class="w-full h-9 sm:h-9.5 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
             >
               <option value="Boshqa shaharga ko'chish">Boshqa shaharga ko'chish</option>
-              <option value="Boshqa ta'lim muassasasiga o'tish">Boshqa ta'lim muassasasiga o'tish</option>
+              <option value="Boshqa ta'lim muassasasiga o'tish">
+                Boshqa ta'lim muassasasiga o'tish
+              </option>
               <option value="O'qish narxi / Shartnoma">O'qish narxi / Shartnoma to'lanmagan</option>
               <option value="Salomatlik sababli">Salomatlik sababli</option>
               <option value="Intizom qoidalari buzilishi">Intizom qoidalari buzilishi</option>
@@ -406,28 +418,30 @@
           </div>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import AppButton from "@/components/AppButton.vue";
-import AppFilterDropdown from "@/components/AppFilterDropdown.vue";
-import AppTable from "@/components/AppTable.vue";
-import AppConfirmModal from "@/components/common/AppConfirmModal.vue";
-import AppDateRangePicker from "@/components/common/AppDateRangePicker.vue";
-import vmodal from "@/components/modal.vue";
-import { useTenantStore } from "@/store/tenant";
+
+import { courseCenterGroups, schoolClasses } from "@/api/schoolClassesData";
 import {
-  loadSchoolDroppedStudents,
+  addDroppedStudent,
   deleteDroppedStudent,
+  loadSchoolDroppedStudents,
   restoreDroppedStudent,
-  addDroppedStudent
 } from "@/api/schoolDroppedData";
 import { initialSchoolStudents } from "@/api/schoolStudentsData";
-import { schoolClasses, courseCenterGroups } from "@/api/schoolClassesData";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import AppButton from "@/components/common/AppButton.vue";
+import AppConfirmModal from "@/components/common/AppConfirmModal.vue";
+import AppDateRangePicker from "@/components/common/AppDateRangePicker.vue";
+import AppFilterDropdown from "@/components/common/AppFilterDropdown.vue";
+import vmodal from "@/components/common/AppModal.vue";
+import AppTable from "@/components/common/AppTable.vue";
+import { useTenantStore } from "@/store/tenant";
+import toast from "@/utils/toast";
 
 export default {
   name: "SchoolDroppedView",
@@ -494,7 +508,11 @@ export default {
     tableColumns() {
       return [
         { key: "fullName", label: "F.I.SH", thClass: "py-3.5 px-4 min-w-[200px]" },
-        { key: "className", label: this.tenantStore.classLabel, thClass: "py-3.5 px-4 min-w-[100px]" },
+        {
+          key: "className",
+          label: this.tenantStore.classLabel,
+          thClass: "py-3.5 px-4 min-w-[100px]",
+        },
         { key: "phone", label: "Telefon", thClass: "py-3.5 px-4 min-w-[160px]" },
         { key: "droppedDate", label: "Chetlatilgan sana", thClass: "py-3.5 px-4 min-w-[140px]" },
         { key: "reason", label: "Sababi", thClass: "py-3.5 px-4 min-w-[260px]" },
@@ -502,13 +520,13 @@ export default {
     },
     availableClasses() {
       if (this.tenantStore.isSchool) {
-        return schoolClasses.map(c => c.name);
+        return schoolClasses.map((c) => c.name);
       } else {
-        return courseCenterGroups.map(g => g.name);
+        return courseCenterGroups.map((g) => g.name);
       }
     },
     classFilterOptions() {
-      return this.availableClasses.map(c => ({
+      return this.availableClasses.map((c) => ({
         label: c,
         value: c,
       }));
@@ -523,7 +541,7 @@ export default {
       );
     },
     filteredStudents() {
-      return this.droppedList.filter(st => {
+      return this.droppedList.filter((st) => {
         // Search
         if (this.searchQuery.trim()) {
           const q = this.searchQuery.toLowerCase().trim();
@@ -551,10 +569,13 @@ export default {
       });
     },
   },
+  mounted() {
+    this.loadData();
+  },
   methods: {
     loadData() {
       this.droppedList = loadSchoolDroppedStudents();
-      this.activeStudentsOptions = initialSchoolStudents.map(s => ({
+      this.activeStudentsOptions = initialSchoolStudents.map((s) => ({
         id: s.id,
         fullName: s.fullName,
         className: s.className,
@@ -581,7 +602,7 @@ export default {
       this.activeDateChip = chipId;
       const today = new Date();
       const pad = (n) => String(n).padStart(2, "0");
-      const fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      const fmt = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
       if (chipId === "TODAY") {
         this.dateFrom = fmt(today);
@@ -655,12 +676,14 @@ export default {
       if (!this.selectedStudentToRestore) return;
       const student = this.selectedStudentToRestore;
       restoreDroppedStudent(student.id, this.targetRestoreClass);
-      this.selectedStudentIds = this.selectedStudentIds.filter(id => id !== student.id);
+      this.selectedStudentIds = this.selectedStudentIds.filter((id) => id !== student.id);
       this.loadData();
       if (this.$refs.restoreModalRef) {
         this.$refs.restoreModalRef.close();
       }
-      this.notifySuccess(`${student.fullName} muvaffaqiyatli qayta tiklandi va ${this.targetRestoreClass}ga qo'shildi`);
+      this.notifySuccess(
+        `${student.fullName} muvaffaqiyatli qayta tiklandi va ${this.targetRestoreClass}ga qo'shildi`
+      );
     },
     // Ommaviy tiklash
     openBulkRestoreModal() {
@@ -691,7 +714,7 @@ export default {
       if (!this.selectedStudentToDelete) return;
       const student = this.selectedStudentToDelete;
       deleteDroppedStudent(student.id);
-      this.selectedStudentIds = this.selectedStudentIds.filter(id => id !== student.id);
+      this.selectedStudentIds = this.selectedStudentIds.filter((id) => id !== student.id);
       this.loadData();
       if (this.$refs.deleteConfirmModalRef) {
         this.$refs.deleteConfirmModalRef.close();
@@ -732,7 +755,7 @@ export default {
       }
     },
     onActiveStudentSelect() {
-      const found = this.activeStudentsOptions.find(s => s.id === this.excludeForm.studentId);
+      const found = this.activeStudentsOptions.find((s) => s.id === this.excludeForm.studentId);
       if (found) {
         this.excludeForm.fullName = found.fullName;
         this.excludeForm.className = found.className;
@@ -767,28 +790,38 @@ export default {
       this.notifySuccess(`${this.excludeForm.fullName} chetlatilganlar ro'yxatiga qo'shildi`);
     },
     exportToExcel() {
-      this.downloadCsv(this.filteredStudents, `chetlatilganlar_${new Date().toISOString().split("T")[0]}.csv`);
+      this.downloadCsv(
+        this.filteredStudents,
+        `chetlatilganlar_${new Date().toISOString().split("T")[0]}.csv`
+      );
       this.notifySuccess("Excel export muvaffaqiyatli amalga oshirildi");
     },
     exportSelectedToExcel() {
-      const selected = this.droppedList.filter(s => this.selectedStudentIds.includes(s.id));
-      this.downloadCsv(selected, `tanlangan_chetlatilganlar_${new Date().toISOString().split("T")[0]}.csv`);
+      const selected = this.droppedList.filter((s) => this.selectedStudentIds.includes(s.id));
+      this.downloadCsv(
+        selected,
+        `tanlangan_chetlatilganlar_${new Date().toISOString().split("T")[0]}.csv`
+      );
       this.notifySuccess("Tanlangan o'quvchilar muvaffaqiyatli export qilindi");
     },
     downloadCsv(list, filename) {
       const rows = [
         ["ID", "F.I.SH", "Sinf/Guruh", "Telefon", "Chetlatilgan sana", "Sababi"],
-        ...list.map(s => [
+        ...list.map((s) => [
           s.studentId,
           s.fullName,
           s.className,
           s.phone,
           s.droppedDate,
-          s.reason
-        ])
+          s.reason,
+        ]),
       ];
 
-      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(e => e.map(i => `"${(i || "").toString().replace(/"/g, '""')}"`).join(",")).join("\n");
+      const csvContent =
+        "data:text/csv;charset=utf-8,\uFEFF" +
+        rows
+          .map((e) => e.map((i) => `"${(i || "").toString().replace(/"/g, '""')}"`).join(","))
+          .join("\n");
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
@@ -801,12 +834,9 @@ export default {
       if (this.$toast && this.$toast.success) {
         this.$toast.success(msg);
       } else {
-        console.log("[Toast Success]", msg);
+        toast.success(msg);
       }
     },
-  },
-  mounted() {
-    this.loadData();
   },
 };
 </script>

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="whitespace-nowrap select-none text-xs sm:text-sm"
-    :class="[alignClass, colorClass]"
-  >
+  <div class="whitespace-nowrap select-none text-xs sm:text-sm" :class="[alignClass, colorClass]">
     <span>{{ formattedAmount }}</span>
     <span v-if="currency" class="ml-1">{{ currency }}</span>
   </div>
@@ -14,22 +11,22 @@ export default {
   props: {
     amount: {
       type: [Number, String],
-      default: 0
+      default: 0,
     },
     type: {
       type: String,
       default: "regular", // 'regular' | 'debt' | 'income'
-      validator: (v) => ["regular", "debt", "income"].includes(v)
+      validator: (v) => ["regular", "debt", "income"].includes(v),
     },
     currency: {
       type: String,
-      default: "so'm"
+      default: "so'm",
     },
     align: {
       type: String,
       default: "left",
-      validator: (v) => ["left", "center", "right"].includes(v)
-    }
+      validator: (v) => ["left", "center", "right"].includes(v),
+    },
   },
   computed: {
     numericAmount() {
@@ -44,8 +41,8 @@ export default {
       return this.align === "right"
         ? "text-right"
         : this.align === "center"
-        ? "text-center"
-        : "text-left";
+          ? "text-center"
+          : "text-left";
     },
     colorClass() {
       if (this.type === "debt") {
@@ -57,7 +54,7 @@ export default {
         return "text-emerald-600 dark:text-emerald-400 font-semibold";
       }
       return "text-gray-700 dark:text-gray-300 font-medium";
-    }
-  }
+    },
+  },
 };
 </script>

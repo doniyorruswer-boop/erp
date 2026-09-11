@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend"
+  >
     <!-- Header -->
     <div class="flex items-center justify-between flex-wrap gap-2">
       <div>
@@ -36,20 +38,30 @@
         class="p-3 rounded-lg bg-gray-50/80 dark:bg-gray-700/30 border border-gray-200/80 dark:border-gray-700/60 space-y-2 hover:border-primary/40 transition"
       >
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-gray-800 dark:text-gray-100 truncate max-w-[160px]" :title="s.groupName || s.title">
+          <span
+            class="text-xs font-bold text-gray-800 dark:text-gray-100 truncate max-w-[160px]"
+            :title="s.groupName || s.title"
+          >
             {{ s.groupName || s.title || "Guruh" }}
           </span>
-          <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary shrink-0">
+          <span
+            class="text-[11px] font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary shrink-0"
+          >
             {{ formatTime(s.startAt) }} - {{ formatTime(s.endAt) }}
           </span>
         </div>
 
-        <div class="grid grid-cols-2 gap-1 text-[11px] text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-200/60 dark:border-gray-700/40">
+        <div
+          class="grid grid-cols-2 gap-1 text-[11px] text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-200/60 dark:border-gray-700/40"
+        >
           <div class="flex items-center gap-1 truncate" :title="s.resourceName">
             <Icon icon="solar:home-2-linear" class="shrink-0 text-gray-400" />
             <span class="truncate">{{ s.resourceName || "Xonasiz" }}</span>
           </div>
-          <div class="flex items-center gap-1 truncate text-right justify-end" :title="s.instructorName">
+          <div
+            class="flex items-center gap-1 truncate text-right justify-end"
+            :title="s.instructorName"
+          >
             <Icon icon="solar:user-linear" class="shrink-0 text-gray-400" />
             <span class="truncate">{{ s.instructorName || "O'qituvchi" }}</span>
           </div>

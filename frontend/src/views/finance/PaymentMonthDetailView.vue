@@ -24,18 +24,22 @@
     />
 
     <!-- 4. Deep Inspection Tabs -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xs overflow-hidden">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xs overflow-hidden"
+    >
       <!-- Tabs Navigation Header with Solar Icons -->
-      <div class="flex items-center gap-2 p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/80 overflow-x-auto">
+      <div
+        class="flex items-center gap-2 p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/80 overflow-x-auto"
+      >
         <button
           type="button"
-          @click="activeSubTab = 'classes'"
           :class="[
             'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 transition cursor-pointer whitespace-nowrap',
             activeSubTab === 'classes'
               ? 'bg-primary text-white shadow-2xs'
-              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-gray-700'
+              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-gray-700',
           ]"
+          @click="activeSubTab = 'classes'"
         >
           <Icon icon="solar:users-group-two-rounded-bold" class="text-base" />
           <span>Sinflar va Guruhlar kesimi ({{ classBreakdown.length }})</span>
@@ -43,13 +47,13 @@
 
         <button
           type="button"
-          @click="activeSubTab = 'transactions'"
           :class="[
             'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 transition cursor-pointer whitespace-nowrap',
             activeSubTab === 'transactions'
               ? 'bg-primary text-white shadow-2xs'
-              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-gray-700'
+              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-gray-700',
           ]"
+          @click="activeSubTab = 'transactions'"
         >
           <Icon icon="solar:wallet-money-bold" class="text-base" />
           <span>Shu oydagi to'lovlar jurnali ({{ transactionsList.length }})</span>
@@ -57,13 +61,13 @@
 
         <button
           type="button"
-          @click="activeSubTab = 'debtors'"
           :class="[
             'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 transition cursor-pointer whitespace-nowrap',
             activeSubTab === 'debtors'
               ? 'bg-rose-600 text-white shadow-2xs'
-              : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30'
+              : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30',
           ]"
+          @click="activeSubTab = 'debtors'"
         >
           <Icon icon="solar:danger-triangle-bold" class="text-base" />
           <span>Qarzdorlar ro'yxati ({{ debtorsList.length }})</span>
@@ -71,10 +75,7 @@
       </div>
 
       <!-- Tab 1: Sinflar Kesimida -->
-      <MonthDetailClassesTab
-        v-if="activeSubTab === 'classes'"
-        :classes="classBreakdown"
-      />
+      <MonthDetailClassesTab v-if="activeSubTab === 'classes'" :classes="classBreakdown" />
 
       <!-- Tab 2: To'lovlar Jurnali -->
       <MonthDetailTransactionsTab
@@ -105,22 +106,18 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import MonthDetailHeader from "@/components/payment-stats/month-detail/MonthDetailHeader.vue";
-import MonthDetailKpis from "@/components/payment-stats/month-detail/MonthDetailKpis.vue";
+
+import { getStudentsByClass, loadSchoolClasses } from "@/api/schoolClassesData";
+import { dashboardApi, paymentsApi } from "@/api/services";
 import MonthDetailCharts from "@/components/payment-stats/month-detail/MonthDetailCharts.vue";
 import MonthDetailClassesTab from "@/components/payment-stats/month-detail/MonthDetailClassesTab.vue";
-import MonthDetailTransactionsTab from "@/components/payment-stats/month-detail/MonthDetailTransactionsTab.vue";
 import MonthDetailDebtorsTab from "@/components/payment-stats/month-detail/MonthDetailDebtorsTab.vue";
+import MonthDetailHeader from "@/components/payment-stats/month-detail/MonthDetailHeader.vue";
+import MonthDetailKpis from "@/components/payment-stats/month-detail/MonthDetailKpis.vue";
 import MonthDetailSmsModal from "@/components/payment-stats/month-detail/MonthDetailSmsModal.vue";
-
-import { loadSchoolClasses, getStudentsByClass } from "@/api/schoolClassesData";
+import MonthDetailTransactionsTab from "@/components/payment-stats/month-detail/MonthDetailTransactionsTab.vue";
+import { getActivePaymentMethods } from "@/config/paymentMethods";
 import { useTenantStore } from "@/store/tenant";
-import { dashboardApi, paymentsApi } from "@/api/services";
-import {
-  getActivePaymentMethods,
-  getPaymentMethodName,
-  getPaymentMethodColor,
-} from "@/config/paymentMethods";
 
 export default {
   name: "PaymentMonthDetailView",
@@ -156,9 +153,7 @@ export default {
 
       if (this.statsData && Array.isArray(this.statsData.months)) {
         const found = this.statsData.months.find(
-          (m) =>
-            m.key.toLowerCase() === key ||
-            m.name.toLowerCase().startsWith(key)
+          (m) => m.key.toLowerCase() === key || m.name.toLowerCase().startsWith(key)
         );
         if (found) {
           return {
@@ -167,7 +162,10 @@ export default {
             year: found.year || q.year || "2025-2026",
             plan: Number(found.plan) || Number(q.plan) || 1250000000,
             fact: Number(found.fact) || Number(q.fact) || 0,
-            percent: found.percent !== undefined ? found.percent : Math.round(((found.fact || 0) / (found.plan || 1)) * 100),
+            percent:
+              found.percent !== undefined
+                ? found.percent
+                : Math.round(((found.fact || 0) / (found.plan || 1)) * 100),
             isCurrent: !!found.isCurrent,
             isPast: !!found.isPast,
           };
@@ -177,7 +175,8 @@ export default {
       if (q.name && q.plan !== undefined) {
         const plan = Number(q.plan) || 1250000000;
         const fact = Number(q.fact) || 0;
-        const percent = q.percent !== undefined ? Number(q.percent) : Math.round((fact / (plan || 1)) * 100);
+        const percent =
+          q.percent !== undefined ? Number(q.percent) : Math.round((fact / (plan || 1)) * 100);
         return {
           key: this.monthKey,
           name: q.name,
@@ -192,7 +191,13 @@ export default {
 
       const map = {
         avg: { name: "Avgust", year: "2025-2026", plan: 1100000000, fact: 1045000000, percent: 95 },
-        sen: { name: "Sentabr", year: "2025-2026", plan: 1250000000, fact: 1187500000, percent: 95 },
+        sen: {
+          name: "Sentabr",
+          year: "2025-2026",
+          plan: 1250000000,
+          fact: 1187500000,
+          percent: 95,
+        },
         okt: { name: "Oktabr", year: "2025-2026", plan: 1250000000, fact: 980500000, percent: 78 },
         noy: { name: "Noyabr", year: "2025-2026", plan: 1250000000, fact: 625000000, percent: 50 },
         dek: { name: "Dekabr", year: "2025-2026", plan: 1250000000, fact: 250000000, percent: 20 },
@@ -203,14 +208,16 @@ export default {
         may: { name: "May", year: "2025-2026", plan: 1250000000, fact: 0, percent: 0 },
       };
       const prefix = key.slice(0, 3);
-      return map[prefix] || {
-        key: this.monthKey,
-        name: this.monthKey.charAt(0).toUpperCase() + this.monthKey.slice(1),
-        year: "2025-2026",
-        plan: 1250000000,
-        fact: 980500000,
-        percent: 78,
-      };
+      return (
+        map[prefix] || {
+          key: this.monthKey,
+          name: this.monthKey.charAt(0).toUpperCase() + this.monthKey.slice(1),
+          year: "2025-2026",
+          plan: 1250000000,
+          fact: 980500000,
+          percent: 78,
+        }
+      );
     },
     monthMetrics() {
       const plan = this.monthInfo.plan;
@@ -224,20 +231,23 @@ export default {
     classBreakdown() {
       const bType = this.tenantStore?.businessType || "SCHOOL";
       const classes = loadSchoolClasses(bType);
-      const monthRatio = ((this.monthInfo.fact || 1) / (this.monthInfo.plan || 1)) || 0.8;
+      const monthRatio = (this.monthInfo.fact || 1) / (this.monthInfo.plan || 1) || 0.8;
 
       return classes.map((c, i) => {
         const studentCount = c.studentsCount || 28;
         const monthlyRate = 4458000;
         const plan = studentCount * monthlyRate;
-        const variance = [0.95, 0.88, 0.76, 0.92, 0.68, 0.84, 0.90, 0.82, 0.86, 0.72, 0.80, 0.94][i % 12];
+        const variance = [0.95, 0.88, 0.76, 0.92, 0.68, 0.84, 0.9, 0.82, 0.86, 0.72, 0.8, 0.94][
+          i % 12
+        ];
         const fact = Math.round(plan * Math.min(1, monthRatio * variance));
         const debt = Math.max(0, plan - fact);
         const percent = plan > 0 ? Math.round((fact / plan) * 100) : 0;
         return {
           id: c.id,
           name: c.name,
-          courseName: c.courseName || (this.tenantStore.isSchool ? "Umumta'lim sinfi" : "Standart guruh"),
+          courseName:
+            c.courseName || (this.tenantStore.isSchool ? "Umumta'lim sinfi" : "Standart guruh"),
           studentsCount: studentCount,
           plan,
           fact,
@@ -265,18 +275,24 @@ export default {
 
           const studentName = p.student
             ? `${p.student.firstName} ${p.student.lastName}`
-            : (p.customer ? `${p.customer.firstName} ${p.customer.lastName}` : "Noma'lum o'quvchi");
+            : p.customer
+              ? `${p.customer.firstName} ${p.customer.lastName}`
+              : "Noma'lum o'quvchi";
 
           return {
             id: p.id || `tx-${idx + 1}`,
             date,
             studentId: p.studentId || (p.student && p.student.id) || `STU-${1000 + idx}`,
             studentName,
-            className: (classes[idx % classes.length]?.name) || "1-A",
+            className: classes[idx % classes.length]?.name || "1-A",
             amount: Number(p.amount) || 4458000,
             method: p.method || ["CARD", "CLICK", "CASH", "PAYME"][idx % 4],
             receiptNumber: p.receiptNumber || `CHK-${90000 + idx}`,
-            cashier: p.receivedBy ? `${p.receivedBy.firstName} ${p.receivedBy.lastName}` : (p.cashbox ? p.cashbox.name : "Asosiy Kassa"),
+            cashier: p.receivedBy
+              ? `${p.receivedBy.firstName} ${p.receivedBy.lastName}`
+              : p.cashbox
+                ? p.cashbox.name
+                : "Asosiy Kassa",
           };
         });
       }
@@ -286,20 +302,31 @@ export default {
       let txId = 1001;
       const mName = this.monthInfo.name;
       const monthNumMap = {
-        Avgust: "08", Sentabr: "09", Oktabr: "10", Oktyabr: "10",
-        Noyabr: "11", Dekabr: "12", Yanvar: "01", Fevral: "02",
-        Mart: "03", Aprel: "04", May: "05",
+        Avgust: "08",
+        Sentabr: "09",
+        Oktabr: "10",
+        Oktyabr: "10",
+        Noyabr: "11",
+        Dekabr: "12",
+        Yanvar: "01",
+        Fevral: "02",
+        Mart: "03",
+        Aprel: "04",
+        May: "05",
       };
       const monthStr = monthNumMap[mName] || "09";
       const yearStr = ["01", "02", "03", "04", "05"].includes(monthStr) ? "2026" : "2025";
 
       for (let day = 1; day <= 28; day++) {
         const dateStr = `${String(day).padStart(2, "0")}.${monthStr}.${yearStr}`;
-        const countOnDay = (day <= 10) ? 5 : 2;
+        const countOnDay = day <= 10 ? 5 : 2;
         for (let k = 0; k < countOnDay; k++) {
           const cls = classes[(day + k) % classes.length];
           const stList = getStudentsByClass(cls.id, cls.name, cls.studentsCount, bType);
-          const st = stList[(day * 3 + k) % stList.length] || { studentId: "250026000300", fullName: "To'rayev Shahnoza Shavkat o'g'li" };
+          const st = stList[(day * 3 + k) % stList.length] || {
+            studentId: "250026000300",
+            fullName: "To'rayev Shahnoza Shavkat o'g'li",
+          };
           const methodObj = activeMethods[(day + k * 2) % activeMethods.length];
           list.push({
             id: `tx-${txId++}`,
@@ -346,7 +373,7 @@ export default {
       this.transactionsList.forEach((t) => {
         const day = parseInt(t.date.slice(0, 2), 10);
         if (day >= 1 && day <= 30) {
-          sumsByDay[day - 1] += (t.amount || 0);
+          sumsByDay[day - 1] += t.amount || 0;
         }
       });
       return sumsByDay;
@@ -355,13 +382,16 @@ export default {
       const activeMethods = getActivePaymentMethods();
       const total = this.transactionsList.length || 1;
       const counts = {};
-      activeMethods.forEach((m) => { counts[m.code] = 0; });
+      activeMethods.forEach((m) => {
+        counts[m.code] = 0;
+      });
 
       this.transactionsList.forEach((t) => {
         if (counts[t.method] !== undefined) {
           counts[t.method]++;
         } else {
-          counts[activeMethods[0]?.code || "CARD"] = (counts[activeMethods[0]?.code || "CARD"] || 0) + 1;
+          counts[activeMethods[0]?.code || "CARD"] =
+            (counts[activeMethods[0]?.code || "CARD"] || 0) + 1;
         }
       });
 
@@ -393,7 +423,7 @@ export default {
         if (paymentsRes.status === "fulfilled" && paymentsRes.value) {
           const list = Array.isArray(paymentsRes.value)
             ? paymentsRes.value
-            : (paymentsRes.value.payments || paymentsRes.value.data || []);
+            : paymentsRes.value.payments || paymentsRes.value.data || [];
           this.realPayments = list;
         }
       } catch (err) {
@@ -403,7 +433,9 @@ export default {
       }
     },
     exportMonthExcel() {
-      alert(`${this.monthInfo.name} ${this.monthInfo.year} to'lovlar hisoboti Excel formatida yuklab olindi!`);
+      alert(
+        `${this.monthInfo.name} ${this.monthInfo.year} to'lovlar hisoboti Excel formatida yuklab olindi!`
+      );
     },
     printSummarySheet() {
       window.print();

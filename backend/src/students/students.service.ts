@@ -1,10 +1,19 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException, ConflictException, Logger, Optional } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { WorkflowService } from '../workflow/workflow.service';
-import { SubscriptionsService } from '../subscriptions/subscriptions.service';
-import { StudentStatus, AuditAction, AttendanceStatus } from '@prisma/client';
-import { BranchContext, buildBranchWhere, assertBranchAccess } from '../auth/branch-access';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+  ConflictException,
+  Logger,
+  Optional,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { WorkflowService } from "../workflow/workflow.service";
+import { SubscriptionsService } from "../subscriptions/subscriptions.service";
+import { StudentStatus, AuditAction, AttendanceStatus, Prisma } from "@prisma/client";
+import { BranchContext, buildBranchWhere, assertBranchAccess } from "../auth/branch-access";
+import { CreateStudentDto, UpdateStudentDto } from "./dto/student.dto";
 
 @Injectable()
 export class StudentsService {
@@ -14,12 +23,20 @@ export class StudentsService {
     private prisma: PrismaService,
     private auditService: AuditService,
     @Optional() private workflowService?: WorkflowService,
-    @Optional() private subscriptionsService?: SubscriptionsService,
+    @Optional() private subscriptionsService?: SubscriptionsService
   ) {}
 
   async findAll(
-    query: { search?: string; status?: StudentStatus; groupId?: string; orgId: string; branchId?: string; page?: number; limit?: number },
-    branchCtx?: BranchContext,
+    query: {
+      search?: string;
+      status?: StudentStatus;
+      groupId?: string;
+      orgId: string;
+      branchId?: string;
+      page?: number;
+      limit?: number;
+    },
+    branchCtx?: BranchContext
   ) {
     const page = query.page ? Number(query.page) : 1;
     const limit = query.limit ? Math.min(Number(query.limit), 100) : 50;
@@ -27,9 +44,11 @@ export class StudentsService {
 
     const branchFilter = branchCtx
       ? buildBranchWhere(branchCtx, query.branchId)
-      : (query.branchId ? { branchId: query.branchId } : {});
+      : query.branchId
+        ? { branchId: query.branchId }
+        : {};
 
-    const where: any = {
+    const where: Prisma.StudentWhereInput = {
       organizationId: query.orgId,
       deletedAt: null,
       status: query.status,
@@ -37,8 +56,8 @@ export class StudentsService {
       enrollments: query.groupId ? { some: { groupId: query.groupId, isActive: true } } : undefined,
       OR: query.search
         ? [
-            { firstName: { contains: query.search, mode: 'insensitive' } },
-            { lastName: { contains: query.search, mode: 'insensitive' } },
+            { firstName: { contains: query.search, mode: "insensitive" } },
+            { lastName: { contains: query.search, mode: "insensitive" } },
             { phone: { contains: query.search } },
           ]
         : undefined,
@@ -65,11 +84,11 @@ export class StudentsService {
             include: { parent: true },
           },
           payments: {
-            orderBy: { paymentDate: 'desc' },
+            orderBy: { paymentDate: "desc" },
             take: 5,
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       }),
       this.prisma.student.count({ where }),
     ]);
@@ -102,28 +121,29 @@ export class StudentsService {
           },
         },
         enrollmentHistories: {
-          orderBy: { date: 'desc' },
+          orderBy: { date: "desc" },
         },
         payments: {
-          orderBy: { paymentDate: 'desc' },
+          orderBy: { paymentDate: "desc" },
         },
         attendances: {
-          orderBy: { date: 'desc' },
+          orderBy: { date: "desc" },
           take: 20,
         },
         grades: {
-          orderBy: { date: 'desc' },
+          orderBy: { date: "desc" },
           include: { exam: true, lesson: true },
         },
       },
     });
-    if (!student) throw new NotFoundException("O'quvchi topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!student)
+      throw new NotFoundException("O'quvchi topilmadi yoki ushbu filialga kirish huquqi yo'q");
     return student;
   }
 
-  async create(data: any, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async create(data: CreateStudentDto, orgId: string, userId?: string, branchCtx?: BranchContext) {
     if (this.subscriptionsService) {
-      await this.subscriptionsService.checkLimit('MAX_STUDENTS_CUSTOMERS', 1, orgId);
+      await this.subscriptionsService.checkLimit("MAX_STUDENTS_CUSTOMERS", 1, orgId);
     }
 
     let targetBranchId = data.branchId;
@@ -137,9 +157,12 @@ export class StudentsService {
       const group = await this.prisma.group.findFirst({
         where: { id: data.initialGroupId, organizationId: orgId, deletedAt: null },
       });
-      if (!group) throw new BadRequestException('Guruh topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!group)
+        throw new BadRequestException("Guruh topilmadi yoki ushbu tashkilotga tegishli emas");
       if (targetBranchId && group.branchId && targetBranchId !== group.branchId) {
-        throw new BadRequestException("O'quvchining filiali tanlangan guruh filiali bilan mos kelmadi");
+        throw new BadRequestException(
+          "O'quvchining filiali tanlangan guruh filiali bilan mos kelmadi"
+        );
       }
     }
 
@@ -152,7 +175,7 @@ export class StudentsService {
     });
 
     if (existing && existing.deletedAt === null) {
-      throw new ConflictException('Ushbu telefon raqamli o\'quvchi tashkilotda allaqachon mavjud');
+      throw new ConflictException("Ushbu telefon raqamli o'quvchi tashkilotda allaqachon mavjud");
     }
 
     if (existing && existing.deletedAt !== null) {
@@ -181,7 +204,10 @@ export class StudentsService {
           parentEmail: data.parentEmail || existing.parentEmail,
           notes: data.notes || existing.notes,
           status: data.status || StudentStatus.ACTIVE,
-          customFields: data.customFields !== undefined ? data.customFields : existing.customFields,
+          customFields:
+            data.customFields !== undefined
+              ? (data.customFields as unknown as Prisma.InputJsonValue)
+              : (existing.customFields as unknown as Prisma.InputJsonValue | undefined),
           deletedAt: null,
         },
       });
@@ -205,8 +231,8 @@ export class StudentsService {
           data: {
             studentId: existing.id,
             groupId: data.initialGroupId,
-            action: 'ENROLLED',
-            reason: 'Tizimga qayta tiklandi va guruhga yozildi',
+            action: "ENROLLED",
+            reason: "Tizimga qayta tiklandi va guruhga yozildi",
           },
         });
       }
@@ -215,7 +241,7 @@ export class StudentsService {
         organizationId: orgId,
         userId,
         action: AuditAction.UPDATE,
-        entityType: 'Student',
+        entityType: "Student",
         entityId: existing.id,
         before: existing,
         after: updated,
@@ -224,16 +250,20 @@ export class StudentsService {
       return updated;
     }
 
-    const { initialGroupId, parents, organizationId: _ignoredOrgId, ...studentData } = data;
+    const { initialGroupId, parents, ...studentData } = data;
 
     const student = await this.prisma.$transaction(async (tx) => {
       const createdStudent = await tx.student.create({
         data: {
           ...studentData,
+          lastName: studentData.lastName || "",
           organizationId: orgId,
           birthDate: studentData.birthDate ? new Date(studentData.birthDate) : undefined,
           enrolledDate: studentData.enrolledDate ? new Date(studentData.enrolledDate) : undefined,
           status: studentData.status || StudentStatus.ACTIVE,
+          customFields: studentData.customFields
+            ? (studentData.customFields as unknown as Prisma.InputJsonValue)
+            : undefined,
         },
       });
 
@@ -247,10 +277,10 @@ export class StudentsService {
                 phone: parent.phone || `p-${createdStudent.id}`,
               },
             },
-            update: { fullName: parent.fullName },
+            update: { fullName: parent.fullName || "" },
             create: {
               organizationId: orgId,
-              fullName: parent.fullName,
+              fullName: parent.fullName || "",
               phone: parent.phone || `p-${createdStudent.id}`,
               relationship: parent.relationship || null,
               isPrimary: parent.isPrimary !== undefined ? parent.isPrimary : true,
@@ -285,10 +315,10 @@ export class StudentsService {
               phone: parentPhone,
             },
           },
-          update: { fullName: studentData.parentName || 'Ota-onasi' },
+          update: { fullName: studentData.parentName || "Ota-onasi" },
           create: {
             organizationId: orgId,
-            fullName: studentData.parentName || 'Ota-onasi',
+            fullName: studentData.parentName || "Ota-onasi",
             phone: parentPhone,
             isPrimary: true,
           },
@@ -322,8 +352,8 @@ export class StudentsService {
           data: {
             studentId: createdStudent.id,
             groupId: initialGroupId,
-            action: 'ENROLLED',
-            reason: 'Yangi talaba guruhga qabul qilindi',
+            action: "ENROLLED",
+            reason: "Yangi talaba guruhga qabul qilindi",
           },
         });
       }
@@ -335,7 +365,7 @@ export class StudentsService {
       organizationId: orgId,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Student',
+      entityType: "Student",
       entityId: student.id,
       after: student,
     });
@@ -343,7 +373,7 @@ export class StudentsService {
     if (this.workflowService) {
       try {
         await this.workflowService.processEvent(
-          'student.created',
+          "student.created",
           {
             id: student.id,
             firstName: student.firstName,
@@ -352,24 +382,32 @@ export class StudentsService {
             branchId: student.branchId,
             status: student.status,
           },
-          orgId,
+          orgId
         );
-      } catch (err: any) {
-        this.logger.warn(`Workflow execution failed for student.created: ${err.message}`);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.logger.warn(`Workflow execution failed for student.created: ${msg}`);
       }
     }
 
     return student;
   }
 
-  async update(id: string, data: any, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async update(
+    id: string,
+    data: UpdateStudentDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const branchFilter = branchCtx ? buildBranchWhere(branchCtx) : {};
     const existing = await this.prisma.student.findFirst({
       where: { id, organizationId: orgId, deletedAt: null, ...branchFilter },
     });
-    if (!existing) throw new NotFoundException("O'quvchi topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!existing)
+      throw new NotFoundException("O'quvchi topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
-    let targetBranchId = existing.branchId;
+    let targetBranchId: string | null | undefined = existing.branchId;
     if (data.branchId && branchCtx) {
       targetBranchId = assertBranchAccess(branchCtx, data.branchId);
       data.branchId = targetBranchId;
@@ -379,9 +417,12 @@ export class StudentsService {
       const group = await this.prisma.group.findFirst({
         where: { id: data.initialGroupId, organizationId: orgId, deletedAt: null },
       });
-      if (!group) throw new BadRequestException('Guruh topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!group)
+        throw new BadRequestException("Guruh topilmadi yoki ushbu tashkilotga tegishli emas");
       if (targetBranchId && group.branchId && targetBranchId !== group.branchId) {
-        throw new BadRequestException("O'quvchining filiali tanlangan guruh filiali bilan mos kelmadi");
+        throw new BadRequestException(
+          "O'quvchining filiali tanlangan guruh filiali bilan mos kelmadi"
+        );
       }
     }
 
@@ -392,6 +433,9 @@ export class StudentsService {
         ...studentData,
         birthDate: studentData.birthDate ? new Date(studentData.birthDate) : undefined,
         enrolledDate: studentData.enrolledDate ? new Date(studentData.enrolledDate) : undefined,
+        customFields: studentData.customFields
+          ? (studentData.customFields as unknown as Prisma.InputJsonValue)
+          : undefined,
       },
     });
 
@@ -416,7 +460,7 @@ export class StudentsService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Student',
+      entityType: "Student",
       entityId: id,
       before: existing,
       after: student,
@@ -425,19 +469,29 @@ export class StudentsService {
     return student;
   }
 
-  async freeze(id: string, reason: string | undefined, returnDate: string | undefined, userId: string | undefined, orgId: string, branchCtx?: BranchContext) {
+  async freeze(
+    id: string,
+    reason: string | undefined,
+    returnDate: string | undefined,
+    userId: string | undefined,
+    orgId: string,
+    branchCtx?: BranchContext
+  ) {
     const branchFilter = branchCtx ? buildBranchWhere(branchCtx) : {};
     const student = await this.prisma.student.findFirst({
       where: { id, organizationId: orgId, deletedAt: null, ...branchFilter },
       include: { enrollments: true },
     });
-    if (!student) throw new NotFoundException("Talaba topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!student)
+      throw new NotFoundException("Talaba topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const updated = await this.prisma.student.update({
       where: { id },
       data: {
         status: StudentStatus.FROZEN,
-        notes: reason ? `${student.notes ? student.notes + '\n' : ''}[Muzlatildi: ${reason}${returnDate ? ' Qaytish: ' + returnDate : ''}]` : student.notes,
+        notes: reason
+          ? `${student.notes ? student.notes + "\n" : ""}[Muzlatildi: ${reason}${returnDate ? " Qaytish: " + returnDate : ""}]`
+          : student.notes,
       },
     });
 
@@ -446,7 +500,7 @@ export class StudentsService {
         data: {
           studentId: id,
           groupId: enrollment.groupId,
-          action: 'FROZEN',
+          action: "FROZEN",
           reason: reason || "O'qish vaqtincha muzlatildi",
         },
       });
@@ -457,7 +511,7 @@ export class StudentsService {
       branchId: student.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Student',
+      entityType: "Student",
       entityId: id,
       before: student,
       after: updated,
@@ -472,7 +526,8 @@ export class StudentsService {
       where: { id, organizationId: orgId, deletedAt: null, ...branchFilter },
       include: { enrollments: true },
     });
-    if (!student) throw new NotFoundException("Talaba topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!student)
+      throw new NotFoundException("Talaba topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const updated = await this.prisma.student.update({
       where: { id },
@@ -486,7 +541,7 @@ export class StudentsService {
         data: {
           studentId: id,
           groupId: enrollment.groupId,
-          action: 'UNFROZEN',
+          action: "UNFROZEN",
           reason: "O'qish qayta faollashtirildi",
         },
       });
@@ -497,7 +552,7 @@ export class StudentsService {
       branchId: student.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Student',
+      entityType: "Student",
       entityId: id,
       before: student,
       after: updated,
@@ -506,30 +561,43 @@ export class StudentsService {
     return updated;
   }
 
-  async graduate(id: string, data: { groupId?: string; certificateNumber?: string; score?: number }, userId: string | undefined, orgId: string, branchCtx?: BranchContext) {
+  async graduate(
+    id: string,
+    data: { groupId?: string; certificateNumber?: string; score?: number },
+    userId: string | undefined,
+    orgId: string,
+    branchCtx?: BranchContext
+  ) {
     const branchFilter = branchCtx ? buildBranchWhere(branchCtx) : {};
     const student = await this.prisma.student.findFirst({
       where: { id, organizationId: orgId, deletedAt: null, ...branchFilter },
       include: { enrollments: true },
     });
-    if (!student) throw new NotFoundException("Talaba topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!student)
+      throw new NotFoundException("Talaba topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const updated = await this.prisma.student.update({
       where: { id },
       data: {
         status: StudentStatus.GRADUATED,
-        notes: data.certificateNumber ? `${student.notes ? student.notes + '\n' : ''}[Sertifikat: ${data.certificateNumber}${data.score ? ' Ball: ' + data.score : ''}]` : student.notes,
+        notes: data.certificateNumber
+          ? `${student.notes ? student.notes + "\n" : ""}[Sertifikat: ${data.certificateNumber}${data.score ? " Ball: " + data.score : ""}]`
+          : student.notes,
       },
     });
 
-    const targetGroupIds = data.groupId ? [data.groupId] : student.enrollments.map(e => e.groupId);
+    const targetGroupIds = data.groupId
+      ? [data.groupId]
+      : student.enrollments.map((e) => e.groupId);
     for (const gId of targetGroupIds) {
       await this.prisma.enrollmentHistory.create({
         data: {
           studentId: id,
           groupId: gId,
-          action: 'GRADUATED',
-          reason: data.certificateNumber ? `Bitirdi (Sertifikat: ${data.certificateNumber})` : 'Kursni muvaffaqiyatli yakunladi',
+          action: "GRADUATED",
+          reason: data.certificateNumber
+            ? `Bitirdi (Sertifikat: ${data.certificateNumber})`
+            : "Kursni muvaffaqiyatli yakunladi",
         },
       });
     }
@@ -539,7 +607,7 @@ export class StudentsService {
       branchId: student.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Student',
+      entityType: "Student",
       entityId: id,
       before: student,
       after: updated,
@@ -563,7 +631,7 @@ export class StudentsService {
         attendances: true,
         grades: {
           include: { exam: true, lesson: true },
-          orderBy: { date: 'desc' },
+          orderBy: { date: "desc" },
         },
         invoices: true,
         payments: true,
@@ -573,13 +641,25 @@ export class StudentsService {
     if (!student) throw new NotFoundException("Talaba topilmadi");
 
     const totalAttendances = student.attendances.length;
-    const presentCount = student.attendances.filter(a => a.status === AttendanceStatus.PRESENT).length;
-    const lateCount = student.attendances.filter(a => a.status === AttendanceStatus.LATE).length;
-    const absentCount = student.attendances.filter(a => a.status === AttendanceStatus.ABSENT || a.status === AttendanceStatus.ABSENT_UNEXCUSED).length;
-    const attendanceRate = totalAttendances > 0 ? Math.round(((presentCount + lateCount * 0.5) / totalAttendances) * 100) : 100;
+    const presentCount = student.attendances.filter(
+      (a) => a.status === AttendanceStatus.PRESENT
+    ).length;
+    const lateCount = student.attendances.filter((a) => a.status === AttendanceStatus.LATE).length;
+    const absentCount = student.attendances.filter(
+      (a) => a.status === AttendanceStatus.ABSENT || a.status === AttendanceStatus.ABSENT_UNEXCUSED
+    ).length;
+    const attendanceRate =
+      totalAttendances > 0
+        ? Math.round(((presentCount + lateCount * 0.5) / totalAttendances) * 100)
+        : 100;
 
     const totalGrades = student.grades.length;
-    const avgScore = totalGrades > 0 ? Math.round((student.grades.reduce((sum, g) => sum + Number(g.score), 0) / totalGrades) * 10) / 10 : 0;
+    const avgScore =
+      totalGrades > 0
+        ? Math.round(
+            (student.grades.reduce((sum, g) => sum + Number(g.score), 0) / totalGrades) * 10
+          ) / 10
+        : 0;
 
     const totalInvoiced = student.invoices.reduce((sum, inv) => sum + Number(inv.totalAmount), 0);
     const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0);
@@ -607,12 +687,16 @@ export class StudentsService {
         totalPaid,
         currentBalance: student.balance,
       },
-      activeGroups: student.enrollments.filter(e => e.isActive).map(e => ({
-        groupId: e.groupId,
-        groupName: e.group.name,
-        courseName: e.group.course.name,
-        teacherName: e.group.teacher ? `${e.group.teacher.firstName} ${e.group.teacher.lastName}` : null,
-      })),
+      activeGroups: student.enrollments
+        .filter((e) => e.isActive)
+        .map((e) => ({
+          groupId: e.groupId,
+          groupName: e.group.name,
+          courseName: e.group.course.name,
+          teacherName: e.group.teacher
+            ? `${e.group.teacher.firstName} ${e.group.teacher.lastName}`
+            : null,
+        })),
     };
   }
 
@@ -621,7 +705,8 @@ export class StudentsService {
     const existing = await this.prisma.student.findFirst({
       where: { id, organizationId: orgId, deletedAt: null, ...branchFilter },
     });
-    if (!existing) throw new NotFoundException("O'quvchi topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!existing)
+      throw new NotFoundException("O'quvchi topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const deleted = await this.prisma.student.update({
       where: { id },
@@ -633,7 +718,7 @@ export class StudentsService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Student',
+      entityType: "Student",
       entityId: id,
       before: existing,
       after: deleted,
@@ -647,7 +732,8 @@ export class StudentsService {
     const existing = await this.prisma.student.findFirst({
       where: { id, organizationId: orgId, ...branchFilter },
     });
-    if (!existing) throw new NotFoundException("O'quvchi topilmadi yoki ushbu filialga kirish huquqi yo'q");
+    if (!existing)
+      throw new NotFoundException("O'quvchi topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const restored = await this.prisma.student.update({
       where: { id },
@@ -659,7 +745,7 @@ export class StudentsService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.RESTORE,
-      entityType: 'Student',
+      entityType: "Student",
       entityId: id,
       before: existing,
       after: restored,

@@ -6,7 +6,7 @@
         :items="[
           { title: 'O\'quv jarayoni', to: '/education/schedule' },
           { title: 'Dars jadvali', to: '/education/schedule' },
-          { title: currentClass.name }
+          { title: currentClass.name },
         ]"
       />
 
@@ -15,11 +15,7 @@
         <div class="flex items-center gap-2 text-xs">
           <span class="text-gray-500 dark:text-gray-400 font-medium">Sinf:</span>
           <div ref="triggerRef" class="inline-block">
-            <AppButton
-              variant="outline"
-              size="md"
-              @click="toggleDropdown"
-            >
+            <AppButton variant="outline" size="md" @click="toggleDropdown">
               <span class="font-bold text-gray-800 dark:text-gray-100">
                 {{ currentClass.name }} ({{ currentClass.stageLabel }})
               </span>
@@ -43,26 +39,27 @@
     <Teleport to="body">
       <div v-if="isDropdownOpen">
         <!-- Transparent Backdrop: tashqariga bosilganda yopish -->
-        <div
-          class="fixed inset-0 z-[9998] bg-transparent"
-          @click="closeDropdown"
-        />
+        <div class="fixed inset-0 z-[9998] bg-transparent" @click="closeDropdown" />
 
         <!-- Popover list: mustaqil scroll bo'ladi, sahifaga ta'sir qilmaydi -->
         <div
           ref="dropdownMenu"
           :style="dropdownStyle"
+          class="custom-dropdown-scroll fixed z-[9999] min-w-[220px] max-h-64 overflow-y-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 font-lexend animate-fade-in"
           @wheel.stop
           @touchmove.stop
-          class="custom-dropdown-scroll fixed z-[9999] min-w-[220px] max-h-64 overflow-y-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 font-lexend animate-fade-in"
         >
           <button
             v-for="c in allClasses"
             :key="c.id"
             type="button"
-            @click="selectClass(c.id)"
             class="w-full text-left px-3.5 py-2.5 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700/80 flex items-center justify-between transition cursor-pointer"
-            :class="c.id === activeClassId ? 'text-primary font-bold bg-primary/5 dark:bg-primary/20' : 'text-gray-700 dark:text-gray-200'"
+            :class="
+              c.id === activeClassId
+                ? 'text-primary font-bold bg-primary/5 dark:bg-primary/20'
+                : 'text-gray-700 dark:text-gray-200'
+            "
+            @click="selectClass(c.id)"
           >
             <div class="flex items-center gap-2">
               <span
@@ -83,15 +80,13 @@
 
     <!-- 2. Chorak sarlavhasi va Generatsiya paneli -->
     <div
-      class="bg-white dark:bg-[#131b2e] border border-gray-200 dark:border-gray-800/80 rounded-2xl p-4 flex items-center justify-between flex-wrap gap-3 shadow-2xs"
+      class="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800/80 rounded-2xl p-4 flex items-center justify-between flex-wrap gap-3 shadow-2xs"
     >
       <div class="flex items-center gap-3 flex-wrap">
         <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 tracking-tight">
           {{ activeQuarter.name }} | {{ activeQuarter.dateRangeText }}
         </h2>
-        <span
-          class="px-2.5 py-1 rounded-lg text-xs font-bold bg-primary text-white shadow-2xs"
-        >
+        <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-primary text-white shadow-2xs">
           {{ currentClass.name }} sinf
         </span>
       </div>
@@ -104,11 +99,7 @@
         >
           Shablonlar
         </AppButton>
-        <AppButton
-          variant="primary"
-          icon="solar:restart-bold"
-          @click="$emit('generate')"
-        >
+        <AppButton variant="primary" icon="solar:restart-bold" @click="$emit('generate')">
           Generatsiya
         </AppButton>
       </div>
@@ -118,9 +109,10 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import AppButton from "@/components/AppButton.vue";
+
 import { SCHOOL_QUARTERS } from "@/api/scheduleData";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import AppButton from "@/components/common/AppButton.vue";
 
 export default {
   name: "ClassScheduleHeader",

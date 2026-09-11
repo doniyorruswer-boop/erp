@@ -70,19 +70,17 @@
 </template>
 
 <script>
-import { Icon } from "@iconify/vue";
-import StatCard from "@/components/dashboard/StatCard.vue";
-import FinancialActivitySection from "@/components/dashboard/FinancialActivitySection.vue";
-import ClassCapacityAndQuickActions from "@/components/dashboard/ClassCapacityAndQuickActions.vue";
-import MonthlyContractsStatistics from "@/components/dashboard/MonthlyContractsStatistics.vue";
-import StudentWizardModal from "@/components/students/StudentWizardModal.vue";
-import { formatUZS, formatShortNumber } from "@/helper/formatters";
 import { dashboardApi, groupsApi } from "@/api";
+import ClassCapacityAndQuickActions from "@/components/dashboard/ClassCapacityAndQuickActions.vue";
+import FinancialActivitySection from "@/components/dashboard/FinancialActivitySection.vue";
+import MonthlyContractsStatistics from "@/components/dashboard/MonthlyContractsStatistics.vue";
+import StatCard from "@/components/dashboard/StatCard.vue";
+import StudentWizardModal from "@/components/students/StudentWizardModal.vue";
+import { formatShortNumber, formatUZS } from "@/helper/formatters";
 
 export default {
   name: "SchoolDashboard",
   components: {
-    Icon,
     StatCard,
     FinancialActivitySection,
     ClassCapacityAndQuickActions,
@@ -102,10 +100,42 @@ export default {
         presentStudents: 56,
       },
       schoolClasses: [
-        { id: 1, name: "1-A", teacher: "Matluba Rahimova", capacity: 20, studentsCount: 15, boys: 8, girls: 7 },
-        { id: 2, name: "2-A", teacher: "Gulbahor Saidova", capacity: 20, studentsCount: 15, boys: 9, girls: 6 },
-        { id: 3, name: "3-B", teacher: "Dilshod Ergashev", capacity: 20, studentsCount: 14, boys: 7, girls: 7 },
-        { id: 4, name: "5-A", teacher: "Nilufar Azimova", capacity: 20, studentsCount: 16, boys: 8, girls: 8 },
+        {
+          id: 1,
+          name: "1-A",
+          teacher: "Matluba Rahimova",
+          capacity: 20,
+          studentsCount: 15,
+          boys: 8,
+          girls: 7,
+        },
+        {
+          id: 2,
+          name: "2-A",
+          teacher: "Gulbahor Saidova",
+          capacity: 20,
+          studentsCount: 15,
+          boys: 9,
+          girls: 6,
+        },
+        {
+          id: 3,
+          name: "3-B",
+          teacher: "Dilshod Ergashev",
+          capacity: 20,
+          studentsCount: 14,
+          boys: 7,
+          girls: 7,
+        },
+        {
+          id: 4,
+          name: "5-A",
+          teacher: "Nilufar Azimova",
+          capacity: 20,
+          studentsCount: 16,
+          boys: 8,
+          girls: 8,
+        },
       ],
     };
   },
@@ -119,10 +149,13 @@ export default {
       try {
         const stats = await dashboardApi.getStats({ type: "SCHOOL" });
         if (stats) {
-          if (stats.totalStudents !== undefined) this.schoolStats.totalStudents = stats.totalStudents;
+          if (stats.totalStudents !== undefined)
+            this.schoolStats.totalStudents = stats.totalStudents;
           if (stats.totalRevenue !== undefined) this.schoolStats.todayPayment = stats.totalRevenue;
-          if (stats.attendanceRate !== undefined) this.schoolStats.attendanceRate = stats.attendanceRate;
-          if (stats.activeGroups !== undefined) this.schoolStats.activeContracts = stats.totalStudents || 42;
+          if (stats.attendanceRate !== undefined)
+            this.schoolStats.attendanceRate = stats.attendanceRate;
+          if (stats.activeGroups !== undefined)
+            this.schoolStats.activeContracts = stats.totalStudents || 42;
           if (stats.groups && Array.isArray(stats.groups) && stats.groups.length > 0) {
             this.schoolClasses = stats.groups;
           }
@@ -136,8 +169,12 @@ export default {
             teacher: g.teacher ? `${g.teacher.firstName} ${g.teacher.lastName}` : "Belgilanmagan",
             capacity: g.room ? g.room.capacity : 20,
             studentsCount: g.enrollments ? g.enrollments.length : 15,
-            boys: g.enrollments ? g.enrollments.filter((e) => e.student && e.student.gender === "MALE").length : 8,
-            girls: g.enrollments ? g.enrollments.filter((e) => e.student && e.student.gender === "FEMALE").length : 7,
+            boys: g.enrollments
+              ? g.enrollments.filter((e) => e.student && e.student.gender === "MALE").length
+              : 8,
+            girls: g.enrollments
+              ? g.enrollments.filter((e) => e.student && e.student.gender === "FEMALE").length
+              : 7,
           }));
         }
       } catch (err) {

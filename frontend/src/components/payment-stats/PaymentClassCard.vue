@@ -13,7 +13,9 @@
             {{ item.courseName }}
           </p>
         </div>
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-2xs shrink-0 whitespace-nowrap">
+        <span
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-2xs shrink-0 whitespace-nowrap"
+        >
           <Icon icon="solar:users-group-two-rounded-bold" class="text-sm" />
           {{ item.studentsCount }} o'quvchi
         </span>
@@ -22,14 +24,21 @@
       <!-- Ustoz / Mentor -->
       <div class="mt-3 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
         <Icon icon="solar:user-circle-linear" class="text-sm shrink-0" />
-        <span class="truncate">Ustoz: <strong class="text-gray-700 dark:text-gray-300">{{ item.teacherName }}</strong></span>
+        <span class="truncate"
+          >Ustoz:
+          <strong class="text-gray-700 dark:text-gray-300">{{ item.teacherName }}</strong></span
+        >
       </div>
 
       <!-- Reja, Tushum va Qarz -->
-      <div class="my-4 space-y-2 border-t border-b border-gray-100 dark:border-gray-700/80 py-3 text-xs sm:text-sm">
+      <div
+        class="my-4 space-y-2 border-t border-b border-gray-100 dark:border-gray-700/80 py-3 text-xs sm:text-sm"
+      >
         <div class="flex justify-between items-center gap-2">
           <span class="text-gray-500 dark:text-gray-400">Oylik Reja:</span>
-          <span class="font-bold text-gray-900 dark:text-gray-100 tracking-tight">{{ formatUZS(item.plan) }}</span>
+          <span class="font-bold text-gray-900 dark:text-gray-100 tracking-tight">{{
+            formatUZS(item.plan)
+          }}</span>
         </div>
         <div class="flex justify-between items-center gap-2">
           <span class="text-gray-500 dark:text-gray-400">Tushum:</span>
@@ -37,9 +46,13 @@
         </div>
         <div class="flex justify-between items-center gap-2">
           <span class="text-gray-500 dark:text-gray-400">Qarzdorlik:</span>
-          <span :class="['font-bold tracking-tight', item.debt > 0 ? 'text-red-500' : 'text-gray-400']">
+          <span
+            :class="['font-bold tracking-tight', item.debt > 0 ? 'text-red-500' : 'text-gray-400']"
+          >
             {{ formatUZS(item.debt) }}
-            <span v-if="item.debtorsCount > 0" class="text-[11px] text-gray-400 font-normal">({{ item.debtorsCount }})</span>
+            <span v-if="item.debtorsCount > 0" class="text-[11px] text-gray-400 font-normal"
+              >({{ item.debtorsCount }})</span
+            >
           </span>
         </div>
       </div>

@@ -1,15 +1,27 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { AuditAction } from '@prisma/client';
-import { CreateExamDto, UpdateExamDto, QueryExamDto, RecordGradesDto, CreateGradeDto, UpdateGradeDto } from './dto/exam.dto';
-import { BranchContext, buildBranchWhere } from '../auth/branch-access';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { AuditAction, Prisma } from "@prisma/client";
+import {
+  CreateExamDto,
+  UpdateExamDto,
+  QueryExamDto,
+  RecordGradesDto,
+  CreateGradeDto,
+  UpdateGradeDto,
+} from "./dto/exam.dto";
+import { BranchContext, buildBranchWhere } from "../auth/branch-access";
 
 @Injectable()
 export class ExamsService {
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
   async findAll(query: QueryExamDto, orgId: string, branchCtx?: BranchContext) {
@@ -19,7 +31,7 @@ export class ExamsService {
 
     const branchFilter = branchCtx ? buildBranchWhere(branchCtx) : {};
 
-    const where: any = {
+    const where: Prisma.ExamWhereInput = {
       group: {
         organizationId: orgId,
         deletedAt: null,
@@ -27,7 +39,7 @@ export class ExamsService {
       },
       groupId: query.groupId,
       deletedAt: null,
-      title: query.search ? { contains: query.search, mode: 'insensitive' } : undefined,
+      title: query.search ? { contains: query.search, mode: "insensitive" } : undefined,
     };
 
     const [exams, total] = await Promise.all([
@@ -46,7 +58,7 @@ export class ExamsService {
           },
           _count: { select: { grades: true } },
         },
-        orderBy: { date: 'desc' },
+        orderBy: { date: "desc" },
       }),
       this.prisma.exam.count({ where }),
     ]);
@@ -88,13 +100,13 @@ export class ExamsService {
               select: { id: true, firstName: true, lastName: true, phone: true },
             },
           },
-          orderBy: { score: 'desc' },
+          orderBy: { score: "desc" },
         },
       },
     });
 
     if (!exam) {
-      throw new NotFoundException('Imtihon topilmadi yoki ushbu tashkilotga tegishli emas');
+      throw new NotFoundException("Imtihon topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     return exam;
@@ -109,7 +121,7 @@ export class ExamsService {
     });
 
     if (!group) {
-      throw new NotFoundException('Guruh topilmadi yoki ushbu tashkilotga tegishli emas');
+      throw new NotFoundException("Guruh topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     const exam = await this.prisma.exam.create({
@@ -129,7 +141,7 @@ export class ExamsService {
       branchId: group.branchId || undefined,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Exam',
+      entityType: "Exam",
       entityId: exam.id,
       after: exam,
     });
@@ -137,7 +149,13 @@ export class ExamsService {
     return exam;
   }
 
-  async update(id: string, dto: UpdateExamDto, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async update(
+    id: string,
+    dto: UpdateExamDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const exam = await this.findOne(id, orgId, branchCtx);
 
     const updated = await this.prisma.exam.update({
@@ -154,7 +172,7 @@ export class ExamsService {
       branchId: exam.group?.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Exam',
+      entityType: "Exam",
       entityId: id,
       before: exam,
       after: updated,
@@ -176,12 +194,12 @@ export class ExamsService {
       branchId: exam.group?.branchId || undefined,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Exam',
+      entityType: "Exam",
       entityId: id,
       before: exam,
     });
 
-    return { success: true, message: 'Imtihon muvaffaqiyatli o\'chirildi', id: deleted.id };
+    return { success: true, message: "Imtihon muvaffaqiyatli o'chirildi", id: deleted.id };
   }
 
   async recordGrades(dto: RecordGradesDto, orgId: string, userId?: string) {
@@ -195,21 +213,21 @@ export class ExamsService {
         include: { group: true },
       });
       if (!exam) {
-        throw new NotFoundException('Imtihon topilmadi yoki ushbu tashkilotga tegishli emas');
+        throw new NotFoundException("Imtihon topilmadi yoki ushbu tashkilotga tegishli emas");
       }
       maxScore = Number(exam.maxScore);
       branchId = exam.group.branchId || undefined;
     }
 
     // 2. Validate all student grades and score boundaries
-    const studentIds = dto.grades.map(g => g.studentId);
+    const studentIds = dto.grades.map((g) => g.studentId);
     const validStudents = await this.prisma.student.findMany({
       where: { id: { in: studentIds }, organizationId: orgId, deletedAt: null },
       select: { id: true },
     });
 
     if (validStudents.length !== studentIds.length) {
-      throw new BadRequestException('Ayrim o\'quvchilar ushbu tashkilotga tegishli emas');
+      throw new BadRequestException("Ayrim o'quvchilar ushbu tashkilotga tegishli emas");
     }
 
     for (const item of dto.grades) {
@@ -218,7 +236,7 @@ export class ExamsService {
       }
       if (item.score > maxScore) {
         throw new BadRequestException(
-          `Baho belgilangan maksimal balldan (${maxScore}) oshib ketdi: ${item.score}`,
+          `Baho belgilangan maksimal balldan (${maxScore}) oshib ketdi: ${item.score}`
         );
       }
     }
@@ -262,8 +280,8 @@ export class ExamsService {
       branchId,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'GradeBatch',
-      entityId: dto.examId || 'batch',
+      entityType: "GradeBatch",
+      entityId: dto.examId || "batch",
       after: { examId: dto.examId, count: createdGrades.length },
     });
 
@@ -279,7 +297,7 @@ export class ExamsService {
       where: { id: studentId, organizationId: orgId, deletedAt: null },
     });
     if (!student) {
-      throw new NotFoundException('O\'quvchi topilmadi');
+      throw new NotFoundException("O'quvchi topilmadi");
     }
 
     return this.prisma.grade.findMany({
@@ -290,7 +308,7 @@ export class ExamsService {
         },
         lesson: true,
       },
-      orderBy: { date: 'desc' },
+      orderBy: { date: "desc" },
     });
   }
 }

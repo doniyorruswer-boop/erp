@@ -1,11 +1,14 @@
 <template>
-  <div class="academic-year-filter relative inline-block font-lexend" v-click-outside="closeDropdown">
+  <div
+    v-click-outside="closeDropdown"
+    class="academic-year-filter relative inline-block font-lexend"
+  >
     <!-- Trigger Button (Matches User Screenshot) -->
     <button
       type="button"
-      @click="isOpen = !isOpen"
       class="flex items-center justify-between gap-3 px-3.5 py-1.5 sm:py-2 rounded-lg border-2 border-teal-600 dark:border-teal-500 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 font-semibold text-xs sm:text-sm hover:bg-gray-50 dark:hover:bg-gray-700/60 transition cursor-pointer shadow-2xs min-w-[130px]"
       title="O'quv yili / Davrni tanlash"
+      @click="isOpen = !isOpen"
     >
       <span class="tracking-wide">{{ modelValue }}</span>
       <Icon
@@ -15,7 +18,7 @@
     </button>
 
     <!-- Dropdown Menu -->
-    <transition name="fade">
+    <Transition name="fade">
       <div
         v-if="isOpen"
         class="absolute right-0 mt-1.5 z-50 w-36 bg-white dark:bg-gray-800 rounded-xl shadow-xl border dark:border-gray-700 py-1 overflow-hidden"
@@ -24,13 +27,13 @@
           v-for="year in years"
           :key="year"
           type="button"
-          @click="selectYear(year)"
           :class="[
             'w-full text-left px-3.5 py-2 text-xs sm:text-sm font-semibold transition flex items-center justify-between cursor-pointer',
             modelValue === year
               ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-              : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+              : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50',
           ]"
+          @click="selectYear(year)"
         >
           <span>{{ year }}</span>
           <Icon
@@ -40,7 +43,7 @@
           />
         </button>
       </div>
-    </transition>
+    </Transition>
   </div>
 </template>
 

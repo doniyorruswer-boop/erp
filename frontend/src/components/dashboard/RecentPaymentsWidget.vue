@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend"
+  >
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
@@ -12,20 +14,22 @@
         </p>
       </div>
 
-      <router-link
+      <RouterLink
         to="/finance"
         class="text-xs sm:text-sm font-semibold text-primary hover:opacity-80 flex items-center gap-1 shrink-0"
       >
         <span>Barcha to'lovlar</span>
         <Icon icon="solar:alt-arrow-right-bold" class="text-xs" />
-      </router-link>
+      </RouterLink>
     </div>
 
     <!-- Table -->
     <div class="overflow-x-auto -mx-4 sm:-mx-5 px-4 sm:px-5">
       <table class="w-full text-left text-sm whitespace-nowrap">
         <thead>
-          <tr class="border-b border-gray-100 dark:border-gray-700 text-gray-400 font-bold uppercase tracking-wider text-xs">
+          <tr
+            class="border-b border-gray-100 dark:border-gray-700 text-gray-400 font-bold uppercase tracking-wider text-xs"
+          >
             <th class="py-2.5 px-3">O'quvchi</th>
             <th class="py-2.5 px-3">Sinf / Guruh</th>
             <th class="py-2.5 px-3">Oy</th>
@@ -48,8 +52,10 @@
             <!-- Student -->
             <td class="py-3 px-3">
               <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-700 dark:text-gray-300 text-xs shrink-0">
-                  {{ p.studentName?.charAt(0) || 'O' }}
+                <div
+                  class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-700 dark:text-gray-300 text-xs shrink-0"
+                >
+                  {{ p.studentName?.charAt(0) || "O" }}
                 </div>
                 <div>
                   <div class="font-bold text-gray-800 dark:text-gray-100 text-sm">
@@ -64,12 +70,12 @@
 
             <!-- Class / Group -->
             <td class="py-3 px-3 text-gray-700 dark:text-gray-200 font-semibold text-sm">
-              {{ p.className || 'Asosiy sinf' }}
+              {{ p.className || "Asosiy sinf" }}
             </td>
 
             <!-- Month -->
             <td class="py-3 px-3 text-gray-600 dark:text-gray-300 text-sm">
-              {{ p.month || 'Joriy oy' }}
+              {{ p.month || "Joriy oy" }}
             </td>
 
             <!-- Amount -->
@@ -84,11 +90,14 @@
                   'px-2.5 py-0.5 rounded-md text-xs font-semibold inline-flex items-center gap-1',
                   p.status === 'PARTIAL' || p.isPartial
                     ? 'bg-amber-50 text-amber-700 border border-amber-200/50 dark:bg-amber-950/40 dark:text-amber-400'
-                    : 'bg-primary/10 text-primary border border-primary/20'
+                    : 'bg-primary/10 text-primary border border-primary/20',
                 ]"
               >
-                <span class="w-1.5 h-1.5 rounded-full" :class="p.status === 'PARTIAL' || p.isPartial ? 'bg-amber-500' : 'bg-primary'"></span>
-                <span>{{ p.status === 'PARTIAL' || p.isPartial ? "Qisman" : "To'langan" }}</span>
+                <span
+                  class="w-1.5 h-1.5 rounded-full"
+                  :class="p.status === 'PARTIAL' || p.isPartial ? 'bg-amber-500' : 'bg-primary'"
+                ></span>
+                <span>{{ p.status === "PARTIAL" || p.isPartial ? "Qisman" : "To'langan" }}</span>
               </span>
             </td>
 
@@ -105,6 +114,7 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
 import { formatUZS } from "@/helper/formatters";
 
 export default {
@@ -118,9 +128,7 @@ export default {
   },
   computed: {
     list() {
-      return (this.payments && this.payments.length > 0)
-        ? this.payments.slice(0, 10)
-        : [];
+      return this.payments && this.payments.length > 0 ? this.payments.slice(0, 10) : [];
     },
   },
   methods: {

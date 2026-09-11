@@ -37,25 +37,25 @@ import { Icon } from "@iconify/vue";
 export default {
   name: "AppPhoneCell",
   components: {
-    Icon
+    Icon,
   },
   props: {
     phone: {
       type: [String, Number],
-      default: ""
+      default: "",
     },
     showIcon: {
       type: Boolean,
-      default: true
+      default: true,
     },
     clickable: {
       type: Boolean,
-      default: true
+      default: true,
     },
     emptyText: {
       type: String,
-      default: "—"
-    }
+      default: "—",
+    },
   },
   computed: {
     rawPhone() {
@@ -79,7 +79,7 @@ export default {
         return `+998 (${digits.slice(3, 5)}) ${digits.slice(5, 8)}-${digits.slice(8, 10)}-${digits.slice(10, 12)}`;
       }
       return String(this.phone);
-    }
-  }
+    },
+  },
 };
 </script>

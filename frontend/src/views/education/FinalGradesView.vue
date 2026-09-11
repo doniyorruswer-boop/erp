@@ -3,7 +3,7 @@
     <Breadcrumb
       :items="[
         { title: 'O\'quv jarayoni', to: '/education/schedule' },
-        { title: 'Yakuniy baholar' }
+        { title: 'Yakuniy baholar' },
       ]"
     />
 
@@ -21,14 +21,14 @@
         <AppButton variant="outline" icon="solar:printer-bold" @click="printGrades">
           Chop etish
         </AppButton>
-        <AppButton variant="primary" icon="ri:file-excel-2-line">
-          Excel hisobot
-        </AppButton>
+        <AppButton variant="primary" icon="ri:file-excel-2-line"> Excel hisobot </AppButton>
       </div>
     </div>
 
     <!-- Filters -->
-    <div class="bg-white dark:bg-[#131b2e] border border-gray-200 dark:border-gray-800 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3 shadow-2xs">
+    <div
+      class="bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-800 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3 shadow-2xs"
+    >
       <div class="flex items-center gap-3 flex-wrap">
         <div class="flex items-center gap-1.5 text-xs">
           <span class="text-gray-500">Sinf:</span>
@@ -36,9 +36,7 @@
             v-model="selectedClass"
             class="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 font-bold text-xs text-gray-800 dark:text-gray-100 focus:outline-hidden focus:ring-1 focus:ring-primary"
           >
-            <option v-for="c in classesList" :key="c.id" :value="c.name">
-              {{ c.name }} sinf
-            </option>
+            <option v-for="c in classesList" :key="c.id" :value="c.name">{{ c.name }} sinf</option>
           </select>
         </div>
 
@@ -79,23 +77,34 @@
       </template>
 
       <template #cell(q1)="{ row }">
-        <span class="px-2.5 py-1 rounded text-xs font-bold" :class="getBadgeClass(row.q1)">{{ row.q1 }}</span>
+        <span class="px-2.5 py-1 rounded text-xs font-bold" :class="getBadgeClass(row.q1)">{{
+          row.q1
+        }}</span>
       </template>
 
       <template #cell(q2)="{ row }">
-        <span class="px-2.5 py-1 rounded text-xs font-bold" :class="getBadgeClass(row.q2)">{{ row.q2 }}</span>
+        <span class="px-2.5 py-1 rounded text-xs font-bold" :class="getBadgeClass(row.q2)">{{
+          row.q2
+        }}</span>
       </template>
 
       <template #cell(q3)="{ row }">
-        <span class="px-2.5 py-1 rounded text-xs font-bold" :class="getBadgeClass(row.q3)">{{ row.q3 }}</span>
+        <span class="px-2.5 py-1 rounded text-xs font-bold" :class="getBadgeClass(row.q3)">{{
+          row.q3
+        }}</span>
       </template>
 
       <template #cell(q4)="{ row }">
-        <span class="px-2.5 py-1 rounded text-xs font-bold" :class="getBadgeClass(row.q4)">{{ row.q4 || '—' }}</span>
+        <span class="px-2.5 py-1 rounded text-xs font-bold" :class="getBadgeClass(row.q4)">{{
+          row.q4 || "—"
+        }}</span>
       </template>
 
       <template #cell(annual)="{ row }">
-        <span class="px-3 py-1 rounded-md text-xs font-bold text-white shadow-2xs" :class="row.annual >= 4 ? 'bg-emerald-600' : 'bg-amber-500'">
+        <span
+          class="px-3 py-1 rounded-md text-xs font-bold text-white shadow-2xs"
+          :class="row.annual >= 4 ? 'bg-emerald-600' : 'bg-amber-500'"
+        >
           {{ row.annual }}
         </span>
       </template>
@@ -104,11 +113,11 @@
 </template>
 
 <script>
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import AppTable from "@/components/AppTable.vue";
-import AppButton from "@/components/AppButton.vue";
-import AppUserCell from "@/components/AppUserCell.vue";
 import { SCHEDULE_CLASSES, SUBJECTS_LIST } from "@/api/scheduleData";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import AppButton from "@/components/common/AppButton.vue";
+import AppTable from "@/components/common/AppTable.vue";
+import AppUserCell from "@/components/common/AppUserCell.vue";
 
 export default {
   name: "FinalGradesView",
@@ -147,9 +156,11 @@ export default {
   },
   methods: {
     getBadgeClass(grade) {
-      if (grade === 5) return "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400";
+      if (grade === 5)
+        return "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400";
       if (grade === 4) return "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400";
-      if (grade === 3) return "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400";
+      if (grade === 3)
+        return "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400";
       if (grade === 2) return "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400";
       return "text-gray-400";
     },

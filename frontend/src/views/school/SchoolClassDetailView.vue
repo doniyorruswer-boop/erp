@@ -67,15 +67,15 @@
 </template>
 
 <script>
-import { toast } from "@/utils/toast";
-import { useTenantStore } from "@/store/tenant";
 import { getClassById, getStudentsByClass, loadSchoolClasses } from "@/api/schoolClassesData";
+import SchoolClassFilters from "@/components/school/SchoolClassFilters.vue";
 import SchoolClassHeader from "@/components/school/SchoolClassHeader.vue";
 import SchoolClassInfoCard from "@/components/school/SchoolClassInfoCard.vue";
-import SchoolClassFilters from "@/components/school/SchoolClassFilters.vue";
-import SchoolClassStudentsTable from "@/components/school/SchoolClassStudentsTable.vue";
 import SchoolClassPaymentsTab from "@/components/school/SchoolClassPaymentsTab.vue";
+import SchoolClassStudentsTable from "@/components/school/SchoolClassStudentsTable.vue";
 import SchoolClassTimetableTab from "@/components/school/SchoolClassTimetableTab.vue";
+import { useTenantStore } from "@/store/tenant";
+import { toast } from "@/utils/toast";
 
 export default {
   name: "SchoolClassDetailView",
@@ -204,7 +204,7 @@ export default {
   computed: {
     classOptions() {
       const list = loadSchoolClasses(this.tenantStore.businessType);
-      const suffix = this.tenantStore.classLabel.toLowerCase() + 'i';
+      const suffix = this.tenantStore.classLabel.toLowerCase() + "i";
       return [
         { value: "", label: `Barcha ${this.tenantStore.classesLabel.toLowerCase()}` },
         ...list.map((c) => {
@@ -279,7 +279,9 @@ export default {
     "tenantStore.businessType": {
       handler(newType) {
         const currentList = loadSchoolClasses(newType);
-        const match = currentList.find((c) => c.id.toLowerCase() === (this.classInfo.id || "").toLowerCase());
+        const match = currentList.find(
+          (c) => c.id.toLowerCase() === (this.classInfo.id || "").toLowerCase()
+        );
         if (match) {
           this.loadClassData(match.id);
         } else if (currentList.length > 0) {
@@ -303,7 +305,12 @@ export default {
         this.classInfo.name = paramId.toUpperCase();
       }
       this.filters.selectedClass = this.classInfo.name;
-      this.students = getStudentsByClass(this.classInfo.id, this.classInfo.name, this.classInfo.studentsCount, this.tenantStore.businessType);
+      this.students = getStudentsByClass(
+        this.classInfo.id,
+        this.classInfo.name,
+        this.classInfo.studentsCount,
+        this.tenantStore.businessType
+      );
       this.selectedStudentIds = [];
       this.currentPage = 1;
       document.title = `${this.classInfo.name} ${this.tenantStore.classLabel.toLowerCase()}i - EduHub`;
@@ -375,16 +382,26 @@ export default {
       } else if (type === "passwords") {
         this.showNotification(`${this.tenantStore.classLabel} o'quvchilari parollari yangilandi!`);
       } else if (type === "promote") {
-        if (confirm(`Haqiqatan ham ${this.classInfo.name}ni keyingi o'quv yiliga (2026-2027) o'tkazmoqchimisiz?`)) {
-          this.showNotification(`${this.tenantStore.classLabel} muvaffaqiyatli keyingi o'quv yiliga ko'chirildi!`);
+        if (
+          confirm(
+            `Haqiqatan ham ${this.classInfo.name}ni keyingi o'quv yiliga (2026-2027) o'tkazmoqchimisiz?`
+          )
+        ) {
+          this.showNotification(
+            `${this.tenantStore.classLabel} muvaffaqiyatli keyingi o'quv yiliga ko'chirildi!`
+          );
         }
       }
     },
     handleBulkAction(type) {
       if (type === "transfer") {
-        this.showNotification(`${this.selectedStudentIds.length} ta o'quvchi boshqa ${this.tenantStore.classLabel.toLowerCase()}ga ko'chirildi`);
+        this.showNotification(
+          `${this.selectedStudentIds.length} ta o'quvchi boshqa ${this.tenantStore.classLabel.toLowerCase()}ga ko'chirildi`
+        );
       } else if (type === "payment-sheet") {
-        this.showNotification(`${this.selectedStudentIds.length} ta o'quvchi uchun to'lov varaqasi tayyorlandi`);
+        this.showNotification(
+          `${this.selectedStudentIds.length} ta o'quvchi uchun to'lov varaqasi tayyorlandi`
+        );
       }
     },
   },

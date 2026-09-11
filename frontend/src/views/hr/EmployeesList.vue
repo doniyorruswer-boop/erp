@@ -6,7 +6,9 @@
     <!-- Header Section -->
     <div class="flex items-center justify-between flex-wrap gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Xodimlar & Oylik Maosh (HR)</h1>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
+          Xodimlar & Oylik Maosh (HR)
+        </h1>
         <p class="text-sm text-gray-400 mt-0.5">
           O'qituvchilar va xodimlar ro'yxati, lavozimlar va oylik ish haqi fondi boshqaruvi
         </p>
@@ -14,8 +16,8 @@
       <div class="flex items-center gap-2.5">
         <button
           type="button"
-          @click="openCreateModal"
           class="border flex items-center text-sm gap-2 text-white bg-primary hover:bg-primary/90 dark:border-gray-700 rounded-md py-2 px-4 font-medium shadow-sm transition cursor-pointer"
+          @click="openCreateModal"
         >
           <Icon icon="solar:user-plus-bold" class="text-lg" />
           <span>Yangi Xodim</span>
@@ -24,7 +26,12 @@
     </div>
 
     <!-- Alert Message -->
-    <Alert v-if="alertMessage" :message="alertMessage" :type="alertType" @close="alertMessage = ''" />
+    <Alert
+      v-if="alertMessage"
+      :message="alertMessage"
+      :type="alertType"
+      @close="alertMessage = ''"
+    />
 
     <!-- 4 Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -39,21 +46,21 @@
         :value="`${activeCount} ta`"
         icon="solar:user-check-bold"
         variant="success"
-        valueClass="text-green-600 dark:text-green-400"
+        value-class="text-green-600 dark:text-green-400"
       />
       <StatsCard
         title="Oylik Maosh Jamg'armasi"
         :value="`${formatMoney(totalSalaryFund)} so'm`"
         icon="solar:wallet-money-bold"
         variant="purple"
-        valueClass="text-primary"
+        value-class="text-primary"
       />
       <StatsCard
         title="Joriy Davr"
         :value="currentPeriod"
         icon="solar:calendar-bold"
         variant="danger"
-        valueClass="text-purple-600 dark:text-purple-400"
+        value-class="text-purple-600 dark:text-purple-400"
       />
     </div>
 
@@ -65,10 +72,10 @@
       :data="filteredEmployees"
       :loading="loading"
       :searchable="true"
-      :showIndex="true"
-      :showPerPage="true"
-      searchPlaceholder="Ism, familiya, lavozim yoki telefon..."
-      rowKey="id"
+      :show-index="true"
+      :show-per-page="true"
+      search-placeholder="Ism, familiya, lavozim yoki telefon..."
+      row-key="id"
     >
       <!-- Header Actions: Status Filter -->
       <template #headerActions>
@@ -94,8 +101,12 @@
 
       <!-- Custom Position Cell -->
       <template #cell(position)="{ row }">
-        <div class="text-gray-800 dark:text-gray-200 font-medium">{{ row.position || 'Xodim' }}</div>
-        <div class="text-xs text-gray-400">{{ row.department || row.branch?.name || 'Asosiy filial' }}</div>
+        <div class="text-gray-800 dark:text-gray-200 font-medium">
+          {{ row.position || "Xodim" }}
+        </div>
+        <div class="text-xs text-gray-400">
+          {{ row.department || row.branch?.name || "Asosiy filial" }}
+        </div>
       </template>
 
       <!-- Custom Salary Cell -->
@@ -111,7 +122,9 @@
       <!-- Custom Status Cell -->
       <template #cell(status)="{ row }">
         <Badge
-          :variant="row.status === 'ACTIVE' ? 'success' : row.status === 'ON_LEAVE' ? 'warning' : 'danger'"
+          :variant="
+            row.status === 'ACTIVE' ? 'success' : row.status === 'ON_LEAVE' ? 'warning' : 'danger'
+          "
           :dot="true"
           size="sm"
         >
@@ -124,18 +137,18 @@
         <div class="flex items-center justify-end gap-1.5">
           <button
             type="button"
-            @click="openPayrollModal(row)"
             title="Oylik maosh to'lash"
             class="p-1.5 text-xs text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded transition flex items-center gap-1 font-medium cursor-pointer"
+            @click="openPayrollModal(row)"
           >
             <Icon icon="solar:wallet-money-bold" class="text-base" />
             <span>Maosh</span>
           </button>
           <button
             type="button"
-            @click="deleteEmployee(row)"
             title="O'chirish"
             class="p-1.5 text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition cursor-pointer"
+            @click="deleteEmployee(row)"
           >
             <Icon icon="solar:trash-bin-trash-linear" class="text-base" />
           </button>
@@ -144,15 +157,15 @@
     </DataTable>
 
     <!-- Create Employee Modal -->
-    <vmodal
+    <Vmodal
       :model-value="showCreateModal"
-      @update:model-value="showCreateModal = $event"
       title="Yangi Xodim Qo'shish"
       subtitle="Xodim shaxsiy va mehnat ma'lumotlarini kiriting"
       width="max-w-lg"
       :hide-button="true"
+      @update:model-value="showCreateModal = $event"
     >
-      <form @submit.prevent="saveEmployee" class="space-y-4">
+      <form class="space-y-4" @submit.prevent="saveEmployee">
         <div class="grid grid-cols-2 gap-3">
           <FormInput
             v-model="form.firstName"
@@ -201,7 +214,7 @@
               { value: 'FULL_TIME', label: 'To\'liq stavka (Full-time)' },
               { value: 'PART_TIME', label: 'Yarim stavka (Part-time)' },
               { value: 'CONTRACT', label: 'Shartnoma asosida' },
-              { value: 'HOURLY', label: 'Soatbay' }
+              { value: 'HOURLY', label: 'Soatbay' },
             ]"
           />
         </div>
@@ -209,8 +222,8 @@
         <div class="flex justify-end gap-2 pt-3 border-t dark:border-gray-700">
           <button
             type="button"
-            @click="showCreateModal = false"
             class="px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition cursor-pointer"
+            @click="showCreateModal = false"
           >
             Bekor qilish
           </button>
@@ -220,24 +233,26 @@
             class="px-5 py-2 text-xs font-semibold bg-primary hover:bg-primary/90 text-white rounded-md shadow-sm transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-sm" />
-            <span>{{ saving ? 'Saqlanmoqda...' : 'Saqlash' }}</span>
+            <span>{{ saving ? "Saqlanmoqda..." : "Saqlash" }}</span>
           </button>
         </div>
       </form>
-    </vmodal>
+    </Vmodal>
 
     <!-- Payroll Modal -->
-    <vmodal
+    <Vmodal
       :model-value="showPayrollModal"
-      @update:model-value="showPayrollModal = $event"
       :title="`Oylik Maosh To'lash: ${selectedEmployee ? selectedEmployee.firstName + ' ' + selectedEmployee.lastName : ''}`"
       subtitle="Belgilangan davr uchun hisoblangan ish haqini to'lovga chiqarish"
       width="max-w-md"
       :hide-button="true"
+      @update:model-value="showPayrollModal = $event"
     >
-      <form @submit.prevent="submitPayroll" class="space-y-3.5">
+      <form class="space-y-3.5" @submit.prevent="submitPayroll">
         <div>
-          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Davr (Oy)</label>
+          <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >Davr (Oy)</label
+          >
           <input
             v-model="payrollForm.period"
             type="month"
@@ -248,7 +263,9 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Asosiy Miqdor (so'm)</label>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >Asosiy Miqdor (so'm)</label
+            >
             <input
               v-model.number="payrollForm.baseAmount"
               type="number"
@@ -257,7 +274,9 @@
             />
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Bonus (so'm)</label>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >Bonus (so'm)</label
+            >
             <input
               v-model.number="payrollForm.bonusAmount"
               type="number"
@@ -268,7 +287,9 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Ushlab qolish (so'm)</label>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >Ushlab qolish (so'm)</label
+            >
             <input
               v-model.number="payrollForm.deductionAmount"
               type="number"
@@ -276,7 +297,9 @@
             />
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">To'lov usuli</label>
+            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >To'lov usuli</label
+            >
             <select
               v-model="payrollForm.paidVia"
               class="w-full text-sm rounded-md border border-gray-300 dark:border-gray-700 p-2 outline-none focus:border-primary dark:bg-gray-900 text-gray-800 dark:text-gray-100"
@@ -289,8 +312,12 @@
         </div>
 
         <!-- Calculated Summary Card -->
-        <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-md border border-emerald-200 dark:border-emerald-800/50">
-          <p class="text-xs text-emerald-700 dark:text-emerald-300 font-medium">To'lanadigan Yakuniy Summa:</p>
+        <div
+          class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-md border border-emerald-200 dark:border-emerald-800/50"
+        >
+          <p class="text-xs text-emerald-700 dark:text-emerald-300 font-medium">
+            To'lanadigan Yakuniy Summa:
+          </p>
           <p class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mt-1">
             {{ formatMoney(calculatedNet) }} so'm
           </p>
@@ -299,8 +326,8 @@
         <div class="flex justify-end gap-2 pt-3 border-t dark:border-gray-700">
           <button
             type="button"
-            @click="showPayrollModal = false"
             class="px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition cursor-pointer"
+            @click="showPayrollModal = false"
           >
             Bekor qilish
           </button>
@@ -310,26 +337,27 @@
             class="px-5 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-md shadow-sm transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-sm" />
-            <span>{{ saving ? 'To\'lanmoqda...' : 'To\'lovni Tasdiqlash' }}</span>
+            <span>{{ saving ? "To'lanmoqda..." : "To'lovni Tasdiqlash" }}</span>
           </button>
         </div>
       </form>
-    </vmodal>
+    </Vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import StatsCard from "@/components/StatsCard.vue";
-import DataTable from "@/components/DataTable.vue";
-import Badge from "@/components/Badge.vue";
+
+import { employeesApi } from "@/api/services";
 import Alert from "@/components/Alert.vue";
-import vmodal from "@/components/modal.vue";
+import Badge from "@/components/Badge.vue";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import vmodal from "@/components/common/AppModal.vue";
+import DataTable from "@/components/common/AppTable.vue";
+import FormCurrencyInput from "@/components/FormCurrencyInput.vue";
 import FormInput from "@/components/FormInput.vue";
 import FormSelect from "@/components/FormSelect.vue";
-import FormCurrencyInput from "@/components/FormCurrencyInput.vue";
-import { employeesApi } from "@/api/services";
+import StatsCard from "@/components/StatsCard.vue";
 
 export default {
   name: "EmployeesList",
@@ -406,7 +434,7 @@ export default {
       this.loading = true;
       try {
         const res = await employeesApi.getAll();
-        this.employees = Array.isArray(res) ? res : (res?.data || res?.items || []);
+        this.employees = Array.isArray(res) ? res : res?.data || res?.items || [];
       } catch (err) {
         console.error("Xodimlarni yuklashda xatolik:", err);
         this.alertType = "danger";
@@ -457,7 +485,8 @@ export default {
         await this.fetchEmployees();
       } catch (err) {
         this.alertType = "danger";
-        this.alertMessage = "Xodim qo'shishda xatolik: " + (err.response?.data?.message || err.message);
+        this.alertMessage =
+          "Xodim qo'shishda xatolik: " + (err.response?.data?.message || err.message);
       } finally {
         this.saving = false;
       }
@@ -496,7 +525,8 @@ export default {
       }
     },
     async deleteEmployee(emp) {
-      if (!confirm(`${emp.firstName} ${emp.lastName}ni xodimlar ro'yxatidan o'chirmoqchimisiz?`)) return;
+      if (!confirm(`${emp.firstName} ${emp.lastName}ni xodimlar ro'yxatidan o'chirmoqchimisiz?`))
+        return;
       try {
         await employeesApi.delete(emp.id);
         this.alertType = "success";

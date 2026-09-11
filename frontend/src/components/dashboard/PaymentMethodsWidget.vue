@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend"
+  >
     <!-- Header -->
     <div class="flex items-center justify-between flex-wrap gap-2">
       <div>
@@ -29,17 +31,10 @@
 
     <!-- Methods List with Visual Bars -->
     <div v-else class="space-y-3">
-      <div
-        v-for="m in methodItems"
-        :key="m.label"
-        class="space-y-1.5"
-      >
+      <div v-for="m in methodItems" :key="m.label" class="space-y-1.5">
         <div class="flex items-center justify-between text-xs">
           <div class="flex items-center gap-2">
-            <span
-              class="w-2.5 h-2.5 rounded-full shrink-0"
-              :class="m.colorDot"
-            ></span>
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="m.colorDot"></span>
             <span class="font-bold text-gray-800 dark:text-gray-200">
               {{ m.name }}
             </span>
@@ -72,6 +67,7 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
 import { formatUZS } from "@/helper/formatters";
 
 export default {

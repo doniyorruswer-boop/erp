@@ -1,7 +1,12 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateEmployeeDto, UpdateEmployeeDto, QueryEmployeeDto, CreatePayrollDto } from './dto/employee.dto';
-import { PayrollStatus } from '@prisma/client';
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import {
+  CreateEmployeeDto,
+  UpdateEmployeeDto,
+  QueryEmployeeDto,
+  CreatePayrollDto,
+} from "./dto/employee.dto";
+import { PayrollStatus, Prisma } from "@prisma/client";
 
 @Injectable()
 export class EmployeesService {
@@ -32,7 +37,7 @@ export class EmployeesService {
   }
 
   async findAll(query: QueryEmployeeDto, orgId: string) {
-    const where: any = {
+    const where: Prisma.EmployeeWhereInput = {
       organizationId: orgId,
     };
 
@@ -46,10 +51,10 @@ export class EmployeesService {
 
     if (query.search) {
       where.OR = [
-        { firstName: { contains: query.search, mode: 'insensitive' } },
-        { lastName: { contains: query.search, mode: 'insensitive' } },
+        { firstName: { contains: query.search, mode: "insensitive" } },
+        { lastName: { contains: query.search, mode: "insensitive" } },
         { phone: { contains: query.search } },
-        { position: { contains: query.search, mode: 'insensitive' } },
+        { position: { contains: query.search, mode: "insensitive" } },
       ];
     }
 
@@ -62,7 +67,7 @@ export class EmployeesService {
           select: { payrolls: true },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -73,14 +78,14 @@ export class EmployeesService {
         branch: { select: { id: true, name: true } },
         user: { select: { id: true, role: true, phone: true, email: true } },
         payrolls: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 12,
         },
       },
     });
 
     if (!employee) {
-      throw new NotFoundException('Xodim topilmadi');
+      throw new NotFoundException("Xodim topilmadi");
     }
 
     return employee;
@@ -133,15 +138,15 @@ export class EmployeesService {
     try {
       // Find or create default Salary category
       let category = await this.prisma.expenseCategory.findFirst({
-        where: { organizationId: orgId, name: 'Ish haqi va Oylik' },
+        where: { organizationId: orgId, name: "Ish haqi va Oylik" },
       });
 
       if (!category) {
         category = await this.prisma.expenseCategory.create({
           data: {
             organizationId: orgId,
-            name: 'Ish haqi va Oylik',
-            code: 'SALARY',
+            name: "Ish haqi va Oylik",
+            code: "SALARY",
           },
         });
       }
@@ -154,7 +159,7 @@ export class EmployeesService {
           title: `Ish haqi: ${employee.firstName} ${employee.lastName} (${dto.period})`,
           amount: netAmount,
           payee: `${employee.firstName} ${employee.lastName}`,
-          paymentMethod: dto.paidVia || 'CASH',
+          paymentMethod: dto.paidVia || "CASH",
           notes: `Oylik maosh. Asosiy: ${baseAmount}, Bonus: ${bonusAmount}, Ushlab qolish: ${deductionAmount}`,
         },
       });
@@ -174,7 +179,7 @@ export class EmployeesService {
         deductionAmount,
         netAmount,
         status: PayrollStatus.PAID,
-        paidVia: dto.paidVia || 'CASH',
+        paidVia: dto.paidVia || "CASH",
         paymentDate: new Date(),
         expenseId,
         notes: dto.notes,
@@ -190,7 +195,7 @@ export class EmployeesService {
 
     return this.prisma.payroll.findMany({
       where: { employeeId, organizationId: orgId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       include: {
         expense: { select: { id: true, amount: true, paymentMethod: true } },
       },

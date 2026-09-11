@@ -1,14 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { InvoicesService } from './invoices.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AuditService } from '../../audit/audit.service';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { InvoiceStatus } from '@prisma/client';
+import { Test, TestingModule } from "@nestjs/testing";
+import { InvoicesService } from "./invoices.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import { AuditService } from "../../audit/audit.service";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { InvoiceStatus } from "@prisma/client";
+import { CreateInvoiceDto } from "../dto/invoice.dto";
 
-describe('InvoicesService (Unit Tests)', () => {
+type MockPrisma = Record<string, Record<string, jest.Mock>>;
+type MockAudit = Record<string, jest.Mock>;
+
+describe("InvoicesService (Unit Tests)", () => {
   let service: InvoicesService;
-  let prisma: any;
-  let auditService: any;
+  let prisma: MockPrisma;
+  let auditService: MockAudit;
 
   beforeEach(async () => {
     prisma = {
@@ -18,7 +22,7 @@ describe('InvoicesService (Unit Tests)', () => {
         create: jest.fn(),
       },
       branch: {
-        findFirst: jest.fn().mockResolvedValue({ id: 'branch-1', organizationId: 'org-1' }),
+        findFirst: jest.fn().mockResolvedValue({ id: "branch-1", organizationId: "org-1" }),
       },
       student: {
         findFirst: jest.fn(),
@@ -29,7 +33,7 @@ describe('InvoicesService (Unit Tests)', () => {
     };
 
     auditService = {
-      log: jest.fn().mockResolvedValue({ id: 'audit-log-1' }),
+      log: jest.fn().mockResolvedValue({ id: "audit-log-1" }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -43,47 +47,47 @@ describe('InvoicesService (Unit Tests)', () => {
     service = module.get<InvoicesService>(InvoicesService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should throw BadRequestException if invoice items are empty', async () => {
+  describe("create", () => {
+    it("should throw BadRequestException if invoice items are empty", async () => {
       await expect(
         service.create(
           {
-            studentId: 'student-1',
+            studentId: "student-1",
             items: [],
-          } as any,
-          'org-1',
-        ),
+          } as unknown as CreateInvoiceDto,
+          "org-1"
+        )
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw BadRequestException if student does not belong to org', async () => {
+    it("should throw BadRequestException if student does not belong to org", async () => {
       prisma.student.findFirst.mockResolvedValue(null);
 
       await expect(
         service.create(
           {
-            studentId: 'unknown-student',
-            items: [{ description: 'Kurs tolovi', quantity: 1, unitPrice: 500000 }],
-          } as any,
-          'org-1',
-        ),
+            studentId: "unknown-student",
+            items: [{ description: "Kurs tolovi", quantity: 1, unitPrice: 500000 }],
+          } as unknown as CreateInvoiceDto,
+          "org-1"
+        )
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should calculate totals and create invoice successfully', async () => {
+    it("should calculate totals and create invoice successfully", async () => {
       prisma.student.findFirst.mockResolvedValue({
-        id: 'student-1',
-        organizationId: 'org-1',
-        branchId: 'branch-1',
+        id: "student-1",
+        organizationId: "org-1",
+        branchId: "branch-1",
       });
 
       const mockInvoice = {
-        id: 'inv-1',
-        invoiceNumber: 'INV-202609-0001',
+        id: "inv-1",
+        invoiceNumber: "INV-202609-0001",
         totalAmount: 500000,
         status: InvoiceStatus.ISSUED,
       };
@@ -92,12 +96,12 @@ describe('InvoicesService (Unit Tests)', () => {
 
       const result = await service.create(
         {
-          studentId: 'student-1',
-          branchId: 'branch-1',
-          items: [{ description: 'Matematika kursi', quantity: 1, unitPrice: 500000 }],
-        } as any,
-        'org-1',
-        'user-1',
+          studentId: "student-1",
+          branchId: "branch-1",
+          items: [{ description: "Matematika kursi", quantity: 1, unitPrice: 500000 }],
+        } as unknown as CreateInvoiceDto,
+        "org-1",
+        "user-1"
       );
 
       expect(result).toEqual(mockInvoice);
@@ -106,18 +110,18 @@ describe('InvoicesService (Unit Tests)', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('should throw NotFoundException if invoice not found', async () => {
+  describe("findOne", () => {
+    it("should throw NotFoundException if invoice not found", async () => {
       prisma.invoice.findFirst.mockResolvedValue(null);
 
-      await expect(service.findOne('non-existent', 'org-1')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne("non-existent", "org-1")).rejects.toThrow(NotFoundException);
     });
 
-    it('should return invoice if found', async () => {
-      const mockInvoice = { id: 'inv-1', organizationId: 'org-1' };
+    it("should return invoice if found", async () => {
+      const mockInvoice = { id: "inv-1", organizationId: "org-1" };
       prisma.invoice.findFirst.mockResolvedValue(mockInvoice);
 
-      const result = await service.findOne('inv-1', 'org-1');
+      const result = await service.findOne("inv-1", "org-1");
       expect(result).toEqual(mockInvoice);
     });
   });

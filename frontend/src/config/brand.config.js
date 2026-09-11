@@ -1,38 +1,31 @@
 /**
- * ================================================================
- * 🌟 Central Brand & Product Configuration (Single Source of Truth)
- * ================================================================
- * Loyihaning barcha joylaridagi brend, nom, domen va email nomlanishlarini
- * yagona joydan boshqaruvchi konfiguratsiya fayli.
- *
- * Nomni o'zgartirish uchun faqat:
- * 1) Ushbu fayldagi BRAND_DEFAULTS ni o'zgartiring, yoki
- * 2) .env faylida VUE_APP_NAME="YangiNom" deb yozing!
+ * EduHub Central Brand & Product Configuration (Single Source of Truth)
+ * Centralizes brand naming, portal domain, support emails and copyright.
  */
 
-const rawName = process.env.VUE_APP_NAME || "EduHub";
+import { ENV_CONFIG } from "./env.config";
 
 export const BRAND_CONFIG = {
   // Asosiy mahsulot nomi
-  name: rawName,
+  name: ENV_CONFIG.APP_NAME,
 
-  // Logo uchun 2 qismga ajratilgan ko'rinish (masalan: Edu va HUB)
-  prefix: process.env.VUE_APP_BRAND_PREFIX || (rawName.length > 3 ? rawName.slice(0, 3) : rawName),
-  suffix: process.env.VUE_APP_BRAND_SUFFIX || (rawName.length > 3 ? rawName.slice(3) : ""),
+  // Logo uchun 2 qismga ajratilgan ko'rinish
+  prefix: ENV_CONFIG.BRAND_PREFIX,
+  suffix: ENV_CONFIG.BRAND_SUFFIX,
 
   // Domen va Portal
-  domain: process.env.VUE_APP_DOMAIN || "eduhub.uz",
-  portalUrl: process.env.VUE_APP_PORTAL_URL || `https://${process.env.VUE_APP_DOMAIN || "eduhub.uz"}`,
+  domain: ENV_CONFIG.DOMAIN,
+  portalUrl: ENV_CONFIG.PORTAL_URL,
 
   // Ta'rif va shior
-  description: process.env.VUE_APP_DESCRIPTION || "Ta'lim va Biznes Boshqaruv Platformasi",
+  description: ENV_CONFIG.DESCRIPTION,
 
   // Aloqa va tizim emaillari
-  adminEmail: process.env.VUE_APP_ADMIN_EMAIL || `admin@${process.env.VUE_APP_DOMAIN || "eduhub.uz"}`,
-  supportEmail: process.env.VUE_APP_SUPPORT_EMAIL || `support@${process.env.VUE_APP_DOMAIN || "eduhub.uz"}`,
+  adminEmail: ENV_CONFIG.ADMIN_EMAIL,
+  supportEmail: ENV_CONFIG.SUPPORT_EMAIL,
 
   // Mualliflik huquqi (Footer)
-  copyright: `${rawName} © ${new Date().getFullYear()}. Barcha huquqlar himoyalangan.`,
+  copyright: `${ENV_CONFIG.APP_NAME} © ${new Date().getFullYear()}. Barcha huquqlar himoyalangan.`,
 };
 
 export default BRAND_CONFIG;

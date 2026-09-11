@@ -1,28 +1,28 @@
-import { Injectable, NotFoundException, ForbiddenException, Optional } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { SubscriptionsService } from '../subscriptions/subscriptions.service';
-import { AuditAction } from '@prisma/client';
-import { BranchContext } from '../auth/branch-access';
+import { Injectable, NotFoundException, ForbiddenException, Optional } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { SubscriptionsService } from "../subscriptions/subscriptions.service";
+import { AuditAction } from "@prisma/client";
+import { BranchContext } from "../auth/branch-access";
+import { UpdateBranchDto } from "./dto/branch.dto";
 
 @Injectable()
 export class BranchesService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
-    @Optional() private subscriptionsService?: SubscriptionsService,
+    @Optional() private subscriptionsService?: SubscriptionsService
   ) {}
 
   async findAll(params: { orgId: string; search?: string }, branchCtx?: BranchContext) {
     const orgWhere = { organizationId: params.orgId };
-    const branchRestriction = branchCtx && !branchCtx.isOrgAdmin
-      ? { id: { in: branchCtx.accessibleBranchIds } }
-      : {};
+    const branchRestriction =
+      branchCtx && !branchCtx.isOrgAdmin ? { id: { in: branchCtx.accessibleBranchIds } } : {};
     const searchWhere = params.search
       ? {
           OR: [
-            { name: { contains: params.search, mode: 'insensitive' as const } },
-            { code: { contains: params.search, mode: 'insensitive' as const } },
+            { name: { contains: params.search, mode: "insensitive" as const } },
+            { code: { contains: params.search, mode: "insensitive" as const } },
           ],
         }
       : {};
@@ -45,13 +45,13 @@ export class BranchesService {
           },
         },
       },
-      orderBy: { name: 'asc' },
+      orderBy: { name: "asc" },
     });
   }
 
   async findOne(id: string, orgId: string, branchCtx?: BranchContext) {
     if (branchCtx && !branchCtx.isOrgAdmin && !branchCtx.accessibleBranchIds.includes(id)) {
-      throw new ForbiddenException('Siz ushbu filialga kirish huquqiga ega emassiz');
+      throw new ForbiddenException("Siz ushbu filialga kirish huquqiga ega emassiz");
     }
 
     const branch = await this.prisma.branch.findFirst({
@@ -70,18 +70,22 @@ export class BranchesService {
         },
       },
     });
-    if (!branch) throw new NotFoundException('Filial topilmadi');
+    if (!branch) throw new NotFoundException("Filial topilmadi");
     return branch;
   }
 
-  async create(data: {
-    name: string;
-    code?: string;
-    phone?: string;
-    address?: string;
-  }, orgId: string, userId?: string) {
+  async create(
+    data: {
+      name: string;
+      code?: string;
+      phone?: string;
+      address?: string;
+    },
+    orgId: string,
+    userId?: string
+  ) {
     if (this.subscriptionsService) {
-      await this.subscriptionsService.checkLimit('MAX_BRANCHES', 1, orgId);
+      await this.subscriptionsService.checkLimit("MAX_BRANCHES", 1, orgId);
     }
 
     const branch = await this.prisma.branch.create({
@@ -101,7 +105,7 @@ export class BranchesService {
       branchId: branch.id,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Branch',
+      entityType: "Branch",
       entityId: branch.id,
       after: branch,
     });
@@ -109,9 +113,9 @@ export class BranchesService {
     return branch;
   }
 
-  async update(id: string, data: any, orgId: string, userId?: string) {
+  async update(id: string, data: UpdateBranchDto, orgId: string, userId?: string) {
     const existing = await this.prisma.branch.findFirst({ where: { id, organizationId: orgId } });
-    if (!existing) throw new NotFoundException('Filial topilmadi');
+    if (!existing) throw new NotFoundException("Filial topilmadi");
 
     const updated = await this.prisma.branch.update({
       where: { id },
@@ -123,7 +127,7 @@ export class BranchesService {
       branchId: id,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Branch',
+      entityType: "Branch",
       entityId: id,
       before: existing,
       after: updated,
@@ -133,8 +137,10 @@ export class BranchesService {
   }
 
   async remove(id: string, orgId: string, userId?: string) {
-    const existing = await this.prisma.branch.findFirst({ where: { id, organizationId: orgId, deletedAt: null } });
-    if (!existing) throw new NotFoundException('Filial topilmadi');
+    const existing = await this.prisma.branch.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null },
+    });
+    if (!existing) throw new NotFoundException("Filial topilmadi");
 
     const deleted = await this.prisma.branch.update({
       where: { id },
@@ -146,7 +152,7 @@ export class BranchesService {
       branchId: id,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Branch',
+      entityType: "Branch",
       entityId: id,
       before: existing,
       after: deleted,
@@ -157,7 +163,7 @@ export class BranchesService {
 
   async restore(id: string, orgId: string, userId?: string) {
     const existing = await this.prisma.branch.findFirst({ where: { id, organizationId: orgId } });
-    if (!existing) throw new NotFoundException('Filial topilmadi');
+    if (!existing) throw new NotFoundException("Filial topilmadi");
 
     const restored = await this.prisma.branch.update({
       where: { id },
@@ -169,7 +175,7 @@ export class BranchesService {
       branchId: id,
       userId,
       action: AuditAction.RESTORE,
-      entityType: 'Branch',
+      entityType: "Branch",
       entityId: id,
       before: existing,
       after: restored,

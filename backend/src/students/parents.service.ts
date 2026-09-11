@@ -1,14 +1,24 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { AuditAction } from '@prisma/client';
-import { CreateParentDto, UpdateParentDto, QueryParentDto, LinkStudentParentDto } from './dto/parent.dto';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { AuditAction, Prisma } from "@prisma/client";
+import {
+  CreateParentDto,
+  UpdateParentDto,
+  QueryParentDto,
+  LinkStudentParentDto,
+} from "./dto/parent.dto";
 
 @Injectable()
 export class ParentsService {
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
   async findAll(query: QueryParentDto, orgId: string) {
@@ -16,12 +26,12 @@ export class ParentsService {
     const limit = Math.min(Number(query.limit) || 20, 100);
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    const where: Prisma.ParentWhereInput = {
       organizationId: orgId,
       deletedAt: null,
       OR: query.search
         ? [
-            { fullName: { contains: query.search, mode: 'insensitive' } },
+            { fullName: { contains: query.search, mode: "insensitive" } },
             { phone: { contains: query.search } },
           ]
         : undefined,
@@ -48,7 +58,7 @@ export class ParentsService {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       }),
       this.prisma.parent.count({ where }),
     ]);
@@ -84,7 +94,7 @@ export class ParentsService {
     });
 
     if (!parent) {
-      throw new NotFoundException('Ota-ona topilmadi yoki ushbu tashkilotga tegishli emas');
+      throw new NotFoundException("Ota-ona topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     return parent;
@@ -97,7 +107,9 @@ export class ParentsService {
     });
 
     if (existing) {
-      throw new ConflictException('Ushbu telefon raqamli ota-ona ushbu tashkilotda allaqachon mavjud');
+      throw new ConflictException(
+        "Ushbu telefon raqamli ota-ona ushbu tashkilotda allaqachon mavjud"
+      );
     }
 
     const parent = await this.prisma.parent.create({
@@ -114,7 +126,7 @@ export class ParentsService {
       organizationId: orgId,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Parent',
+      entityType: "Parent",
       entityId: parent.id,
       after: parent,
     });
@@ -130,7 +142,7 @@ export class ParentsService {
         where: { organizationId: orgId, phone: dto.phone, deletedAt: null, id: { not: id } },
       });
       if (conflict) {
-        throw new ConflictException('Ushbu telefon raqami boshqa ota-onaga biriktirilgan');
+        throw new ConflictException("Ushbu telefon raqami boshqa ota-onaga biriktirilgan");
       }
     }
 
@@ -148,7 +160,7 @@ export class ParentsService {
       organizationId: orgId,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Parent',
+      entityType: "Parent",
       entityId: id,
       before: parent,
       after: updated,
@@ -169,12 +181,12 @@ export class ParentsService {
       organizationId: orgId,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Parent',
+      entityType: "Parent",
       entityId: id,
       before: parent,
     });
 
-    return { success: true, message: 'Ota-ona muvaffaqiyatli o\'chirildi', id: softDeleted.id };
+    return { success: true, message: "Ota-ona muvaffaqiyatli o'chirildi", id: softDeleted.id };
   }
 
   async linkStudent(dto: LinkStudentParentDto, orgId: string, userId?: string) {
@@ -183,7 +195,7 @@ export class ParentsService {
       where: { id: dto.studentId, organizationId: orgId, deletedAt: null },
     });
     if (!student) {
-      throw new NotFoundException('O\'quvchi topilmadi yoki ushbu tashkilotga tegishli emas');
+      throw new NotFoundException("O'quvchi topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     // 2. Verify Parent belongs to org
@@ -191,7 +203,7 @@ export class ParentsService {
       where: { id: dto.parentId, organizationId: orgId, deletedAt: null },
     });
     if (!parent) {
-      throw new NotFoundException('Ota-ona topilmadi yoki ushbu tashkilotga tegishli emas');
+      throw new NotFoundException("Ota-ona topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     // 3. Upsert / Create StudentParent junction link
@@ -222,7 +234,7 @@ export class ParentsService {
       organizationId: orgId,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'StudentParent',
+      entityType: "StudentParent",
       entityId: link.id,
       after: { studentId: dto.studentId, parentId: dto.parentId, relationship: link.relationship },
     });
@@ -242,7 +254,7 @@ export class ParentsService {
     });
 
     if (!link) {
-      throw new NotFoundException('Bog\'lanish topilmadi yoki ushbu tashkilotga tegishli emas');
+      throw new NotFoundException("Bog'lanish topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     await this.prisma.studentParent.delete({
@@ -253,11 +265,11 @@ export class ParentsService {
       organizationId: orgId,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'StudentParent',
+      entityType: "StudentParent",
       entityId: link.id,
       before: link,
     });
 
-    return { success: true, message: 'Talaba va ota-ona bog\'lanishi uzildi' };
+    return { success: true, message: "Talaba va ota-ona bog'lanishi uzildi" };
   }
 }

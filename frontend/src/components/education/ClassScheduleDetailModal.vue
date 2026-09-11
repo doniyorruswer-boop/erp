@@ -1,5 +1,5 @@
 <template>
-  <transition
+  <Transition
     enter-active-class="transition duration-200 ease-out"
     enter-from-class="opacity-0"
     enter-to-class="opacity-100"
@@ -24,7 +24,7 @@
               class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-lg shadow-sm shrink-0"
               :style="{ backgroundColor: currentClass?.color || '#3b82f6' }"
             >
-              {{ currentClass?.name || 'Sinf' }}
+              {{ currentClass?.name || "Sinf" }}
             </div>
             <div>
               <div class="flex items-center gap-2 flex-wrap">
@@ -34,7 +34,7 @@
                 <span
                   class="px-2 py-0.5 rounded text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20"
                 >
-                  {{ currentClass?.stageLabel || 'Boshlang\'ich' }}
+                  {{ currentClass?.stageLabel || "Boshlang'ich" }}
                 </span>
               </div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-2">
@@ -62,8 +62,8 @@
               <span>Sinf:</span>
               <select
                 v-model="selectedClassId"
-                @change="onClassChange"
                 class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-800 dark:text-gray-200 focus:outline-hidden focus:ring-1 focus:ring-primary"
+                @change="onClassChange"
               >
                 <option v-for="c in allClasses" :key="c.id" :value="c.id">
                   {{ c.name }}
@@ -72,20 +72,15 @@
             </div>
 
             <!-- Print button -->
-            <AppButton
-              variant="outline"
-              size="sm"
-              icon="solar:printer-bold"
-              @click="printSchedule"
-            >
+            <AppButton variant="outline" size="sm" icon="solar:printer-bold" @click="printSchedule">
               Chop etish
             </AppButton>
 
             <!-- Close button -->
             <button
               type="button"
-              @click="close"
               class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+              @click="close"
             >
               <Icon icon="solar:close-circle-bold" class="text-xl" />
             </button>
@@ -94,12 +89,18 @@
 
         <!-- 2. Timetable Grid Table (Scrollable) -->
         <div class="flex-1 overflow-auto p-4 bg-gray-100/40 dark:bg-gray-950/40">
-          <div class="min-w-[780px] bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs overflow-hidden">
+          <div
+            class="min-w-[780px] bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs overflow-hidden"
+          >
             <!-- Grid Table -->
             <table class="w-full border-collapse text-left text-xs">
               <thead>
-                <tr class="bg-gray-50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300">
-                  <th class="py-3 px-3 w-28 font-bold border-r border-gray-200 dark:border-gray-800 text-center">
+                <tr
+                  class="bg-gray-50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
+                >
+                  <th
+                    class="py-3 px-3 w-28 font-bold border-r border-gray-200 dark:border-gray-800 text-center"
+                  >
                     Qo'ng'iroq
                   </th>
                   <th
@@ -120,7 +121,9 @@
                   class="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
                 >
                   <!-- Period / Time Cell -->
-                  <td class="py-2.5 px-3 border-r border-gray-200 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20 text-center">
+                  <td
+                    class="py-2.5 px-3 border-r border-gray-200 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20 text-center"
+                  >
                     <div class="font-bold text-gray-800 dark:text-gray-200">
                       {{ bell.label }}
                     </div>
@@ -166,7 +169,9 @@
                       v-else
                       class="h-16 rounded-lg border border-dashed border-gray-200 dark:border-gray-800 hover:border-primary/50 hover:bg-primary/5 dark:hover:bg-primary/10 flex items-center justify-center transition cursor-pointer text-gray-300 dark:text-gray-600 hover:text-primary"
                     >
-                      <span class="text-xs font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span
+                        class="text-xs font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
                         <Icon icon="solar:add-circle-bold" class="text-sm" />
                         Qo'shish
                       </span>
@@ -184,19 +189,20 @@
         >
           <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
             <Icon icon="solar:info-circle-bold" class="text-primary text-sm" />
-            <span>Katakchani bosish orqali darsni o'zgartirishingiz yoki yangi dars biriktirishingiz mumkin.</span>
+            <span
+              >Katakchani bosish orqali darsni o'zgartirishingiz yoki yangi dars biriktirishingiz
+              mumkin.</span
+            >
           </div>
 
           <div class="flex items-center gap-2">
-            <AppButton variant="outline" size="sm" @click="close">
-              Yopish
-            </AppButton>
+            <AppButton variant="outline" size="sm" @click="close"> Yopish </AppButton>
           </div>
         </div>
       </div>
 
       <!-- Nested Slot Edit Modal -->
-      <transition
+      <Transition
         enter-active-class="transition duration-150 ease-out"
         enter-from-class="opacity-0 scale-95"
         enter-to-class="opacity-100 scale-100"
@@ -212,7 +218,9 @@
           <div
             class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-5 w-full max-w-md shadow-2xl space-y-4"
           >
-            <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+            <div
+              class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3"
+            >
               <div>
                 <h4 class="font-bold text-gray-900 dark:text-gray-100 text-sm">
                   Darsni tahrirlash
@@ -223,8 +231,8 @@
               </div>
               <button
                 type="button"
-                @click="editingSlot = null"
                 class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                @click="editingSlot = null"
               >
                 <Icon icon="solar:close-circle-bold" class="text-lg" />
               </button>
@@ -281,12 +289,14 @@
             </div>
 
             <!-- Actions inside edit modal -->
-            <div class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
+            <div
+              class="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800"
+            >
               <button
                 v-if="hasExistingLesson"
                 type="button"
-                @click="clearCurrentSlot"
                 class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900 transition"
+                @click="clearCurrentSlot"
               >
                 Darsni bekor qilish
               </button>
@@ -296,31 +306,30 @@
                 <AppButton variant="outline" size="sm" @click="editingSlot = null">
                   Bekor qilish
                 </AppButton>
-                <AppButton variant="primary" size="sm" @click="saveSlot">
-                  Saqlash
-                </AppButton>
+                <AppButton variant="primary" size="sm" @click="saveSlot"> Saqlash </AppButton>
               </div>
             </div>
           </div>
         </div>
-      </transition>
+      </Transition>
     </div>
-  </transition>
+  </Transition>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import AppButton from "@/components/AppButton.vue";
+
 import {
-  SCHEDULE_CLASSES,
   BELL_PERIODS,
-  WEEKDAYS,
+  getClassSchedule,
+  ROOMS_LIST,
+  saveClassSchedule,
+  SCHEDULE_CLASSES,
   SUBJECTS_LIST,
   TEACHERS_LIST,
-  ROOMS_LIST,
-  getClassSchedule,
-  saveClassSchedule,
+  WEEKDAYS,
 } from "@/api/scheduleData";
+import AppButton from "@/components/common/AppButton.vue";
 
 export default {
   name: "ClassScheduleDetailModal",

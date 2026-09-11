@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #4F46E5;
+  --color-primary: #4f46e5;
   --color-primary-rgb: 79, 70, 229;
 }
 
 .item a.exact-active,
 .item a.router-link-exact-active,
 .item a.router-link-active {
-  background-color: var(--color-primary, #4F46E5) !important;
+  background-color: var(--color-primary, #4f46e5) !important;
   color: #ffffff !important;
 }
 
@@ -58,7 +58,7 @@
 
 body {
   overflow: hidden;
-  background-color: "#EEF6FF";
+  background-color: #eef6ff;
 }
 
 .flex-sidebar {
@@ -95,10 +95,12 @@ body {
   .title-base {
     @apply text-lg sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight;
   }
-  .title-md, .title-medium {
+  .title-md,
+  .title-medium {
     @apply text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight;
   }
-  .title-lg, .title-large {
+  .title-lg,
+  .title-large {
     @apply text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight;
   }
 }

@@ -1,5 +1,13 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsBoolean, IsNumber, IsArray } from 'class-validator';
-import { CustomFieldType } from '@prisma/client';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsBoolean,
+  IsNumber,
+  IsArray,
+} from "class-validator";
+import { CustomFieldType } from "@prisma/client";
 
 export class CreateFieldDefinitionDto {
   @IsString()
@@ -18,7 +26,7 @@ export class CreateFieldDefinitionDto {
   fieldType: CustomFieldType;
 
   @IsOptional()
-  options?: any;
+  options?: unknown;
 
   @IsString()
   @IsOptional()
@@ -51,7 +59,7 @@ export class UpdateFieldDefinitionDto {
   fieldType?: CustomFieldType;
 
   @IsOptional()
-  options?: any;
+  options?: unknown;
 
   @IsString()
   @IsOptional()

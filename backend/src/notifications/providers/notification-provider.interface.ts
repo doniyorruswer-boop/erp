@@ -1,9 +1,9 @@
-import { NotificationChannel } from '@prisma/client';
+import { NotificationChannel } from "@prisma/client";
 
 export interface SendResult {
   success: boolean;
   messageId?: string;
-  response?: any;
+  response?: Record<string, unknown> | unknown;
   error?: string;
 }
 
@@ -11,7 +11,7 @@ export interface NotificationPayload {
   recipient: string; // userId, email, phone, or telegram chatId
   title: string;
   body: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface NotificationProvider {

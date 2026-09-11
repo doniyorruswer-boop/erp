@@ -6,7 +6,12 @@ const ts = require("../frontend/node_modules/typescript");
 const moduleCache = new Map();
 
 function loadTsModule(filePath) {
-  const normalized = path.normalize(filePath);
+  let normalized = path.normalize(filePath);
+  if (!fs.existsSync(normalized)) {
+    if (fs.existsSync(normalized + ".ts")) normalized += ".ts";
+    else if (fs.existsSync(normalized + ".js")) normalized += ".js";
+  }
+
   if (moduleCache.has(normalized)) {
     return moduleCache.get(normalized);
   }
@@ -23,6 +28,7 @@ function loadTsModule(filePath) {
 
   const wrapper = new Function("exports", "require", "module", "__filename", "__dirname", transpiled.outputText);
   const customRequire = (reqPath) => {
+    if (reqPath === "vue-router") return {};
     if (reqPath.includes("types")) return {};
     let resolved = reqPath;
     if (reqPath.startsWith("@/")) {
@@ -30,8 +36,10 @@ function loadTsModule(filePath) {
     } else {
       resolved = path.resolve(path.dirname(normalized), reqPath);
     }
-    if (!resolved.endsWith(".ts") && fs.existsSync(resolved + ".ts")) {
+    if (fs.existsSync(resolved + ".ts")) {
       resolved += ".ts";
+    } else if (fs.existsSync(resolved + ".js")) {
+      resolved += ".js";
     }
     return loadTsModule(resolved);
   };

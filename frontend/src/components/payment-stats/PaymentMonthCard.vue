@@ -1,18 +1,20 @@
 <template>
   <div
-    @click="goToDetail"
     :class="[
       'rounded-xl p-4 sm:p-5 transition-all duration-200 flex flex-col justify-between relative overflow-hidden cursor-pointer group hover:shadow-lg hover:border-primary/60',
       'bg-white dark:bg-gray-800 border',
       month.isCurrent
         ? 'border-primary/60 dark:border-primary/70 shadow-md shadow-primary/5 ring-1 ring-primary/30'
-        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-xs'
+        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-xs',
     ]"
+    @click="goToDetail"
   >
     <!-- Yuqori qism: Oy nomi (chapda) va Tepa o'ngdagi holat belgisi (ikonka + badge) -->
     <div class="flex items-start justify-between gap-2 min-w-0 mb-3">
       <div class="min-w-0">
-        <h3 class="text-base sm:text-lg font-bold text-gray-800 dark:text-gray-100 leading-tight truncate">
+        <h3
+          class="text-base sm:text-lg font-bold text-gray-800 dark:text-gray-100 leading-tight truncate"
+        >
           {{ month.name }}
         </h3>
         <p class="text-xs text-gray-400 font-medium font-mono mt-0.5">
@@ -25,7 +27,7 @@
         <span
           :class="[
             'text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md border whitespace-nowrap',
-            badgeClass
+            badgeClass,
           ]"
         >
           {{ badgeLabel }}
@@ -34,7 +36,7 @@
         <div
           :class="[
             'w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-sm sm:text-base shrink-0 shadow-2xs transition-transform duration-200 hover:scale-105',
-            iconBgClass
+            iconBgClass,
           ]"
           :title="badgeLabel"
         >
@@ -44,7 +46,9 @@
     </div>
 
     <!-- O'rta qism: Reja va Fakt ko'rsatkichlari -->
-    <div class="my-4 space-y-2.5 border-t border-gray-100 dark:border-gray-700/80 pt-3 text-xs sm:text-sm">
+    <div
+      class="my-4 space-y-2.5 border-t border-gray-100 dark:border-gray-700/80 pt-3 text-xs sm:text-sm"
+    >
       <div class="flex justify-between items-center gap-2">
         <span class="text-gray-500 dark:text-gray-400">Reja:</span>
         <span class="font-bold text-gray-900 dark:text-gray-100 tracking-tight text-right">
@@ -53,7 +57,14 @@
       </div>
       <div class="flex justify-between items-center gap-2">
         <span class="text-gray-500 dark:text-gray-400">Fakt:</span>
-        <span :class="['font-bold tracking-tight text-right', month.fact > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500']">
+        <span
+          :class="[
+            'font-bold tracking-tight text-right',
+            month.fact > 0
+              ? 'text-emerald-600 dark:text-emerald-400'
+              : 'text-gray-400 dark:text-gray-500',
+          ]"
+        >
           {{ formatUZS(month.fact) }}
         </span>
       </div>
@@ -75,10 +86,15 @@
           :style="{ width: `${Math.min(100, Math.max(2, month.percent))}%` }"
         ></div>
       </div>
-          <!-- Pastki qism: Batafsil tahlil tugmasi -->
-      <div class="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-700/80 flex items-center justify-between text-xs font-semibold text-gray-500 group-hover:text-primary transition-colors">
+      <!-- Pastki qism: Batafsil tahlil tugmasi -->
+      <div
+        class="mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-700/80 flex items-center justify-between text-xs font-semibold text-gray-500 group-hover:text-primary transition-colors"
+      >
         <span>Batafsil ko'rish</span>
-        <Icon icon="solar:arrow-right-linear" class="text-sm transition-transform group-hover:translate-x-1" />
+        <Icon
+          icon="solar:arrow-right-linear"
+          class="text-sm transition-transform group-hover:translate-x-1"
+        />
       </div>
     </div>
   </div>
@@ -165,8 +181,8 @@ export default {
     },
   },
   methods: {
-        goToDetail() {
-      const key = this.month?.key || this.month?.name || 'Okt';
+    goToDetail() {
+      const key = this.month?.key || this.month?.name || "Okt";
       this.$router.push({
         path: `/payment-stats/month/${key}`,
         query: {

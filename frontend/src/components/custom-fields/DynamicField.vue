@@ -28,7 +28,9 @@
         :placeholder="field.placeholder || '0'"
         :required="field.isRequired"
         class="w-full h-11 px-3.5 text-xs sm:text-sm rounded-xl border border-gray-300 dark:border-gray-700 outline-none transition bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-2xs"
-        @input="$emit('update:modelValue', $event.target.value ? Number($event.target.value) : null)"
+        @input="
+          $emit('update:modelValue', $event.target.value ? Number($event.target.value) : null)
+        "
       />
     </div>
 
@@ -66,13 +68,16 @@
     <!-- BOOLEAN -->
     <div v-else-if="field.fieldType === 'BOOLEAN'" class="flex items-center gap-3 pt-4">
       <input
-        type="checkbox"
         :id="`field-${field.key}`"
+        type="checkbox"
         :checked="!!modelValue"
         class="w-5 h-5 text-primary rounded-lg border-gray-300 focus:ring-primary dark:border-gray-700 dark:bg-gray-900"
         @change="$emit('update:modelValue', $event.target.checked)"
       />
-      <label :for="`field-${field.key}`" class="text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+      <label
+        :for="`field-${field.key}`"
+        class="text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer"
+      >
         {{ field.label }}
         <span v-if="field.isRequired" class="text-red-500">*</span>
       </label>
@@ -103,7 +108,9 @@
         {{ field.label }}
         <span v-if="field.isRequired" class="text-red-500">*</span>
       </label>
-      <div class="flex flex-wrap gap-2 p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <div
+        class="flex flex-wrap gap-2 p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900"
+      >
         <label
           v-for="(opt, idx) in normalizedOptions"
           :key="idx"

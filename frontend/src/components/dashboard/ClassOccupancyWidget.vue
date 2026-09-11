@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-2xs space-y-4 font-lexend"
+  >
     <!-- Header with 4 Summary Pills -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
@@ -13,27 +15,53 @@
 
       <!-- 4 Top KPI Badges in Uzbek (Dynamic from real classes) -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-        <div class="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/60">
-          <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium">Jami o'quvchilar</span>
-          <span class="font-bold text-gray-800 dark:text-gray-100 text-sm sm:text-base">{{ totalStudents }} ta</span>
+        <div
+          class="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/60"
+        >
+          <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium"
+            >Jami o'quvchilar</span
+          >
+          <span class="font-bold text-gray-800 dark:text-gray-100 text-sm sm:text-base"
+            >{{ totalStudents }} ta</span
+          >
         </div>
-        <div class="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/60">
-          <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium">Sinflar sig'imi</span>
-          <span class="font-bold text-gray-800 dark:text-gray-100 text-sm sm:text-base">{{ totalStudents }}/{{ totalCapacity }}</span>
+        <div
+          class="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/60"
+        >
+          <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium"
+            >Sinflar sig'imi</span
+          >
+          <span class="font-bold text-gray-800 dark:text-gray-100 text-sm sm:text-base"
+            >{{ totalStudents }}/{{ totalCapacity }}</span
+          >
         </div>
-        <div class="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/60">
-          <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium">Bo'sh o'rinlar</span>
+        <div
+          class="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/60"
+        >
+          <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium"
+            >Bo'sh o'rinlar</span
+          >
           <span class="font-bold text-primary text-sm sm:text-base">{{ freeSeats }} ta</span>
         </div>
-        <div class="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/60">
-          <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium">Filial quvvati</span>
-          <span class="font-bold text-gray-800 dark:text-gray-100 text-sm sm:text-base">{{ totalStudents }}/{{ totalCapacity }} <span class="text-xs text-gray-400 font-normal">(+{{ freeSeats }})</span></span>
+        <div
+          class="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600/60"
+        >
+          <span class="text-xs text-gray-500 dark:text-gray-400 block font-medium"
+            >Filial quvvati</span
+          >
+          <span class="font-bold text-gray-800 dark:text-gray-100 text-sm sm:text-base"
+            >{{ totalStudents }}/{{ totalCapacity }}
+            <span class="text-xs text-gray-400 font-normal">(+{{ freeSeats }})</span></span
+          >
         </div>
       </div>
     </div>
 
     <!-- Empty state if no groups -->
-    <div v-if="classes.length === 0" class="py-8 text-center text-gray-400 dark:text-gray-500 text-xs">
+    <div
+      v-if="classes.length === 0"
+      class="py-8 text-center text-gray-400 dark:text-gray-500 text-xs"
+    >
       Hozircha guruhlar ro'yxati mavjud emas
     </div>
 
@@ -45,11 +73,17 @@
         class="p-3 rounded-lg bg-gray-50/80 dark:bg-gray-700/30 border border-gray-200/80 dark:border-gray-700/60 space-y-1.5 hover:border-primary/50 transition"
       >
         <div class="flex items-center justify-between text-sm font-semibold">
-          <span class="text-gray-800 dark:text-gray-100 truncate" :title="c.name">{{ c.name }}</span>
+          <span class="text-gray-800 dark:text-gray-100 truncate" :title="c.name">{{
+            c.name
+          }}</span>
           <span
             :class="[
               'text-xs sm:text-sm font-bold shrink-0 ml-1',
-              c.count > c.capacity ? 'text-primary' : c.count === 0 ? 'text-gray-400' : 'text-gray-700 dark:text-gray-300'
+              c.count > c.capacity
+                ? 'text-primary'
+                : c.count === 0
+                  ? 'text-gray-400'
+                  : 'text-gray-700 dark:text-gray-300',
             ]"
           >
             {{ c.count }}/{{ c.capacity }}
@@ -60,7 +94,9 @@
           <div
             class="h-full rounded-full transition-all duration-300"
             :class="c.color || 'bg-primary'"
-            :style="{ width: `${c.capacity > 0 ? Math.min(100, Math.round((c.count / c.capacity) * 100)) : 0}%` }"
+            :style="{
+              width: `${c.capacity > 0 ? Math.min(100, Math.round((c.count / c.capacity) * 100)) : 0}%`,
+            }"
           ></div>
         </div>
       </div>

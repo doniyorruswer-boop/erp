@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { QueryTransactionDto } from '../dto/transaction.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { QueryTransactionDto } from "../dto/transaction.dto";
 
 @Injectable()
 export class TransactionsService {
@@ -11,9 +11,10 @@ export class TransactionsService {
     const cashboxWhere = params?.cashboxId ? { cashboxId: params.cashboxId } : {};
     const typeWhere = params?.type ? { type: params.type } : {};
 
-    const dateWhere: any = {};
+    const dateWhere: { date?: { gte?: Date; lte?: Date } } = {};
     if (params?.startDate) dateWhere.date = { gte: new Date(params.startDate) };
-    if (params?.endDate) dateWhere.date = { ...(dateWhere.date || {}), lte: new Date(params.endDate) };
+    if (params?.endDate)
+      dateWhere.date = { ...(dateWhere.date || {}), lte: new Date(params.endDate) };
 
     return this.prisma.transaction.findMany({
       where: {
@@ -29,7 +30,7 @@ export class TransactionsService {
         expense: { select: { id: true, title: true, amount: true } },
         refund: { select: { id: true, reason: true, amount: true } },
       },
-      orderBy: { date: 'desc' },
+      orderBy: { date: "desc" },
     });
   }
 }

@@ -1,16 +1,17 @@
 <template>
   <div class="p-4 space-y-4">
     <!-- Debtor banner -->
-    <div class="flex items-center justify-between flex-wrap gap-3 bg-rose-50/80 dark:bg-rose-950/40 p-3.5 rounded-xl border border-rose-200 dark:border-rose-800 text-xs sm:text-sm">
+    <div
+      class="flex items-center justify-between flex-wrap gap-3 bg-rose-50/80 dark:bg-rose-950/40 p-3.5 rounded-xl border border-rose-200 dark:border-rose-800 text-xs sm:text-sm"
+    >
       <div class="flex items-center gap-2 text-rose-800 dark:text-rose-200 font-semibold">
         <Icon icon="solar:danger-triangle-bold" class="text-lg text-rose-600" />
-        <span>Ushbu oy bo'yicha jami {{ debtors.length }} ta o'quvchi to'lov qilmagan. Umumiy qarz: <strong>{{ formatUZS(totalDebt) }}</strong></span>
+        <span
+          >Ushbu oy bo'yicha jami {{ debtors.length }} ta o'quvchi to'lov qilmagan. Umumiy qarz:
+          <strong>{{ formatUZS(totalDebt) }}</strong></span
+        >
       </div>
-      <AppButton
-        variant="danger"
-        icon="solar:chat-round-dots-bold"
-        @click="$emit('open-sms')"
-      >
+      <AppButton variant="danger" icon="solar:chat-round-dots-bold" @click="$emit('open-sms')">
         Barchasiga SMS Eslatma Yuborish
       </AppButton>
     </div>
@@ -18,7 +19,9 @@
     <!-- Debtors table -->
     <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl">
       <table class="w-full text-left border-collapse min-w-[850px]">
-        <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider text-[11px] border-b dark:border-gray-700">
+        <thead
+          class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider text-[11px] border-b dark:border-gray-700"
+        >
           <tr>
             <th class="py-3 px-3.5 w-12 text-center">#</th>
             <th class="py-3 px-4">O'quvchi FISH</th>
@@ -36,11 +39,16 @@
             :key="d.studentId"
             class="hover:bg-rose-50/20 dark:hover:bg-rose-950/10 transition-colors"
           >
-            <td class="py-3 px-3.5 text-center text-gray-400 font-medium">{{ (currentPage - 1) * perPage + idx + 1 }}</td>
+            <td class="py-3 px-3.5 text-center text-gray-400 font-medium">
+              {{ (currentPage - 1) * perPage + idx + 1 }}
+            </td>
             <td class="py-3 px-4">
-              <router-link :to="`/students/${d.studentId}`" class="font-bold text-gray-900 dark:text-white hover:text-primary transition-colors">
+              <RouterLink
+                :to="`/students/${d.studentId}`"
+                class="font-bold text-gray-900 dark:text-white hover:text-primary transition-colors"
+              >
                 {{ d.studentName }}
-              </router-link>
+              </RouterLink>
               <span class="block text-[11px] text-gray-400">ID: {{ d.studentId }}</span>
             </td>
             <td class="py-3 px-4 text-center font-bold text-gray-700 dark:text-gray-300">
@@ -53,13 +61,18 @@
               {{ d.parentName }}
             </td>
             <td class="py-3 px-4">
-              <a :href="`tel:${d.parentPhone}`" class="text-primary font-semibold hover:underline flex items-center gap-1">
+              <a
+                :href="`tel:${d.parentPhone}`"
+                class="text-primary font-semibold hover:underline flex items-center gap-1"
+              >
                 <Icon icon="solar:phone-calling-linear" class="text-sm" />
                 {{ d.parentPhone }}
               </a>
             </td>
             <td class="py-3 px-4 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300">
+              <span
+                class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300"
+              >
                 {{ d.delayDays }} kun kechikkan
               </span>
             </td>
@@ -72,11 +85,11 @@
               >
                 SMS
               </AppButton>
-              <router-link :to="`/students/${d.studentId}`">
+              <RouterLink :to="`/students/${d.studentId}`">
                 <AppButton size="sm" variant="outline" icon="solar:user-id-linear">
                   Profil
                 </AppButton>
-              </router-link>
+              </RouterLink>
             </td>
           </tr>
           <tr v-if="debtors.length === 0">
@@ -100,8 +113,9 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import AppButton from "@/components/AppButton.vue";
-import AppPagination from "@/components/AppPagination.vue";
+
+import AppButton from "@/components/common/AppButton.vue";
+import AppPagination from "@/components/common/AppPagination.vue";
 import { formatUZS } from "@/helper/formatters";
 
 export default {

@@ -1,9 +1,15 @@
 <template>
-  <div class="attendance-grid-card bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-5 shadow-sm">
+  <div
+    class="attendance-grid-card bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 p-5 shadow-sm"
+  >
     <!-- Header & Month Switcher -->
-    <div class="flex items-center justify-between flex-wrap gap-3 pb-4 mb-4 border-b dark:border-gray-700">
+    <div
+      class="flex items-center justify-between flex-wrap gap-3 pb-4 mb-4 border-b dark:border-gray-700"
+    >
       <div class="flex items-center gap-2">
-        <div class="p-2 rounded-lg bg-green-500/10 text-green-600 text-xl flex items-center justify-center">
+        <div
+          class="p-2 rounded-lg bg-green-500/10 text-green-600 text-xl flex items-center justify-center"
+        >
           <Icon icon="fluent:calendar-checkmark-24-filled" />
         </div>
         <div>
@@ -15,17 +21,19 @@
       <!-- Month Selector -->
       <div class="flex items-center gap-2">
         <button
-          @click="prevMonth"
           class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition"
+          @click="prevMonth"
         >
           <Icon icon="lucide:chevron-left" class="text-lg" />
         </button>
-        <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 min-w-[130px] text-center capitalize">
+        <span
+          class="text-sm font-semibold text-gray-800 dark:text-gray-200 min-w-[130px] text-center capitalize"
+        >
           {{ currentMonthName }} {{ currentYear }}
         </span>
         <button
-          @click="nextMonth"
           class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition"
+          @click="nextMonth"
         >
           <Icon icon="lucide:chevron-right" class="text-lg" />
         </button>
@@ -34,19 +42,31 @@
 
     <!-- Stats Summary Row -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-      <div class="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/40 text-center">
+      <div
+        class="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/40 text-center"
+      >
         <span class="text-xs text-green-600 dark:text-green-400 font-medium block">Kelgan</span>
-        <span class="text-lg font-bold text-green-700 dark:text-green-300">{{ stats.present }} ta</span>
+        <span class="text-lg font-bold text-green-700 dark:text-green-300"
+          >{{ stats.present }} ta</span
+        >
       </div>
-      <div class="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-center">
+      <div
+        class="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-center"
+      >
         <span class="text-xs text-red-600 dark:text-red-400 font-medium block">Kelmagan</span>
         <span class="text-lg font-bold text-red-700 dark:text-red-300">{{ stats.absent }} ta</span>
       </div>
-      <div class="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 text-center">
+      <div
+        class="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 text-center"
+      >
         <span class="text-xs text-amber-600 dark:text-amber-400 font-medium block">Sababli</span>
-        <span class="text-lg font-bold text-amber-700 dark:text-amber-300">{{ stats.excused }} ta</span>
+        <span class="text-lg font-bold text-amber-700 dark:text-amber-300"
+          >{{ stats.excused }} ta</span
+        >
       </div>
-      <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40 text-center">
+      <div
+        class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40 text-center"
+      >
         <span class="text-xs text-blue-600 dark:text-blue-400 font-medium block">Davomat %</span>
         <span class="text-lg font-bold text-blue-700 dark:text-blue-300">{{ percentage }}%</span>
       </div>
@@ -81,7 +101,7 @@
             :key="`day-${day}`"
             :class="[
               'h-14 p-1.5 rounded-lg border flex flex-col justify-between transition text-xs relative group',
-              getDayCellClass(day)
+              getDayCellClass(day),
             ]"
           >
             <div class="flex justify-between items-center">
@@ -96,9 +116,7 @@
                 {{ getStatusText(getDayRecord(day).status) }}
               </span>
             </div>
-            <div v-else class="text-[10px] text-gray-300 dark:text-gray-600">
-              Dars yo'q
-            </div>
+            <div v-else class="text-[10px] text-gray-300 dark:text-gray-600">Dars yo'q</div>
           </div>
         </div>
       </div>

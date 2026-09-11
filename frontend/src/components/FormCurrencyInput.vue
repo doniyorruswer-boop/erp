@@ -26,7 +26,7 @@
           error
             ? 'border-red-500 focus:border-red-600 focus:ring-2 focus:ring-red-500/20'
             : 'border-gray-300 dark:border-gray-700 focus:border-primary focus:ring-2 focus:ring-primary/20',
-          disabled ? 'bg-gray-100 dark:bg-gray-800 opacity-60 cursor-not-allowed' : ''
+          disabled ? 'bg-gray-100 dark:bg-gray-800 opacity-60 cursor-not-allowed' : '',
         ]"
         @input="onInput"
         @blur="onBlur"
@@ -36,7 +36,7 @@
       <span
         class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs font-semibold text-gray-500 dark:text-gray-400"
       >
-        {{ unit || 'UZS' }}
+        {{ unit || "UZS" }}
       </span>
     </div>
 
@@ -48,6 +48,7 @@
 
 <script>
 import { Icon } from "@iconify/vue";
+
 import { formatMoney, parseMoney } from "@/config/app.config";
 
 export default {

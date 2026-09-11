@@ -9,22 +9,24 @@
     <!-- Trigger Input -->
     <div
       ref="triggerInput"
-      @click="togglePicker"
       :class="[
         'w-full text-xs rounded-md border flex items-center justify-between transition-colors bg-white dark:bg-gray-900 cursor-pointer shadow-2xs py-2 px-3',
-        isOpen ? 'border-primary ring-1 ring-primary/30' : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600',
-        error ? 'border-red-500 ring-1 ring-red-500' : ''
+        isOpen
+          ? 'border-primary ring-1 ring-primary/30'
+          : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600',
+        error ? 'border-red-500 ring-1 ring-red-500' : '',
       ]"
+      @click="togglePicker"
     >
       <div class="flex items-center gap-2 min-w-0 flex-1">
         <Icon icon="solar:clock-circle-linear" class="text-gray-400 text-base shrink-0" />
         <span
           :class="[
             'truncate',
-            modelValue ? 'text-gray-800 dark:text-gray-100 font-semibold' : 'text-gray-400'
+            modelValue ? 'text-gray-800 dark:text-gray-100 font-semibold' : 'text-gray-400',
           ]"
         >
-          {{ modelValue || placeholder || 'Masalan: 14:00 - 18:00' }}
+          {{ modelValue || placeholder || "Masalan: 14:00 - 18:00" }}
         </span>
       </div>
 
@@ -32,13 +34,17 @@
         <button
           v-if="modelValue"
           type="button"
-          @click.stop="clearTime"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-0.5 rounded transition cursor-pointer"
           title="Tozalash"
+          @click.stop="clearTime"
         >
           <Icon icon="solar:close-circle-linear" class="text-sm" />
         </button>
-        <Icon icon="solar:alt-arrow-down-linear" class="text-gray-400 text-xs transition-transform" :class="{ 'rotate-180': isOpen }" />
+        <Icon
+          icon="solar:alt-arrow-down-linear"
+          class="text-gray-400 text-xs transition-transform"
+          :class="{ 'rotate-180': isOpen }"
+        />
       </div>
     </div>
     <FormFieldError :error="error" />
@@ -55,7 +61,9 @@
           @click.stop
         >
           <div class="flex items-center justify-between border-b dark:border-gray-700 pb-2">
-            <span class="font-bold text-gray-800 dark:text-gray-100 text-xs flex items-center gap-1.5">
+            <span
+              class="font-bold text-gray-800 dark:text-gray-100 text-xs flex items-center gap-1.5"
+            >
               <Icon icon="solar:clock-circle-bold" class="text-primary text-base" />
               Vaqtni tanlang (Soat va Minut)
             </span>
@@ -67,41 +75,49 @@
           <!-- Boshlanish va Tugash vaqtlari -->
           <div class="space-y-2.5">
             <!-- Boshlanish -->
-            <div class="bg-gray-50 dark:bg-gray-900/50 p-2.5 rounded-lg border dark:border-gray-700/60 flex items-center justify-between">
-              <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Boshlanish vaqti:</span>
+            <div
+              class="bg-gray-50 dark:bg-gray-900/50 p-2.5 rounded-lg border dark:border-gray-700/60 flex items-center justify-between"
+            >
+              <span class="text-xs font-medium text-gray-700 dark:text-gray-300"
+                >Boshlanish vaqti:</span
+              >
               <div class="flex items-center gap-1.5">
                 <select
                   v-model="startHour"
                   class="w-14 p-1.5 text-xs font-bold rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center outline-none focus:border-primary cursor-pointer"
                 >
-                  <option v-for="h in hoursList" :key="'sh'+h" :value="h">{{ h }}</option>
+                  <option v-for="h in hoursList" :key="'sh' + h" :value="h">{{ h }}</option>
                 </select>
                 <span class="text-gray-500 font-bold">:</span>
                 <select
                   v-model="startMinute"
                   class="w-14 p-1.5 text-xs font-medium rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center outline-none focus:border-primary cursor-pointer"
                 >
-                  <option v-for="m in minutesList" :key="'sm'+m" :value="m">{{ m }}</option>
+                  <option v-for="m in minutesList" :key="'sm' + m" :value="m">{{ m }}</option>
                 </select>
               </div>
             </div>
 
             <!-- Tugash -->
-            <div class="bg-gray-50 dark:bg-gray-900/50 p-2.5 rounded-lg border dark:border-gray-700/60 flex items-center justify-between">
-              <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Tugash vaqti:</span>
+            <div
+              class="bg-gray-50 dark:bg-gray-900/50 p-2.5 rounded-lg border dark:border-gray-700/60 flex items-center justify-between"
+            >
+              <span class="text-xs font-medium text-gray-700 dark:text-gray-300"
+                >Tugash vaqti:</span
+              >
               <div class="flex items-center gap-1.5">
                 <select
                   v-model="endHour"
                   class="w-14 p-1.5 text-xs font-bold rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center outline-none focus:border-primary cursor-pointer"
                 >
-                  <option v-for="h in hoursList" :key="'eh'+h" :value="h">{{ h }}</option>
+                  <option v-for="h in hoursList" :key="'eh' + h" :value="h">{{ h }}</option>
                 </select>
                 <span class="text-gray-500 font-bold">:</span>
                 <select
                   v-model="endMinute"
                   class="w-14 p-1.5 text-xs font-medium rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center outline-none focus:border-primary cursor-pointer"
                 >
-                  <option v-for="m in minutesList" :key="'em'+m" :value="m">{{ m }}</option>
+                  <option v-for="m in minutesList" :key="'em' + m" :value="m">{{ m }}</option>
                 </select>
               </div>
             </div>
@@ -111,15 +127,15 @@
           <div class="flex items-center justify-between pt-2 border-t dark:border-gray-700">
             <button
               type="button"
-              @click="closePicker"
               class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
+              @click="closePicker"
             >
               Bekor qilish
             </button>
             <button
               type="button"
-              @click="saveTime"
               class="px-5 py-1.5 text-xs font-semibold bg-primary hover:bg-primary/90 text-white rounded-md shadow-sm cursor-pointer transition"
+              @click="saveTime"
             >
               Tanlash
             </button>

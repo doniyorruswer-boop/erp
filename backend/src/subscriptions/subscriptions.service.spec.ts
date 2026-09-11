@@ -1,12 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SubscriptionsService } from './subscriptions.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { SubscriptionStatus } from '@prisma/client';
-import { ForbiddenException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { SubscriptionsService } from "./subscriptions.service";
+import { PrismaService } from "../prisma/prisma.service";
+import { SubscriptionStatus } from "@prisma/client";
+import { ForbiddenException } from "@nestjs/common";
 
-describe('SubscriptionsService (Unit Tests)', () => {
+type MockPrisma = Record<string, Record<string, jest.Mock>>;
+
+describe("SubscriptionsService (Unit Tests)", () => {
   let service: SubscriptionsService;
-  let prisma: any;
+  let prisma: MockPrisma;
 
   beforeEach(async () => {
     prisma = {
@@ -43,31 +45,28 @@ describe('SubscriptionsService (Unit Tests)', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        SubscriptionsService,
-        { provide: PrismaService, useValue: prisma },
-      ],
+      providers: [SubscriptionsService, { provide: PrismaService, useValue: prisma }],
     }).compile();
 
     service = module.get<SubscriptionsService>(SubscriptionsService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  describe('checkLimit', () => {
-    it('should return { allowed: true } when current usage is under limit', async () => {
+  describe("checkLimit", () => {
+    it("should return { allowed: true } when current usage is under limit", async () => {
       prisma.subscription.findFirst.mockResolvedValue({
-        id: 'sub-1',
-        organizationId: 'org-1',
+        id: "sub-1",
+        organizationId: "org-1",
         status: SubscriptionStatus.ACTIVE,
         plan: {
-          code: 'FREE',
+          code: "FREE",
           limits: [
-            { limitCode: 'MAX_STUDENTS_CUSTOMERS', value: 50 },
-            { limitCode: 'MAX_BRANCHES', value: 1 },
-            { limitCode: 'MAX_USERS', value: 2 },
+            { limitCode: "MAX_STUDENTS_CUSTOMERS", value: 50 },
+            { limitCode: "MAX_BRANCHES", value: 1 },
+            { limitCode: "MAX_USERS", value: 2 },
           ],
         },
       });
@@ -78,24 +77,24 @@ describe('SubscriptionsService (Unit Tests)', () => {
       prisma.customer.count.mockResolvedValue(5);
       prisma.branch.count.mockResolvedValue(1);
 
-      const result = await service.checkLimit('MAX_STUDENTS_CUSTOMERS', 1, 'org-1');
+      const result = await service.checkLimit("MAX_STUDENTS_CUSTOMERS", 1, "org-1");
 
       expect(result.allowed).toBe(true);
       expect(result.current).toBe(35);
       expect(result.limit).toBe(50);
     });
 
-    it('should throw ForbiddenException when increment causes usage to exceed limit', async () => {
+    it("should throw ForbiddenException when increment causes usage to exceed limit", async () => {
       prisma.subscription.findFirst.mockResolvedValue({
-        id: 'sub-1',
-        organizationId: 'org-1',
+        id: "sub-1",
+        organizationId: "org-1",
         status: SubscriptionStatus.ACTIVE,
         plan: {
-          code: 'FREE',
+          code: "FREE",
           limits: [
-            { limitCode: 'MAX_STUDENTS_CUSTOMERS', value: 50 },
-            { limitCode: 'MAX_BRANCHES', value: 1 },
-            { limitCode: 'MAX_USERS', value: 2 },
+            { limitCode: "MAX_STUDENTS_CUSTOMERS", value: 50 },
+            { limitCode: "MAX_BRANCHES", value: 1 },
+            { limitCode: "MAX_USERS", value: 2 },
           ],
         },
       });
@@ -107,27 +106,27 @@ describe('SubscriptionsService (Unit Tests)', () => {
       prisma.branch.count.mockResolvedValue(1);
 
       // Attempting to add 1 more student (50 + 1 > 50) should throw ForbiddenException
-      await expect(
-        service.checkLimit('MAX_STUDENTS_CUSTOMERS', 1, 'org-1'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.checkLimit("MAX_STUDENTS_CUSTOMERS", 1, "org-1")).rejects.toThrow(
+        ForbiddenException
+      );
 
       // Branch limit is 1, current is 1 -> adding 1 more branch should throw ForbiddenException
-      await expect(
-        service.checkLimit('MAX_BRANCHES', 1, 'org-1'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.checkLimit("MAX_BRANCHES", 1, "org-1")).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
-    it('should never reject when limit is unlimited (value: -1)', async () => {
+    it("should never reject when limit is unlimited (value: -1)", async () => {
       prisma.subscription.findFirst.mockResolvedValue({
-        id: 'sub-enterprise',
-        organizationId: 'org-1',
+        id: "sub-enterprise",
+        organizationId: "org-1",
         status: SubscriptionStatus.ACTIVE,
         plan: {
-          code: 'ENTERPRISE',
+          code: "ENTERPRISE",
           limits: [
-            { limitCode: 'MAX_USERS', value: -1 },
-            { limitCode: 'MAX_STUDENTS_CUSTOMERS', value: -1 },
-            { limitCode: 'MAX_BRANCHES', value: -1 },
+            { limitCode: "MAX_USERS", value: -1 },
+            { limitCode: "MAX_STUDENTS_CUSTOMERS", value: -1 },
+            { limitCode: "MAX_BRANCHES", value: -1 },
           ],
         },
       });
@@ -138,7 +137,7 @@ describe('SubscriptionsService (Unit Tests)', () => {
       prisma.customer.count.mockResolvedValue(2000);
       prisma.branch.count.mockResolvedValue(50);
 
-      const result = await service.checkLimit('MAX_STUDENTS_CUSTOMERS', 10, 'org-1');
+      const result = await service.checkLimit("MAX_STUDENTS_CUSTOMERS", 10, "org-1");
 
       expect(result.allowed).toBe(true);
       expect(result.current).toBe(12000);

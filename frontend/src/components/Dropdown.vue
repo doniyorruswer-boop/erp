@@ -9,64 +9,64 @@
 
     <!-- to close when clicked on space around it-->
     <button
-      class="fixed inset-0 h-full w-full cursor-default focus:outline-none"
       v-if="open"
-      @click="open = false"
+      class="fixed inset-0 h-full w-full cursor-default focus:outline-none"
       tabindex="-1"
+      @click="open = false"
     ></button>
 
     <!--dropdown menu-->
-    <div
-      v-if="placement == 'right'"
-      @click="open = false"
-    >
-      <transition name="fade">
+    <div v-if="placement == 'right'" @click="open = false">
+      <Transition name="fade">
         <div
-          @blur="close"
-          :class="['absolute right-0 shadow-lg rounded-md border dark:border-gray-600 text-sm mt-2 bg-white dark:bg-gray-800 dark:text-white z-50', width || 'w-auto min-w-max']"
           v-show="open"
+          :class="[
+            'absolute right-0 shadow-lg rounded-md border dark:border-gray-600 text-sm mt-2 bg-white dark:bg-gray-800 dark:text-white z-50',
+            width || 'w-auto min-w-max',
+          ]"
+          @blur="close"
         >
           <slot name="content"></slot>
         </div>
-      </transition>
+      </Transition>
     </div>
-    <div
-      v-else
-      @click="open = false"
-    >
-      <transition name="fade">
+    <div v-else @click="open = false">
+      <Transition name="fade">
         <div
-          @blur="close"
-          :class="['absolute left-0 shadow-lg rounded-md border dark:border-gray-600 text-sm mt-2 bg-white dark:bg-gray-800 dark:text-white z-50', width || 'w-auto min-w-max']"
           v-show="open"
+          :class="[
+            'absolute left-0 shadow-lg rounded-md border dark:border-gray-600 text-sm mt-2 bg-white dark:bg-gray-800 dark:text-white z-50',
+            width || 'w-auto min-w-max',
+          ]"
+          @blur="close"
         >
           <slot name="content"></slot>
         </div>
-      </transition>
+      </Transition>
     </div>
   </div>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        open: false,
-      };
+export default {
+  props: {
+    placement: String,
+    dropdown: Boolean,
+    width: {
+      type: String,
+      default: "w-auto min-w-max",
     },
-    props: {
-      placement: String,
-      dropdown: Boolean,
-      width: {
-        type: String,
-        default: "w-auto min-w-max",
-      },
+  },
+  data() {
+    return {
+      open: false,
+    };
+  },
+  mounted() {},
+  methods: {
+    toggle() {
+      this.open = !this.open;
     },
-    methods: {
-      toggle() {
-        this.open = !this.open;
-      },
-    },
-    mounted() {},
-  };
+  },
+};
 </script>

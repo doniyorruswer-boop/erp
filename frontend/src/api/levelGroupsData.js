@@ -201,7 +201,7 @@ export function getLevelGroupStudents(group) {
   group.sources.forEach((clsName, cIdx) => {
     const classId = clsName.toLowerCase().replace(/\s+/g, "-");
     const classStudents = getStudentsByClass(classId, clsName, 25, "SCHOOL");
-    
+
     // Pick 2-3 students from this class
     const take = Math.min(3, Math.max(1, Math.ceil(target / group.sources.length)));
     for (let k = 0; k < take && added < target; k++) {

@@ -1,22 +1,22 @@
 <template>
-  <vmodal
+  <Vmodal
     ref="modalRef"
-    :hideButton="true"
+    :hide-button="true"
     :title="title"
     :subtitle="subtitle"
-    :btnTextSubmit="confirmText"
-    :btnTextClose="cancelText"
-    :btnColorSubmit="submitButtonColor"
-    :btnVariantSubmit="variant"
+    :btn-text-submit="confirmText"
+    :btn-text-close="cancelText"
+    :btn-color-submit="submitButtonColor"
+    :btn-variant-submit="variant"
     :width="width"
     @submit="handleConfirm"
     @close="handleCancel"
   >
-    <template v-slot:Icon>
+    <template #Icon>
       <Icon :icon="displayIcon" :class="['text-3xl mb-2', iconColorClass]" />
     </template>
-    <template v-slot:body>
-      <div class="space-y-3.5 text-xs text-left" v-if="message">
+    <template #body>
+      <div v-if="message" class="space-y-3.5 text-xs text-left">
         <div :class="['p-3.5 rounded-xl border', boxClasses]">
           <p class="font-bold text-sm leading-snug">
             {{ message }}
@@ -28,12 +28,13 @@
       </div>
       <slot />
     </template>
-  </vmodal>
+  </Vmodal>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import vmodal from "@/components/modal.vue";
+
+import vmodal from "@/components/common/AppModal.vue";
 
 export default {
   name: "AppConfirmModal",

@@ -6,7 +6,9 @@
     <!-- Header Section -->
     <div class="flex items-center justify-between flex-wrap gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Foydalanuvchilar & Xodimlar</h1>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
+          Foydalanuvchilar & Xodimlar
+        </h1>
         <p class="text-sm text-gray-400 mt-0.5">
           Tizimga kirish huquqiga ega foydalanuvchilar, ularning rollari va filial birikmalari
         </p>
@@ -14,8 +16,8 @@
       <div class="flex items-center gap-2.5">
         <button
           type="button"
-          @click="openCreateModal"
           class="border flex items-center text-sm gap-2 text-white bg-primary hover:bg-primary/90 dark:border-gray-700 rounded-md py-2 px-4 font-medium shadow-sm transition cursor-pointer"
+          @click="openCreateModal"
         >
           <Icon icon="solar:user-plus-bold" class="text-lg" />
           <span>Yangi Foydalanuvchi</span>
@@ -24,7 +26,12 @@
     </div>
 
     <!-- Alert Message -->
-    <Alert v-if="alertMessage" :message="alertMessage" :type="alertType" @close="alertMessage = ''" />
+    <Alert
+      v-if="alertMessage"
+      :message="alertMessage"
+      :type="alertType"
+      @close="alertMessage = ''"
+    />
 
     <!-- 4 Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -39,21 +46,21 @@
         :value="`${adminCount} ta`"
         icon="solar:shield-user-bold"
         variant="purple"
-        valueClass="text-primary"
+        value-class="text-primary"
       />
       <StatsCard
         title="O'qituvchilar"
         :value="`${teacherCount} ta`"
         icon="solar:diploma-bold"
         variant="success"
-        valueClass="text-green-600 dark:text-green-400"
+        value-class="text-green-600 dark:text-green-400"
       />
       <StatsCard
         title="Faol Akkauntlar"
         :value="`${activeCount} ta`"
         icon="solar:user-check-bold"
         variant="info"
-        valueClass="text-blue-600 dark:text-blue-400"
+        value-class="text-blue-600 dark:text-blue-400"
       />
     </div>
 
@@ -65,10 +72,10 @@
       :data="filteredUsers"
       :loading="loading"
       :searchable="true"
-      :showIndex="true"
-      :showPerPage="true"
-      searchPlaceholder="Ism, telefon, email yoki rol..."
-      rowKey="id"
+      :show-index="true"
+      :show-per-page="true"
+      search-placeholder="Ism, telefon, email yoki rol..."
+      row-key="id"
     >
       <!-- Header Actions: Role & Status Filters -->
       <template #headerActions>
@@ -100,15 +107,17 @@
       <!-- Custom User Cell -->
       <template #cell(user)="{ row }">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center shrink-0">
-            {{ (row.firstName?.[0] || 'U') + (row.lastName?.[0] || '') }}
+          <div
+            class="w-9 h-9 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center shrink-0"
+          >
+            {{ (row.firstName?.[0] || "U") + (row.lastName?.[0] || "") }}
           </div>
           <div>
             <div class="font-semibold text-gray-800 dark:text-gray-100">
               {{ row.firstName }} {{ row.lastName }}
             </div>
             <div class="text-xs text-gray-400 flex items-center gap-1.5">
-              <span>{{ row.phone || '-' }}</span>
+              <span>{{ row.phone || "-" }}</span>
               <span v-if="row.email" class="text-gray-300 dark:text-gray-600">•</span>
               <span v-if="row.email">{{ row.email }}</span>
             </div>
@@ -133,7 +142,7 @@
       <!-- Custom Status Cell -->
       <template #cell(status)="{ row }">
         <Badge :variant="row.isActive !== false ? 'success' : 'danger'" :dot="true" size="sm">
-          {{ row.isActive !== false ? 'Faol' : 'Nofaol' }}
+          {{ row.isActive !== false ? "Faol" : "Nofaol" }}
         </Badge>
       </template>
 
@@ -142,17 +151,17 @@
         <div class="flex items-center justify-end gap-1.5">
           <button
             type="button"
-            @click="openEditModal(row)"
             title="Tahrirlash"
             class="p-1.5 text-xs text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded transition cursor-pointer"
+            @click="openEditModal(row)"
           >
             <Icon icon="solar:pen-linear" class="text-base" />
           </button>
           <button
             type="button"
-            @click="deleteUser(row)"
             title="O'chirish"
             class="p-1.5 text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition cursor-pointer"
+            @click="deleteUser(row)"
           >
             <Icon icon="solar:trash-bin-trash-linear" class="text-base" />
           </button>
@@ -161,15 +170,15 @@
     </DataTable>
 
     <!-- Create / Edit User Modal -->
-    <vmodal
+    <Vmodal
       :model-value="showModal"
-      @update:model-value="showModal = $event"
       :title="isEditing ? 'Foydalanuvchini Tahrirlash' : 'Yangi Foydalanuvchi Qo\'shish'"
       subtitle="Tizimga kirish akkaunti va rol biriktirish"
       width="max-w-lg"
       :hide-button="true"
+      @update:model-value="showModal = $event"
     >
-      <form @submit.prevent="saveUser" class="space-y-4">
+      <form class="space-y-4" @submit.prevent="saveUser">
         <div class="grid grid-cols-2 gap-3">
           <FormInput
             v-model="form.firstName"
@@ -235,22 +244,18 @@
               { value: 'TEACHER', label: 'O\'qituvchi' },
               { value: 'RECEPTIONIST', label: 'Qabulxona (Reception)' },
               { value: 'ACCOUNTANT', label: 'Buxgalter' },
-              { value: 'STUDENT', label: 'Talaba' }
+              { value: 'STUDENT', label: 'Talaba' },
             ]"
           />
 
-          <FormSelect
-            v-model="form.branchId"
-            label="Filial"
-            :options="branchOptions"
-          />
+          <FormSelect v-model="form.branchId" label="Filial" :options="branchOptions" />
         </div>
 
         <div class="flex justify-end gap-2 pt-3 border-t dark:border-gray-700">
           <button
             type="button"
-            @click="showModal = false"
             class="px-4 py-2 text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md transition cursor-pointer"
+            @click="showModal = false"
           >
             Bekor qilish
           </button>
@@ -260,25 +265,26 @@
             class="px-5 py-2 text-xs font-semibold bg-primary hover:bg-primary/90 text-white rounded-md shadow-sm transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             <Icon v-if="saving" icon="eos-icons:loading" class="animate-spin text-sm" />
-            <span>{{ saving ? 'Saqlanmoqda...' : 'Saqlash' }}</span>
+            <span>{{ saving ? "Saqlanmoqda..." : "Saqlash" }}</span>
           </button>
         </div>
       </form>
-    </vmodal>
+    </Vmodal>
   </div>
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import StatsCard from "@/components/StatsCard.vue";
-import DataTable from "@/components/DataTable.vue";
-import Badge from "@/components/Badge.vue";
+
+import { branchesApi, rolesApi, usersApi } from "@/api/services";
 import Alert from "@/components/Alert.vue";
-import vmodal from "@/components/modal.vue";
+import Badge from "@/components/Badge.vue";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import vmodal from "@/components/common/AppModal.vue";
+import DataTable from "@/components/common/AppTable.vue";
 import FormInput from "@/components/FormInput.vue";
 import FormSelect from "@/components/FormSelect.vue";
-import { usersApi, branchesApi, rolesApi } from "@/api/services";
+import StatsCard from "@/components/StatsCard.vue";
 
 export default {
   name: "UsersList",
@@ -366,15 +372,15 @@ export default {
         ]);
         if (usersRes.status === "fulfilled") {
           const val = usersRes.value;
-          this.users = Array.isArray(val) ? val : (val?.data || val?.items || []);
+          this.users = Array.isArray(val) ? val : val?.data || val?.items || [];
         }
         if (branchesRes.status === "fulfilled") {
           const val = branchesRes.value;
-          this.branches = Array.isArray(val) ? val : (val?.data || val?.items || []);
+          this.branches = Array.isArray(val) ? val : val?.data || val?.items || [];
         }
         if (rolesRes.status === "fulfilled") {
           const val = rolesRes.value;
-          this.roles = Array.isArray(val) ? val : (val?.data || val?.items || []);
+          this.roles = Array.isArray(val) ? val : val?.data || val?.items || [];
         }
       } catch (err) {
         console.error("Foydalanuvchilarni yuklashda xatolik:", err);

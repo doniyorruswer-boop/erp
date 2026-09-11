@@ -1,5 +1,7 @@
 <template>
-  <div class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl border dark:border-gray-700 shadow-xs flex items-center gap-3.5 hover:shadow-sm transition font-lexend">
+  <div
+    class="stat-card bg-white dark:bg-gray-800 p-4 rounded-xl border dark:border-gray-700 shadow-xs flex items-center gap-3.5 hover:shadow-sm transition font-lexend"
+  >
     <!-- Left Icon -->
     <div
       class="w-11 h-11 rounded-xl flex items-center justify-center text-2xl shrink-0"
@@ -14,12 +16,18 @@
         <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block truncate">
           {{ title }}
         </span>
-        <span v-if="badge" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary">
+        <span
+          v-if="badge"
+          class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary"
+        >
           {{ badge }}
         </span>
       </div>
 
-      <h2 class="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100 mt-0.5 leading-tight truncate" :title="String(value)">
+      <h2
+        class="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100 mt-0.5 leading-tight truncate"
+        :title="String(value)"
+      >
         {{ value }}
       </h2>
 
@@ -36,7 +44,10 @@
         </span>
 
         <!-- Alternative subtext with custom icon -->
-        <div v-else-if="subtext" class="flex items-center gap-1 text-gray-500 dark:text-gray-400 truncate">
+        <div
+          v-else-if="subtext"
+          class="flex items-center gap-1 text-gray-500 dark:text-gray-400 truncate"
+        >
           <Icon v-if="subicon" :icon="subicon" class="text-xs shrink-0" />
           <span class="truncate">{{ subtext }}</span>
         </div>

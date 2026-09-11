@@ -5,41 +5,40 @@
       :items="[
         { title: 'Bosh sahifa', to: '/' },
         { title: 'Ta\'lim', to: '/school/classes' },
-        { title: 'Darajalar va to\'garaklar' }
+        { title: 'Darajalar va to\'garaklar' },
       ]"
     />
 
     <!-- 2. Header Section (Oq fonsiz, toza header) -->
     <div class="flex items-center justify-between flex-wrap gap-4">
       <div class="flex items-center gap-3 flex-wrap">
-        <PageTitle size="md">
-          Darajalar va to'garaklar
-        </PageTitle>
+        <PageTitle size="md"> Darajalar va to'garaklar </PageTitle>
       </div>
 
       <!-- Action Button -->
-      <AppButton
-        variant="primary"
-        icon="solar:add-circle-bold"
-        @click="openCreateModal"
-      >
+      <AppButton variant="primary" icon="solar:add-circle-bold" @click="openCreateModal">
         Yangi daraja guruhi
       </AppButton>
     </div>
 
     <!-- 3. Filters Bar -->
-    <div class="bg-white dark:bg-gray-800 p-3 sm:p-3.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+    <div
+      class="bg-white dark:bg-gray-800 p-3 sm:p-3.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-2xs flex items-center justify-between flex-wrap gap-3"
+    >
       <!-- Left Filters -->
       <div class="flex items-center gap-2.5 flex-wrap flex-1 min-w-[280px]">
         <!-- Search Input -->
         <div class="relative w-full sm:w-64">
-          <Icon icon="solar:magnifer-linear" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
+          <Icon
+            icon="solar:magnifer-linear"
+            class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+          />
           <input
-            type="text"
             v-model="searchQuery"
-            @input="currentPage = 1"
+            type="text"
             placeholder="Nomi bo'yicha qidirish..."
             class="w-full pl-9 pr-3.5 h-9 sm:h-9.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 placeholder-gray-400 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition shadow-2xs"
+            @input="currentPage = 1"
           />
         </div>
 
@@ -83,9 +82,9 @@
         <button
           v-if="isFiltered"
           type="button"
-          @click="resetAllFilters"
           class="h-9 sm:h-9.5 px-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-600 dark:text-gray-300 flex items-center gap-1.5 transition cursor-pointer"
           title="Filtrlarni tozalash"
+          @click="resetAllFilters"
         >
           <Icon icon="solar:restart-linear" class="text-sm" />
           <span>Tozalash</span>
@@ -97,13 +96,16 @@
         <!-- Faqat darajalar Toggle Pill -->
         <button
           type="button"
-          @click="onlyLevels = !onlyLevels; currentPage = 1"
           :class="[
             'h-9 sm:h-9.5 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold border transition cursor-pointer select-none shadow-2xs',
             onlyLevels
               ? 'bg-primary/10 text-primary border-primary font-bold'
-              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400'
+              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400',
           ]"
+          @click="
+            onlyLevels = !onlyLevels;
+            currentPage = 1;
+          "
         >
           <Icon
             :icon="onlyLevels ? 'solar:check-circle-bold' : 'solar:layers-linear'"
@@ -116,13 +118,16 @@
         <!-- Arxivda Toggle Pill -->
         <button
           type="button"
-          @click="showArchived = !showArchived; currentPage = 1"
           :class="[
             'h-9 sm:h-9.5 inline-flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold border transition cursor-pointer select-none shadow-2xs',
             showArchived
               ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500 font-bold'
-              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400'
+              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-gray-400',
           ]"
+          @click="
+            showArchived = !showArchived;
+            currentPage = 1;
+          "
         >
           <Icon
             :icon="showArchived ? 'solar:archive-bold' : 'solar:archive-linear'"
@@ -157,7 +162,10 @@
 
       <!-- Subject -->
       <template #cell(subject)="{ row: g }">
-        <span v-if="g.subject && g.subject !== '—'" class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+        <span
+          v-if="g.subject && g.subject !== '—'"
+          class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+        >
           {{ g.subject }}
         </span>
         <span v-else class="text-gray-400">—</span>
@@ -177,11 +185,15 @@
             v-if="g.level && g.level !== '—'"
             :class="[
               'px-2.5 py-0.5 rounded-full text-xs font-bold border inline-block',
-              g.level === 'Beginner' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400' :
-              g.level === 'Intermediate' ? 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-400' :
-              g.level === 'Kuchaytirilgan' || g.level === 'Advanced' ? 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/30 dark:text-purple-400' :
-              g.level === 'Olimpiada' ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400' :
-              'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300'
+              g.level === 'Beginner'
+                ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400'
+                : g.level === 'Intermediate'
+                  ? 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-400'
+                  : g.level === 'Kuchaytirilgan' || g.level === 'Advanced'
+                    ? 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/30 dark:text-purple-400'
+                    : g.level === 'Olimpiada'
+                      ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400'
+                      : 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300',
             ]"
           >
             {{ g.level }}
@@ -206,7 +218,13 @@
       <!-- Enrolled / Capacity -->
       <template #cell(enrolledCount)="{ row: g }">
         <div class="text-center font-bold text-xs sm:text-sm">
-          <span :class="g.enrolledCount >= g.capacity ? 'text-amber-600 dark:text-amber-400' : 'text-gray-800 dark:text-gray-200'">
+          <span
+            :class="
+              g.enrolledCount >= g.capacity
+                ? 'text-amber-600 dark:text-amber-400'
+                : 'text-gray-800 dark:text-gray-200'
+            "
+          >
             {{ g.enrolledCount }} / {{ g.capacity }}
           </span>
         </div>
@@ -228,9 +246,9 @@
           <!-- Tahrirlash Button -->
           <button
             type="button"
-            @click="openEditModal(g)"
             class="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/70 dark:hover:bg-blue-950/40 transition shadow-2xs cursor-pointer"
             title="Tahrirlash"
+            @click="openEditModal(g)"
           >
             <Icon icon="solar:pen-new-square-linear" class="text-base" />
           </button>
@@ -238,9 +256,9 @@
           <!-- O'chirish Button -->
           <button
             type="button"
-            @click="confirmDelete(g)"
             class="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-400 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50/70 dark:hover:bg-rose-950/40 transition shadow-2xs cursor-pointer"
             title="O'chirish"
+            @click="confirmDelete(g)"
           >
             <Icon icon="solar:trash-bin-2-linear" class="text-base" />
           </button>
@@ -249,28 +267,34 @@
     </AppTable>
 
     <!-- 5. Create / Edit Group Modal -->
-    <vmodal
+    <Vmodal
       ref="groupModal"
       :title="isEditing ? 'Daraja guruhini tahrirlash' : 'Yangi daraja guruhi qo\'shish'"
       width="max-w-lg"
       hide-button
       hide-footer
     >
-      <template v-slot:body>
-        <form @submit.prevent="saveGroupForm" novalidate class="space-y-4 text-left text-xs sm:text-sm">
+      <template #body>
+        <form
+          novalidate
+          class="space-y-4 text-left text-xs sm:text-sm"
+          @submit.prevent="saveGroupForm"
+        >
           <div>
             <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">
               Guruh / To'garak nomi <span class="text-rose-500">*</span>
             </label>
             <input
-              type="text"
               v-model="groupForm.name"
-              @input="clearFieldError('name')"
+              type="text"
               placeholder="Masalan: Ingliz tili — IELTS Pro"
               :class="[
                 'w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 outline-none transition',
-                formErrors.name ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-gray-300 dark:border-gray-600 focus:border-primary'
+                formErrors.name
+                  ? 'border-rose-500 ring-2 ring-rose-500/20'
+                  : 'border-gray-300 dark:border-gray-600 focus:border-primary',
               ]"
+              @input="clearFieldError('name')"
             />
             <FormFieldError :error="formErrors.name" />
           </div>
@@ -281,14 +305,16 @@
                 Fan <span class="text-rose-500">*</span>
               </label>
               <input
-                type="text"
                 v-model="groupForm.subject"
-                @input="clearFieldError('subject')"
+                type="text"
                 placeholder="Ingliz tili"
                 :class="[
                   'w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 outline-none transition',
-                  formErrors.subject ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-gray-300 dark:border-gray-600 focus:border-primary'
+                  formErrors.subject
+                    ? 'border-rose-500 ring-2 ring-rose-500/20'
+                    : 'border-gray-300 dark:border-gray-600 focus:border-primary',
                 ]"
+                @input="clearFieldError('subject')"
               />
               <FormFieldError :error="formErrors.subject" />
             </div>
@@ -315,14 +341,16 @@
                 O'qituvchi <span class="text-rose-500">*</span>
               </label>
               <input
-                type="text"
                 v-model="groupForm.teacherName"
-                @input="clearFieldError('teacherName')"
+                type="text"
                 placeholder="Masalan: Usmonova Oysha"
                 :class="[
                   'w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 outline-none transition',
-                  formErrors.teacherName ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-gray-300 dark:border-gray-600 focus:border-primary'
+                  formErrors.teacherName
+                    ? 'border-rose-500 ring-2 ring-rose-500/20'
+                    : 'border-gray-300 dark:border-gray-600 focus:border-primary',
                 ]"
+                @input="clearFieldError('teacherName')"
               />
               <FormFieldError :error="formErrors.teacherName" />
             </div>
@@ -331,15 +359,17 @@
                 Maksimal Sig'im <span class="text-rose-500">*</span>
               </label>
               <input
-                type="number"
                 v-model.number="groupForm.capacity"
-                @input="clearFieldError('capacity')"
+                type="number"
                 min="1"
                 max="50"
                 :class="[
                   'w-full px-3 py-2 rounded-lg border bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 outline-none transition',
-                  formErrors.capacity ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-gray-300 dark:border-gray-600 focus:border-primary'
+                  formErrors.capacity
+                    ? 'border-rose-500 ring-2 ring-rose-500/20'
+                    : 'border-gray-300 dark:border-gray-600 focus:border-primary',
                 ]"
+                @input="clearFieldError('capacity')"
               />
               <FormFieldError :error="formErrors.capacity" />
             </div>
@@ -347,10 +377,12 @@
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Dars kunlari</label>
+              <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1"
+                >Dars kunlari</label
+              >
               <input
-                type="text"
                 v-model="groupForm.days"
+                type="text"
                 placeholder="Dush / Chor / Juma"
                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 outline-none focus:border-primary transition"
               />
@@ -358,8 +390,8 @@
             <div>
               <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Xona</label>
               <input
-                type="text"
                 v-model="groupForm.room"
+                type="text"
                 placeholder="201-kabinet"
                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 outline-none focus:border-primary transition"
               />
@@ -368,18 +400,26 @@
 
           <!-- Sources (Classes included) -->
           <div>
-            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1">Manba sinflar (O'quvchilar qaysi sinflardan olinadi)</label>
-            <div class="flex items-center gap-1.5 flex-wrap p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30">
+            <label class="block font-bold text-gray-700 dark:text-gray-300 mb-1"
+              >Manba sinflar (O'quvchilar qaysi sinflardan olinadi)</label
+            >
+            <div
+              class="flex items-center gap-1.5 flex-wrap p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30"
+            >
               <label
                 v-for="cls in availableClasses"
                 :key="cls"
                 class="inline-flex items-center gap-1 px-2 py-1 rounded bg-white dark:bg-gray-800 border text-xs font-semibold cursor-pointer select-none"
-                :class="groupForm.sources.includes(cls) ? 'border-primary text-primary' : 'border-gray-200 dark:border-gray-700 text-gray-600'"
+                :class="
+                  groupForm.sources.includes(cls)
+                    ? 'border-primary text-primary'
+                    : 'border-gray-200 dark:border-gray-700 text-gray-600'
+                "
               >
                 <input
+                  v-model="groupForm.sources"
                   type="checkbox"
                   :value="cls"
-                  v-model="groupForm.sources"
                   class="rounded border-gray-300 text-primary focus:ring-primary h-3.5 w-3.5"
                 />
                 <span>{{ cls }}</span>
@@ -388,26 +428,19 @@
           </div>
 
           <div class="pt-3 border-t dark:border-gray-700 flex justify-end gap-2">
-            <AppButton
-              variant="outline"
-              type="button"
-              @click="$refs.groupModal.close()"
-            >
+            <AppButton variant="outline" type="button" @click="$refs.groupModal.close()">
               Bekor qilish
             </AppButton>
-            <AppButton
-              variant="primary"
-              type="submit"
-            >
-              {{ isEditing ? 'Saqlash' : 'Yaratish' }}
+            <AppButton variant="primary" type="submit">
+              {{ isEditing ? "Saqlash" : "Yaratish" }}
             </AppButton>
           </div>
         </form>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- 6. Members List Modal (Tarkib) -->
-    <vmodal
+    <Vmodal
       ref="membersModal"
       :title="selectedGroup ? selectedGroup.name + ' — Tarkibi' : 'Guruh tarkibi'"
       :subtitle="selectedGroup ? `${selectedGroup.days} • ${selectedGroup.room}` : ''"
@@ -415,26 +448,36 @@
       hide-button
       hide-footer
     >
-      <template v-slot:body>
-        <div class="space-y-4" v-if="selectedGroup">
+      <template #body>
+        <div v-if="selectedGroup" class="space-y-4">
           <!-- Summary Info Bar -->
-          <div class="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 space-y-2 text-xs">
+          <div
+            class="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 space-y-2 text-xs"
+          >
             <div class="flex items-center justify-between flex-wrap gap-2">
               <div>
                 <span class="text-gray-500">Fan:</span>
-                <span class="font-bold text-gray-800 dark:text-gray-100 ml-1">{{ selectedGroup.subject }}</span>
+                <span class="font-bold text-gray-800 dark:text-gray-100 ml-1">{{
+                  selectedGroup.subject
+                }}</span>
                 <span class="mx-2 text-gray-300">•</span>
                 <span class="text-gray-500">O'qituvchi:</span>
-                <span class="font-bold text-gray-800 dark:text-gray-100 ml-1">{{ selectedGroup.teacherName }}</span>
+                <span class="font-bold text-gray-800 dark:text-gray-100 ml-1">{{
+                  selectedGroup.teacherName
+                }}</span>
               </div>
               <div>
                 <span class="text-gray-500">Sig'im:</span>
-                <span class="font-bold text-primary ml-1">{{ currentMembers.length }} / {{ selectedGroup.capacity }}</span>
+                <span class="font-bold text-primary ml-1"
+                  >{{ currentMembers.length }} / {{ selectedGroup.capacity }}</span
+                >
               </div>
             </div>
 
             <!-- Dars jadvali va xona -->
-            <div class="flex items-center gap-3 pt-2 border-t border-gray-200/60 dark:border-gray-700/60 text-gray-600 dark:text-gray-300 flex-wrap">
+            <div
+              class="flex items-center gap-3 pt-2 border-t border-gray-200/60 dark:border-gray-700/60 text-gray-600 dark:text-gray-300 flex-wrap"
+            >
               <div class="flex items-center gap-1.5 font-medium">
                 <Icon icon="solar:clock-circle-linear" class="text-sm text-primary" />
                 <span>{{ selectedGroup.days }}</span>
@@ -449,19 +492,26 @@
 
           <!-- Filter / Search within members -->
           <div class="relative">
-            <Icon icon="solar:magnifer-linear" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+            <Icon
+              icon="solar:magnifer-linear"
+              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
+            />
             <input
-              type="text"
               v-model="memberSearch"
+              type="text"
               placeholder="O'quvchi ismi yoki sinfi bo'yicha qidirish..."
               class="w-full pl-9 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs outline-none focus:border-primary"
             />
           </div>
 
           <!-- Members Table -->
-          <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl max-h-80 overflow-y-auto">
+          <div
+            class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl max-h-80 overflow-y-auto"
+          >
             <table class="w-full text-left border-collapse text-xs">
-              <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 font-bold uppercase text-[10px] border-b dark:border-gray-700 sticky top-0 bg-gray-50 z-10">
+              <thead
+                class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 font-bold uppercase text-[10px] border-b dark:border-gray-700 sticky top-0 bg-gray-50 z-10"
+              >
                 <tr>
                   <th class="py-2.5 px-3 w-10 text-center">#</th>
                   <th class="py-2.5 px-3">O'quvchi FISH</th>
@@ -480,10 +530,14 @@
                   <td class="py-2.5 px-3 text-center text-gray-400">{{ idx + 1 }}</td>
                   <td class="py-2.5 px-3 font-bold text-gray-900 dark:text-white">
                     {{ st.fullName }}
-                    <span class="block text-[10px] text-gray-400 font-normal">ID: {{ st.studentId }}</span>
+                    <span class="block text-[10px] text-gray-400 font-normal"
+                      >ID: {{ st.studentId }}</span
+                    >
                   </td>
                   <td class="py-2.5 px-3 text-center">
-                    <span class="px-2 py-0.5 rounded font-bold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300">
+                    <span
+                      class="px-2 py-0.5 rounded font-bold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300"
+                    >
                       {{ st.className }}
                     </span>
                   </td>
@@ -496,18 +550,16 @@
                   <td class="py-2.5 px-3 text-right">
                     <button
                       type="button"
-                      @click="removeMember(st)"
                       class="w-7 h-7 rounded-md inline-flex items-center justify-center border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50/70 transition cursor-pointer"
                       title="Guruhdan chiqarish"
+                      @click="removeMember(st)"
                     >
                       <Icon icon="solar:trash-bin-2-linear" class="text-xs" />
                     </button>
                   </td>
                 </tr>
                 <tr v-if="filteredMembers.length === 0">
-                  <td colspan="6" class="py-6 text-center text-gray-400">
-                    O'quvchilar topilmadi
-                  </td>
+                  <td colspan="6" class="py-6 text-center text-gray-400">O'quvchilar topilmadi</td>
                 </tr>
               </tbody>
             </table>
@@ -518,17 +570,13 @@
             <span class="text-xs text-gray-400">
               Jami {{ currentMembers.length }} nafar o'quvchi biriktirilgan
             </span>
-            <AppButton
-              variant="outline"
-              size="sm"
-              @click="$refs.membersModal.close()"
-            >
+            <AppButton variant="outline" size="sm" @click="$refs.membersModal.close()">
               Yopish
             </AppButton>
           </div>
         </div>
       </template>
-    </vmodal>
+    </Vmodal>
 
     <!-- 7. Confirm Delete Group Modal (Standart AppConfirmModal) -->
     <AppConfirmModal
@@ -544,7 +592,11 @@
     <AppConfirmModal
       ref="removeMemberConfirmModal"
       title="O'quvchini chiqarish"
-      :message="memberToRemove ? `«${memberToRemove.fullName}» o'quvchisini ushbu guruhdan chiqarishni tasdiqlaysizmi?` : ''"
+      :message="
+        memberToRemove
+          ? `«${memberToRemove.fullName}» o'quvchisini ushbu guruhdan chiqarishni tasdiqlaysizmi?`
+          : ''
+      "
       confirm-text="Tasdiqlash va Chiqarish"
       variant="danger"
       @confirm="executeRemoveMember"
@@ -554,19 +606,20 @@
 
 <script>
 import { Icon } from "@iconify/vue";
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import PageTitle from "@/components/common/PageTitle.vue";
-import AppButton from "@/components/AppButton.vue";
-import AppTable from "@/components/AppTable.vue";
-import AppFilterDropdown from "@/components/AppFilterDropdown.vue";
-import vmodal from "@/components/modal.vue";
+
 import {
+  getLevelGroupStudents,
   loadLevelGroups,
   saveLevelGroups,
-  getLevelGroupStudents,
   saveLevelGroupStudents,
 } from "@/api/levelGroupsData";
-import { validateForm, levelValidationRules } from "@/utils/validators";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import AppButton from "@/components/common/AppButton.vue";
+import AppFilterDropdown from "@/components/common/AppFilterDropdown.vue";
+import vmodal from "@/components/common/AppModal.vue";
+import AppTable from "@/components/common/AppTable.vue";
+import PageTitle from "@/components/common/PageTitle.vue";
+import { levelValidationRules, validateForm } from "@/utils/validators";
 
 export default {
   name: "SchoolLevelsView",
@@ -585,9 +638,19 @@ export default {
         { key: "name", label: "Nomi", sortable: true, thClass: "py-3.5 px-4 min-w-[220px]" },
         { key: "subject", label: "Fan" },
         { key: "teacherName", label: "O'qituvchi" },
-        { key: "level", label: "Daraja", align: "center", thClass: "py-3.5 px-4 text-center whitespace-nowrap" },
+        {
+          key: "level",
+          label: "Daraja",
+          align: "center",
+          thClass: "py-3.5 px-4 text-center whitespace-nowrap",
+        },
         { key: "sources", label: "Manbalar (Sinflar)", thClass: "py-3.5 px-4 min-w-[200px]" },
-        { key: "enrolledCount", label: "O'quvchilar", align: "center", thClass: "py-3.5 px-4 text-center whitespace-nowrap" },
+        {
+          key: "enrolledCount",
+          label: "O'quvchilar",
+          align: "center",
+          thClass: "py-3.5 px-4 text-center whitespace-nowrap",
+        },
       ],
       groupsList: [],
       searchQuery: "",
@@ -618,8 +681,23 @@ export default {
         isArchived: false,
       },
       availableClasses: [
-        "1-A", "1-B", "2-A", "2-B", "3-A", "3-B", "4-A", "4-B",
-        "5-A", "5-B", "6-A", "6-B", "7-A", "8-A", "9-A", "10-A", "11-A"
+        "1-A",
+        "1-B",
+        "2-A",
+        "2-B",
+        "3-A",
+        "3-B",
+        "4-A",
+        "4-B",
+        "5-A",
+        "5-B",
+        "6-A",
+        "6-B",
+        "7-A",
+        "8-A",
+        "9-A",
+        "10-A",
+        "11-A",
       ],
 
       // Members modal state
@@ -648,33 +726,53 @@ export default {
       return Array.from(set).sort();
     },
     levelOptions() {
-      return ["Beginner", "Elementary", "Intermediate", "Kuchaytirilgan", "Olimpiada", "To'garak", "Amaliy", "Ijodiy"];
+      return [
+        "Beginner",
+        "Elementary",
+        "Intermediate",
+        "Kuchaytirilgan",
+        "Olimpiada",
+        "To'garak",
+        "Amaliy",
+        "Ijodiy",
+      ];
     },
     filteredGroups() {
       return this.groupsList.filter((g) => {
         const q = this.searchQuery.toLowerCase().trim();
-        const matchesQuery = !q ||
+        const matchesQuery =
+          !q ||
           g.name.toLowerCase().includes(q) ||
           g.teacherName.toLowerCase().includes(q) ||
           g.subject.toLowerCase().includes(q);
 
         const matchesSubject = this.selectedSubject === "ALL" || g.subject === this.selectedSubject;
-        const matchesClass = this.selectedSourceClass === "ALL" || (Array.isArray(g.sources) && g.sources.includes(this.selectedSourceClass));
+        const matchesClass =
+          this.selectedSourceClass === "ALL" ||
+          (Array.isArray(g.sources) && g.sources.includes(this.selectedSourceClass));
         const matchesLevel = this.selectedLevel === "ALL" || g.level === this.selectedLevel;
 
         const matchesArchived = this.showArchived ? g.isArchived : !g.isArchived;
         const matchesOnlyLevels = !this.onlyLevels || g.isLevelOnly;
 
-        return matchesQuery && matchesSubject && matchesClass && matchesLevel && matchesArchived && matchesOnlyLevels;
+        return (
+          matchesQuery &&
+          matchesSubject &&
+          matchesClass &&
+          matchesLevel &&
+          matchesArchived &&
+          matchesOnlyLevels
+        );
       });
     },
     filteredMembers() {
       if (!this.memberSearch.trim()) return this.currentMembers;
       const q = this.memberSearch.toLowerCase().trim();
-      return this.currentMembers.filter((m) =>
-        m.fullName.toLowerCase().includes(q) ||
-        m.className.toLowerCase().includes(q) ||
-        String(m.studentId).includes(q)
+      return this.currentMembers.filter(
+        (m) =>
+          m.fullName.toLowerCase().includes(q) ||
+          m.className.toLowerCase().includes(q) ||
+          String(m.studentId).includes(q)
       );
     },
     isFiltered() {

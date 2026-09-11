@@ -9,24 +9,28 @@
     <!-- Input Box Trigger -->
     <div
       ref="triggerInput"
-      @click="togglePicker"
       :class="[
         'w-full border flex items-center justify-between transition-colors bg-white dark:bg-gray-900 cursor-pointer shadow-2xs',
-        size === 'sm' ? 'h-9 px-2.5 rounded-lg text-xs' : 'h-11 px-3.5 rounded-xl text-xs sm:text-sm',
-        isOpen ? 'border-primary ring-2 ring-primary/20' : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600',
+        size === 'sm'
+          ? 'h-9 px-2.5 rounded-lg text-xs'
+          : 'h-11 px-3.5 rounded-xl text-xs sm:text-sm',
+        isOpen
+          ? 'border-primary ring-2 ring-primary/20'
+          : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600',
         error ? 'border-red-500 ring-2 ring-red-500/20' : '',
-        disabled ? 'bg-gray-100 dark:bg-gray-800 opacity-60 cursor-not-allowed' : ''
+        disabled ? 'bg-gray-100 dark:bg-gray-800 opacity-60 cursor-not-allowed' : '',
       ]"
+      @click="togglePicker"
     >
       <div class="flex items-center gap-2 min-w-0 flex-1">
         <Icon :icon="icon || 'solar:calendar-linear'" class="text-gray-400 text-base shrink-0" />
         <span
           :class="[
             'truncate',
-            displayValue ? 'text-gray-800 dark:text-gray-100 font-medium' : 'text-gray-400'
+            displayValue ? 'text-gray-800 dark:text-gray-100 font-medium' : 'text-gray-400',
           ]"
         >
-          {{ displayValue || placeholder || 'Sanani tanlang...' }}
+          {{ displayValue || placeholder || "Sanani tanlang..." }}
         </span>
       </div>
 
@@ -34,13 +38,17 @@
         <button
           v-if="modelValue && !disabled"
           type="button"
-          @click.stop="clearDate"
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-0.5 rounded transition cursor-pointer"
           title="Tozalash"
+          @click.stop="clearDate"
         >
           <Icon icon="solar:close-circle-linear" class="text-sm" />
         </button>
-        <Icon icon="solar:alt-arrow-down-linear" class="text-gray-400 text-xs transition-transform duration-200" :class="{ 'rotate-180 text-primary': isOpen }" />
+        <Icon
+          icon="solar:alt-arrow-down-linear"
+          class="text-gray-400 text-xs transition-transform duration-200"
+          :class="{ 'rotate-180 text-primary': isOpen }"
+        />
       </div>
     </div>
 
@@ -68,14 +76,16 @@
           />
 
           <!-- Calendar Header Navigator with Month & Year Selectors -->
-          <div class="relative z-50 flex items-center justify-between mb-3 pb-2.5 border-b dark:border-gray-700">
+          <div
+            class="relative z-50 flex items-center justify-between mb-3 pb-2.5 border-b dark:border-gray-700"
+          >
             <div class="flex items-center gap-1.5">
               <!-- Month Dropdown Selector -->
               <div class="relative month-selector-container">
                 <button
                   type="button"
-                  @click.stop="toggleMonthSelect"
                   class="px-2 py-1 rounded-lg bg-gray-50 dark:bg-gray-700/60 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold text-gray-800 dark:text-gray-100 text-xs flex items-center gap-1 transition cursor-pointer border border-gray-200 dark:border-gray-600"
+                  @click.stop="toggleMonthSelect"
                 >
                   <span>{{ monthNames[viewMonth] }}</span>
                   <Icon icon="solar:alt-arrow-down-linear" class="text-xs text-gray-400" />
@@ -84,20 +94,20 @@
                 <!-- Month Popup Grid -->
                 <div
                   v-if="showMonthSelect"
-                  @click.stop
                   class="absolute left-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1.5 z-50 grid grid-cols-2 gap-1 text-xs"
+                  @click.stop
                 >
                   <button
                     v-for="(mName, mIdx) in monthNames"
                     :key="mIdx"
                     type="button"
-                    @click.stop="selectMonth(mIdx)"
                     :class="[
                       'px-2 py-1.5 rounded-lg text-left font-medium transition cursor-pointer',
                       viewMonth === mIdx
                         ? 'bg-primary text-white font-bold shadow-xs'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200',
                     ]"
+                    @click.stop="selectMonth(mIdx)"
                   >
                     {{ mName }}
                   </button>
@@ -108,8 +118,8 @@
               <div class="relative year-selector-container">
                 <button
                   type="button"
-                  @click.stop="toggleYearSelect"
                   class="px-2 py-1 rounded-lg bg-gray-50 dark:bg-gray-700/60 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold text-gray-800 dark:text-gray-100 text-xs flex items-center gap-1 transition cursor-pointer border border-gray-200 dark:border-gray-600"
+                  @click.stop="toggleYearSelect"
                 >
                   <span>{{ viewYear }}</span>
                   <Icon icon="solar:alt-arrow-down-linear" class="text-xs text-gray-400" />
@@ -119,21 +129,25 @@
                 <div
                   v-if="showYearSelect"
                   ref="yearListContainer"
-                  @click.stop
                   class="absolute left-0 mt-1 w-28 max-h-48 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1 z-50 space-y-0.5 text-xs"
+                  @click.stop
                 >
                   <button
                     v-for="yr in yearList"
                     :key="yr"
-                    :ref="el => { if (yr === viewYear) activeYearEl = el }"
+                    :ref="
+                      (el) => {
+                        if (yr === viewYear) activeYearEl = el;
+                      }
+                    "
                     type="button"
-                    @click.stop="selectYear(yr)"
                     :class="[
                       'w-full px-2.5 py-1.5 rounded-lg text-left font-medium transition cursor-pointer',
                       viewYear === yr
                         ? 'bg-primary text-white font-bold shadow-xs'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200',
                     ]"
+                    @click.stop="selectYear(yr)"
                   >
                     {{ yr }}
                   </button>
@@ -145,17 +159,17 @@
             <div class="flex items-center gap-0.5">
               <button
                 type="button"
-                @click.stop="prevMonth"
                 class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer"
                 title="Oldingi oy"
+                @click.stop="prevMonth"
               >
                 <Icon icon="solar:alt-arrow-left-linear" class="text-base" />
               </button>
               <button
                 type="button"
-                @click.stop="nextMonth"
                 class="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer"
                 title="Keyingi oy"
+                @click.stop="nextMonth"
               >
                 <Icon icon="solar:alt-arrow-right-linear" class="text-base" />
               </button>
@@ -179,41 +193,47 @@
               v-for="(day, idx) in daysInMonthGrid"
               :key="idx"
               type="button"
-              @click.stop="selectDate(day)"
               :disabled="day.disabled"
               :class="[
                 'h-7 w-7 mx-auto rounded-lg flex items-center justify-center text-xs font-medium transition cursor-pointer',
-                day.isCurrentMonth ? 'text-gray-700 dark:text-gray-200' : 'text-gray-300 dark:text-gray-600',
+                day.isCurrentMonth
+                  ? 'text-gray-700 dark:text-gray-200'
+                  : 'text-gray-300 dark:text-gray-600',
                 day.isSelected ? 'bg-primary text-white font-bold shadow-xs' : '',
-                day.isToday && !day.isSelected ? 'border border-primary text-primary font-bold' : '',
+                day.isToday && !day.isSelected
+                  ? 'border border-primary text-primary font-bold'
+                  : '',
                 !day.isSelected && !day.disabled ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : '',
-                day.disabled ? 'opacity-30 cursor-not-allowed' : ''
+                day.disabled ? 'opacity-30 cursor-not-allowed' : '',
               ]"
+              @click.stop="selectDate(day)"
             >
               {{ day.dayNumber }}
             </button>
           </div>
 
           <!-- Quick Presets Footer -->
-          <div class="mt-3 pt-2 border-t dark:border-gray-700 flex items-center justify-between text-[11px]">
+          <div
+            class="mt-3 pt-2 border-t dark:border-gray-700 flex items-center justify-between text-[11px]"
+          >
             <button
               type="button"
-              @click.stop="setQuickDate('today')"
               class="text-primary hover:underline font-bold cursor-pointer"
+              @click.stop="setQuickDate('today')"
             >
               Bugun
             </button>
             <button
               type="button"
-              @click.stop="setQuickDate('tomorrow')"
               class="text-gray-600 dark:text-gray-300 hover:text-primary transition cursor-pointer font-medium"
+              @click.stop="setQuickDate('tomorrow')"
             >
               Ertaga
             </button>
             <button
               type="button"
-              @click.stop="clearDate"
               class="text-rose-500 hover:underline cursor-pointer font-semibold"
+              @click.stop="clearDate"
             >
               Tozalash
             </button>
@@ -290,8 +310,18 @@ export default {
       viewYear: validDate.getFullYear(),
       viewMonth: validDate.getMonth(), // 0-11
       monthNames: [
-        "Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
-        "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
+        "Yanvar",
+        "Fevral",
+        "Mart",
+        "Aprel",
+        "May",
+        "Iyun",
+        "Iyul",
+        "Avgust",
+        "Sentabr",
+        "Oktabr",
+        "Noyabr",
+        "Dekabr",
       ],
     };
   },

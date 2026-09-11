@@ -1,9 +1,14 @@
-import { Injectable, BadRequestException, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { AuditAction, PaymentMethod, PaymentStatus, StudentStatus } from '@prisma/client';
-import { ImportEntityType, PreviewImportDto, ConfirmImportDto, ExportQueryDto } from './dto/import-export.dto';
-import { BranchContext, buildBranchWhere } from '../auth/branch-access';
+import { Injectable, BadRequestException, Logger } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { AuditAction, PaymentMethod, PaymentStatus, StudentStatus } from "@prisma/client";
+import {
+  ImportEntityType,
+  PreviewImportDto,
+  ConfirmImportDto,
+  ExportQueryDto,
+} from "./dto/import-export.dto";
+import { BranchContext, buildBranchWhere } from "../auth/branch-access";
 
 @Injectable()
 export class ImportExportService {
@@ -11,25 +16,25 @@ export class ImportExportService {
 
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
   // Parse CSV string into array of objects
   parseCsv(csvContent: string): Record<string, any>[] {
-    if (!csvContent || typeof csvContent !== 'string') return [];
+    if (!csvContent || typeof csvContent !== "string") return [];
 
     // Remove BOM if present
-    const cleanContent = csvContent.replace(/^\uFEFF/, '').trim();
+    const cleanContent = csvContent.replace(/^\uFEFF/, "").trim();
     const lines = cleanContent.split(/\r\n|\n|\r/);
     if (lines.length < 2) return [];
 
     // Detect delimiter (, or ;)
     const headerLine = lines[0];
-    const delimiter = headerLine.includes(';') && !headerLine.includes(',') ? ';' : ',';
+    const delimiter = headerLine.includes(";") && !headerLine.includes(",") ? ";" : ",";
 
     const parseLine = (line: string): string[] => {
       const result: string[] = [];
-      let current = '';
+      let current = "";
       let inQuotes = false;
 
       for (let i = 0; i < line.length; i++) {
@@ -43,7 +48,7 @@ export class ImportExportService {
           }
         } else if (char === delimiter && !inQuotes) {
           result.push(current.trim());
-          current = '';
+          current = "";
         } else {
           current += char;
         }
@@ -52,7 +57,7 @@ export class ImportExportService {
       return result;
     };
 
-    const headers = parseLine(lines[0]).map(h => h.replace(/^["']|["']$/g, '').trim());
+    const headers = parseLine(lines[0]).map((h) => h.replace(/^["']|["']$/g, "").trim());
 
     const rows: Record<string, any>[] = [];
     for (let i = 1; i < lines.length; i++) {
@@ -63,8 +68,8 @@ export class ImportExportService {
       const row: Record<string, any> = {};
 
       headers.forEach((header, idx) => {
-        let val = values[idx] !== undefined ? values[idx] : '';
-        val = val.replace(/^["']|["']$/g, '').trim();
+        let val = values[idx] !== undefined ? values[idx] : "";
+        val = val.replace(/^["']|["']$/g, "").trim();
         row[header] = val;
       });
 
@@ -76,17 +81,17 @@ export class ImportExportService {
 
   // Convert array of objects to CSV string
   toCsv(headers: { key: string; label: string }[], data: Record<string, any>[]): string {
-    const headerRow = headers.map(h => `"${h.label.replace(/"/g, '""')}"`).join(',');
-    const dataRows = data.map(item =>
+    const headerRow = headers.map((h) => `"${h.label.replace(/"/g, '""')}"`).join(",");
+    const dataRows = data.map((item) =>
       headers
-        .map(h => {
-          const val = item[h.key] !== undefined && item[h.key] !== null ? String(item[h.key]) : '';
+        .map((h) => {
+          const val = item[h.key] !== undefined && item[h.key] !== null ? String(item[h.key]) : "";
           return `"${val.replace(/"/g, '""')}"`;
         })
-        .join(','),
+        .join(",")
     );
 
-    return '\uFEFF' + [headerRow, ...dataRows].join('\r\n');
+    return "\uFEFF" + [headerRow, ...dataRows].join("\r\n");
   }
 
   async preview(data: PreviewImportDto, orgId: string) {
@@ -97,11 +102,12 @@ export class ImportExportService {
     }
 
     if (rows.length === 0) {
-      throw new BadRequestException('Import qilish uchun hech qanday ma\'lumot topilmadi');
+      throw new BadRequestException("Import qilish uchun hech qanday ma'lumot topilmadi");
     }
 
-    const validRows: Record<string, any>[] = [];
-    const errors: { row: number; field: string; error: string; data: any }[] = [];
+    const validRows: Record<string, unknown>[] = [];
+    const errors: { row: number; field: string; error: string; data: Record<string, unknown> }[] =
+      [];
 
     // Pre-fetch existing phones for duplicate checks
     const existingPhones = new Set<string>();
@@ -110,13 +116,13 @@ export class ImportExportService {
         where: { organizationId: orgId, deletedAt: null },
         select: { phone: true },
       });
-      students.forEach(s => existingPhones.add(s.phone));
+      students.forEach((s) => existingPhones.add(s.phone));
     } else if (data.entityType === ImportEntityType.CUSTOMER) {
       const customers = await this.prisma.customer.findMany({
         where: { organizationId: orgId, deletedAt: null },
         select: { phone: true },
       });
-      customers.forEach(c => existingPhones.add(c.phone));
+      customers.forEach((c) => existingPhones.add(c.phone));
     }
 
     rows.forEach((rawRow, idx) => {
@@ -125,27 +131,37 @@ export class ImportExportService {
 
       // Normalize keys to lowercase/camelCase
       Object.entries(rawRow).forEach(([k, v]) => {
-        const key = k.toLowerCase().replace(/[\s_-]+/g, '');
+        const key = k.toLowerCase().replace(/[\s_-]+/g, "");
         row[key] = v;
       });
 
       if (data.entityType === ImportEntityType.STUDENT) {
-        const firstName = row.firstname || row.ism || row.name?.split(' ')[0];
-        const lastName = row.lastname || row.familiya || row.name?.split(' ')[1] || '';
+        const firstName = row.firstname || row.ism || row.name?.split(" ")[0];
+        const lastName = row.lastname || row.familiya || row.name?.split(" ")[1] || "";
         const phone = row.phone || row.telefon || row.tel;
 
         if (!firstName) {
-          errors.push({ row: rowNum, field: 'firstName', error: 'Ism kiritilmagan', data: rawRow });
+          errors.push({ row: rowNum, field: "firstName", error: "Ism kiritilmagan", data: rawRow });
           return;
         }
         if (!phone) {
-          errors.push({ row: rowNum, field: 'phone', error: 'Telefon raqami kiritilmagan', data: rawRow });
+          errors.push({
+            row: rowNum,
+            field: "phone",
+            error: "Telefon raqami kiritilmagan",
+            data: rawRow,
+          });
           return;
         }
 
-        const formattedPhone = String(phone).replace(/\s+/g, '');
+        const formattedPhone = String(phone).replace(/\s+/g, "");
         if (existingPhones.has(formattedPhone)) {
-          errors.push({ row: rowNum, field: 'phone', error: 'Ushbu telefon raqami bilan talaba allaqachon mavjud', data: rawRow });
+          errors.push({
+            row: rowNum,
+            field: "phone",
+            error: "Ushbu telefon raqami bilan talaba allaqachon mavjud",
+            data: rawRow,
+          });
           return;
         }
 
@@ -154,23 +170,28 @@ export class ImportExportService {
           lastName,
           phone: formattedPhone,
           level: row.level || row.daraja || null,
-          source: row.source || row.manba || 'IMPORT',
+          source: row.source || row.manba || "IMPORT",
         });
       } else if (data.entityType === ImportEntityType.CUSTOMER) {
-        const firstName = row.firstname || row.ism || row.name?.split(' ')[0];
-        const lastName = row.lastname || row.familiya || row.name?.split(' ')[1] || '';
+        const firstName = row.firstname || row.ism || row.name?.split(" ")[0];
+        const lastName = row.lastname || row.familiya || row.name?.split(" ")[1] || "";
         const phone = row.phone || row.telefon || row.tel;
 
         if (!firstName) {
-          errors.push({ row: rowNum, field: 'firstName', error: 'Ism kiritilmagan', data: rawRow });
+          errors.push({ row: rowNum, field: "firstName", error: "Ism kiritilmagan", data: rawRow });
           return;
         }
         if (!phone) {
-          errors.push({ row: rowNum, field: 'phone', error: 'Telefon raqami kiritilmagan', data: rawRow });
+          errors.push({
+            row: rowNum,
+            field: "phone",
+            error: "Telefon raqami kiritilmagan",
+            data: rawRow,
+          });
           return;
         }
 
-        const formattedPhone = String(phone).replace(/\s+/g, '');
+        const formattedPhone = String(phone).replace(/\s+/g, "");
         validRows.push({
           firstName,
           lastName,
@@ -179,22 +200,36 @@ export class ImportExportService {
           email: row.email || null,
         });
       } else if (data.entityType === ImportEntityType.LEAD) {
-        const fullName = row.fullname || row.ism || row.name || (row.firstname ? `${row.firstname} ${row.lastname || ''}` : null);
+        const fullName =
+          row.fullname ||
+          row.ism ||
+          row.name ||
+          (row.firstname ? `${row.firstname} ${row.lastname || ""}` : null);
         const phone = row.phone || row.telefon || row.tel;
 
         if (!fullName) {
-          errors.push({ row: rowNum, field: 'fullName', error: 'F.I.SH kiritilmagan', data: rawRow });
+          errors.push({
+            row: rowNum,
+            field: "fullName",
+            error: "F.I.SH kiritilmagan",
+            data: rawRow,
+          });
           return;
         }
         if (!phone) {
-          errors.push({ row: rowNum, field: 'phone', error: 'Telefon raqami kiritilmagan', data: rawRow });
+          errors.push({
+            row: rowNum,
+            field: "phone",
+            error: "Telefon raqami kiritilmagan",
+            data: rawRow,
+          });
           return;
         }
 
         validRows.push({
           fullName,
-          phone: String(phone).replace(/\s+/g, ''),
-          source: row.source || row.manba || 'IMPORT',
+          phone: String(phone).replace(/\s+/g, ""),
+          source: row.source || row.manba || "IMPORT",
           notes: row.notes || row.izoh || null,
         });
       } else if (data.entityType === ImportEntityType.PAYMENT) {
@@ -203,7 +238,12 @@ export class ImportExportService {
         const customerId = row.customerid || row.mijozid;
 
         if (!amount || isNaN(amount) || amount <= 0) {
-          errors.push({ row: rowNum, field: 'amount', error: 'To\'lov summasi noto\'g\'ri', data: rawRow });
+          errors.push({
+            row: rowNum,
+            field: "amount",
+            error: "To'lov summasi noto'g'ri",
+            data: rawRow,
+          });
           return;
         }
 
@@ -211,8 +251,8 @@ export class ImportExportService {
           studentId: studentId || null,
           customerId: customerId || null,
           amount,
-          method: (row.method || row.usul || 'CASH').toUpperCase(),
-          notes: row.notes || row.izoh || 'Import to\'lovi',
+          method: (row.method || row.usul || "CASH").toUpperCase(),
+          notes: row.notes || row.izoh || "Import to'lovi",
         });
       }
     });
@@ -232,7 +272,7 @@ export class ImportExportService {
     const rows = data.rows || [];
 
     if (rows.length === 0) {
-      throw new BadRequestException('Import qilish uchun tasdiqlangan qatorlar mavjud emas');
+      throw new BadRequestException("Import qilish uchun tasdiqlangan qatorlar mavjud emas");
     }
 
     const inserted = [];
@@ -246,7 +286,7 @@ export class ImportExportService {
             lastName: row.lastName,
             phone: row.phone,
             level: row.level,
-            source: row.source || 'IMPORT',
+            source: row.source || "IMPORT",
             status: StudentStatus.ACTIVE,
           },
         });
@@ -273,7 +313,7 @@ export class ImportExportService {
             organizationId: orgId,
             fullName: row.fullName,
             phone: row.phone,
-            source: row.source || 'IMPORT',
+            source: row.source || "IMPORT",
             notes: row.notes,
           },
         });
@@ -285,13 +325,19 @@ export class ImportExportService {
           const student = await this.prisma.student.findFirst({
             where: { id: row.studentId, organizationId: orgId, deletedAt: null },
           });
-          if (!student) throw new BadRequestException(`Talaba ID (${row.studentId}) ushbu tashkilotga tegishli emas`);
+          if (!student)
+            throw new BadRequestException(
+              `Talaba ID (${row.studentId}) ushbu tashkilotga tegishli emas`
+            );
         }
         if (row.customerId) {
           const customer = await this.prisma.customer.findFirst({
             where: { id: row.customerId, organizationId: orgId, deletedAt: null },
           });
-          if (!customer) throw new BadRequestException(`Mijoz ID (${row.customerId}) ushbu tashkilotga tegishli emas`);
+          if (!customer)
+            throw new BadRequestException(
+              `Mijoz ID (${row.customerId}) ushbu tashkilotga tegishli emas`
+            );
         }
 
         const payment = await this.prisma.payment.create({
@@ -302,7 +348,7 @@ export class ImportExportService {
             amount: Number(row.amount),
             method: (row.method as PaymentMethod) || PaymentMethod.CASH,
             notes: row.notes,
-            receiptNumber: 'REC-' + Date.now().toString().slice(-8),
+            receiptNumber: "REC-" + Date.now().toString().slice(-8),
             status: PaymentStatus.PAID,
           },
         });
@@ -326,65 +372,71 @@ export class ImportExportService {
     };
   }
 
-  async export(entityType: ImportEntityType, query: ExportQueryDto, orgId: string, userId?: string, branchCtx?: BranchContext) {
-    let data: any[] = [];
+  async export(
+    entityType: ImportEntityType,
+    query: ExportQueryDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
+    let data: Record<string, unknown>[] = [];
     let headers: { key: string; label: string }[] = [];
     const branchFilter = branchCtx ? buildBranchWhere(branchCtx) : {};
 
     if (entityType === ImportEntityType.STUDENT) {
       headers = [
-        { key: 'id', label: 'ID' },
-        { key: 'firstName', label: 'Ism' },
-        { key: 'lastName', label: 'Familiya' },
-        { key: 'phone', label: 'Telefon' },
-        { key: 'balance', label: 'Balans (UZS)' },
-        { key: 'status', label: 'Holati' },
-        { key: 'source', label: 'Manba' },
-        { key: 'createdAt', label: 'Ro\'yxatdan o\'tgan sana' },
+        { key: "id", label: "ID" },
+        { key: "firstName", label: "Ism" },
+        { key: "lastName", label: "Familiya" },
+        { key: "phone", label: "Telefon" },
+        { key: "balance", label: "Balans (UZS)" },
+        { key: "status", label: "Holati" },
+        { key: "source", label: "Manba" },
+        { key: "createdAt", label: "Ro'yxatdan o'tgan sana" },
       ];
       data = await this.prisma.student.findMany({
         where: { organizationId: orgId, deletedAt: null, ...branchFilter },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       });
     } else if (entityType === ImportEntityType.CUSTOMER) {
       headers = [
-        { key: 'id', label: 'ID' },
-        { key: 'firstName', label: 'Ism' },
-        { key: 'lastName', label: 'Familiya' },
-        { key: 'phone', label: 'Telefon' },
-        { key: 'email', label: 'Email' },
-        { key: 'company', label: 'Kompaniya' },
-        { key: 'createdAt', label: 'Yaratilgan sana' },
+        { key: "id", label: "ID" },
+        { key: "firstName", label: "Ism" },
+        { key: "lastName", label: "Familiya" },
+        { key: "phone", label: "Telefon" },
+        { key: "email", label: "Email" },
+        { key: "company", label: "Kompaniya" },
+        { key: "createdAt", label: "Yaratilgan sana" },
       ];
       data = await this.prisma.customer.findMany({
         where: { organizationId: orgId, deletedAt: null, ...branchFilter },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       });
     } else if (entityType === ImportEntityType.LEAD) {
       headers = [
-        { key: 'id', label: 'ID' },
-        { key: 'fullName', label: 'F.I.SH' },
-        { key: 'phone', label: 'Telefon' },
-        { key: 'status', label: 'Holati' },
-        { key: 'source', label: 'Manba' },
-        { key: 'createdAt', label: 'Tushgan sana' },
+        { key: "id", label: "ID" },
+        { key: "fullName", label: "F.I.SH" },
+        { key: "phone", label: "Telefon" },
+        { key: "status", label: "Holati" },
+        { key: "source", label: "Manba" },
+        { key: "createdAt", label: "Tushgan sana" },
       ];
       data = await this.prisma.lead.findMany({
         where: { organizationId: orgId, deletedAt: null, ...branchFilter },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       });
     } else if (entityType === ImportEntityType.PAYMENT) {
       headers = [
-        { key: 'receiptNumber', label: 'Chek №' },
-        { key: 'amount', label: 'Summa (UZS)' },
-        { key: 'method', label: 'To\'lov usuli' },
-        { key: 'status', label: 'Holati' },
-        { key: 'paymentDate', label: 'Sana' },
-        { key: 'notes', label: 'Izoh' },
+        { key: "receiptNumber", label: "Chek №" },
+        { key: "amount", label: "Summa (UZS)" },
+        { key: "method", label: "To'lov usuli" },
+        { key: "status", label: "Holati" },
+        { key: "paymentDate", label: "Sana" },
+        { key: "notes", label: "Izoh" },
       ];
       data = await this.prisma.payment.findMany({
         where: { organizationId: orgId, deletedAt: null, ...branchFilter },
-        orderBy: { paymentDate: 'desc' },
+        orderBy: { paymentDate: "desc" },
       });
     }
 
@@ -394,17 +446,17 @@ export class ImportExportService {
       action: AuditAction.LOGIN, // Export audit marker
       entityType: `Export_${entityType}`,
       entityId: `exported_${data.length}_records`,
-      after: { count: data.length, format: query.format || 'csv' },
+      after: { count: data.length, format: query.format || "csv" },
     });
 
-    if (query.format === 'json') {
-      return { format: 'json', data };
+    if (query.format === "json") {
+      return { format: "json", data };
     }
 
     const csvString = this.toCsv(headers, data);
     return {
-      format: 'csv',
-      filename: `${entityType.toLowerCase()}_export_${new Date().toISOString().split('T')[0]}.csv`,
+      format: "csv",
+      filename: `${entityType.toLowerCase()}_export_${new Date().toISOString().split("T")[0]}.csv`,
       data: csvString,
       count: data.length,
     };

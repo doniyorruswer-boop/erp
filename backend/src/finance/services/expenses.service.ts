@@ -1,24 +1,34 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AuditService } from '../../audit/audit.service';
-import { CashboxService } from './cashbox.service';
-import { AuditAction, TransactionType, PaymentMethod } from '@prisma/client';
-import { CreateExpenseDto, UpdateExpenseDto, CreateExpenseCategoryDto, QueryExpenseDto } from '../dto/expense.dto';
-import { BranchContext, buildBranchWhere, assertBranchAccess } from '../../auth/branch-access';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { AuditService } from "../../audit/audit.service";
+import { CashboxService } from "./cashbox.service";
+import { AuditAction, TransactionType, PaymentMethod } from "@prisma/client";
+import {
+  CreateExpenseDto,
+  UpdateExpenseDto,
+  CreateExpenseCategoryDto,
+  QueryExpenseDto,
+} from "../dto/expense.dto";
+import { BranchContext, buildBranchWhere, assertBranchAccess } from "../../auth/branch-access";
 
 @Injectable()
 export class ExpensesService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
-    private cashboxService: CashboxService,
+    private cashboxService: CashboxService
   ) {}
 
   // --- Categories ---
   async getCategories(orgId: string) {
     return this.prisma.expenseCategory.findMany({
       where: { organizationId: orgId, deletedAt: null },
-      orderBy: { name: 'asc' },
+      orderBy: { name: "asc" },
     });
   }
 
@@ -28,7 +38,7 @@ export class ExpensesService {
         organizationId: orgId,
         name: data.name,
         code: data.code || null,
-        color: data.color || '#EF4444',
+        color: data.color || "#EF4444",
       },
     });
   }
@@ -37,13 +47,16 @@ export class ExpensesService {
   async findAll(params: QueryExpenseDto & { orgId: string }, branchCtx?: BranchContext) {
     const branchWhere = branchCtx
       ? buildBranchWhere(branchCtx, params.branchId)
-      : (params.branchId ? { branchId: params.branchId } : {});
+      : params.branchId
+        ? { branchId: params.branchId }
+        : {};
     const cashboxWhere = params.cashboxId ? { cashboxId: params.cashboxId } : {};
     const categoryWhere = params.categoryId ? { categoryId: params.categoryId } : {};
 
-    const dateWhere: any = {};
+    const dateWhere: { date?: { gte?: Date; lte?: Date } } = {};
     if (params.startDate) dateWhere.date = { gte: new Date(params.startDate) };
-    if (params.endDate) dateWhere.date = { ...(dateWhere.date || {}), lte: new Date(params.endDate) };
+    if (params.endDate)
+      dateWhere.date = { ...(dateWhere.date || {}), lte: new Date(params.endDate) };
 
     return this.prisma.expense.findMany({
       where: {
@@ -59,7 +72,7 @@ export class ExpensesService {
         cashbox: { select: { id: true, name: true } },
         branch: { select: { id: true, name: true, code: true } },
       },
-      orderBy: { date: 'desc' },
+      orderBy: { date: "desc" },
     });
   }
 
@@ -69,7 +82,8 @@ export class ExpensesService {
       where: { id, organizationId: orgId, deletedAt: null, ...branchWhere },
       include: { category: true, cashbox: true, branch: true },
     });
-    if (!expense) throw new NotFoundException('Xarajat topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    if (!expense)
+      throw new NotFoundException("Xarajat topilmadi yoki ushbu filialga kirish huquqi yo'q");
     return expense;
   }
 
@@ -84,14 +98,16 @@ export class ExpensesService {
       const branch = await this.prisma.branch.findFirst({
         where: { id: data.branchId, organizationId: orgId, deletedAt: null },
       });
-      if (!branch) throw new BadRequestException('Filial topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!branch)
+        throw new BadRequestException("Filial topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     if (data.categoryId) {
       const cat = await this.prisma.expenseCategory.findFirst({
         where: { id: data.categoryId, organizationId: orgId, deletedAt: null },
       });
-      if (!cat) throw new BadRequestException('Kategoriya topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!cat)
+        throw new BadRequestException("Kategoriya topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     let cashboxId = data.cashboxId;
@@ -99,9 +115,10 @@ export class ExpensesService {
       const cb = await this.prisma.cashbox.findFirst({
         where: { id: cashboxId, organizationId: orgId, deletedAt: null },
       });
-      if (!cb) throw new BadRequestException('Kassa topilmadi yoki ushbu tashkilotga tegishli emas');
+      if (!cb)
+        throw new BadRequestException("Kassa topilmadi yoki ushbu tashkilotga tegishli emas");
       if (data.branchId && cb.branchId && data.branchId !== cb.branchId) {
-        throw new BadRequestException('Tanlangan kassa xarajat filialiga tegishli emas');
+        throw new BadRequestException("Tanlangan kassa xarajat filialiga tegishli emas");
       }
     } else {
       const defaultCashbox = await this.cashboxService.ensureDefaultCashbox(orgId, data.branchId);
@@ -154,7 +171,7 @@ export class ExpensesService {
       branchId: data.branchId,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'Expense',
+      entityType: "Expense",
       entityId: expense.id,
       after: expense,
     });
@@ -162,10 +179,19 @@ export class ExpensesService {
     return expense;
   }
 
-  async update(id: string, data: UpdateExpenseDto, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async update(
+    id: string,
+    data: UpdateExpenseDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const existing = await this.prisma.expense.findFirst({ where: { id, organizationId: orgId, deletedAt: null, ...branchWhere } });
-    if (!existing) throw new NotFoundException('Xarajat topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    const existing = await this.prisma.expense.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Xarajat topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const updated = await this.prisma.expense.update({
       where: { id },
@@ -181,7 +207,7 @@ export class ExpensesService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Expense',
+      entityType: "Expense",
       entityId: id,
       before: existing,
       after: updated,
@@ -192,8 +218,11 @@ export class ExpensesService {
 
   async remove(id: string, orgId: string, userId?: string, branchCtx?: BranchContext) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
-    const existing = await this.prisma.expense.findFirst({ where: { id, organizationId: orgId, deletedAt: null, ...branchWhere } });
-    if (!existing) throw new NotFoundException('Xarajat topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    const existing = await this.prisma.expense.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null, ...branchWhere },
+    });
+    if (!existing)
+      throw new NotFoundException("Xarajat topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const deleted = await this.prisma.expense.update({
       where: { id },
@@ -205,7 +234,7 @@ export class ExpensesService {
       branchId: existing.branchId || undefined,
       userId,
       action: AuditAction.DELETE,
-      entityType: 'Expense',
+      entityType: "Expense",
       entityId: id,
       before: existing,
       after: deleted,

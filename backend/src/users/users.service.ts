@@ -1,16 +1,23 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException, Optional } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { SubscriptionsService } from '../subscriptions/subscriptions.service';
-import { Role, AuditAction } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  Optional,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { SubscriptionsService } from "../subscriptions/subscriptions.service";
+import { Role, AuditAction } from "@prisma/client";
+import { UpdateUserDto } from "./dto/user.dto";
+import * as bcrypt from "bcryptjs";
 
 @Injectable()
 export class UsersService {
   constructor(
     private prisma: PrismaService,
     private auditService: AuditService,
-    @Optional() private subscriptionsService?: SubscriptionsService,
+    @Optional() private subscriptionsService?: SubscriptionsService
   ) {}
 
   async findAll(query: { role?: Role; search?: string; branchId?: string; orgId: string }) {
@@ -27,8 +34,8 @@ export class UsersService {
         ...branchWhere,
         OR: query.search
           ? [
-              { firstName: { contains: query.search, mode: 'insensitive' } },
-              { lastName: { contains: query.search, mode: 'insensitive' } },
+              { firstName: { contains: query.search, mode: "insensitive" } },
+              { lastName: { contains: query.search, mode: "insensitive" } },
               { phone: { contains: query.search } },
             ]
           : undefined,
@@ -46,7 +53,7 @@ export class UsersService {
         isActive: true,
         createdAt: true,
       },
-      orderBy: { firstName: 'asc' },
+      orderBy: { firstName: "asc" },
     });
   }
 
@@ -67,28 +74,32 @@ export class UsersService {
         createdAt: true,
       },
     });
-    if (!user) throw new NotFoundException('Foydalanuvchi topilmadi');
+    if (!user) throw new NotFoundException("Foydalanuvchi topilmadi");
     return user;
   }
 
-  async create(data: {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    email?: string;
-    password?: string;
-    role?: Role;
-    customRoleId?: string;
-    salaryType?: string;
-    salaryAmount?: number;
-  }, orgId: string, userId?: string) {
+  async create(
+    data: {
+      firstName: string;
+      lastName: string;
+      phone: string;
+      email?: string;
+      password?: string;
+      role?: Role;
+      customRoleId?: string;
+      salaryType?: string;
+      salaryAmount?: number;
+    },
+    orgId: string,
+    userId?: string
+  ) {
     if (this.subscriptionsService) {
-      await this.subscriptionsService.checkLimit('MAX_USERS', 1, orgId);
+      await this.subscriptionsService.checkLimit("MAX_USERS", 1, orgId);
     }
 
     // Privilege Escalation Protection: Cannot create SUPER_ADMIN
     if (data.role === Role.SUPER_ADMIN) {
-      throw new ForbiddenException('SUPER_ADMIN rolini yaratish yoki biriktirish taqiqlanadi');
+      throw new ForbiddenException("SUPER_ADMIN rolini yaratish yoki biriktirish taqiqlanadi");
     }
 
     if (data.customRoleId) {
@@ -96,14 +107,16 @@ export class UsersService {
         where: { id: data.customRoleId, organizationId: orgId, deletedAt: null },
       });
       if (!customRole) {
-        throw new BadRequestException('Tanlangan custom rol topilmadi yoki ushbu tashkilotga tegishli emas');
+        throw new BadRequestException(
+          "Tanlangan custom rol topilmadi yoki ushbu tashkilotga tegishli emas"
+        );
       }
     }
 
-    if (!data.password && process.env.NODE_ENV === 'production') {
-      throw new BadRequestException('Foydalanuvchi paroli ko\'rsatilishi shart!');
+    if (!data.password && process.env.NODE_ENV === "production") {
+      throw new BadRequestException("Foydalanuvchi paroli ko'rsatilishi shart!");
     }
-    const rawPassword = data.password || 'admin123';
+    const rawPassword = data.password || "admin123";
     const passwordHash = await bcrypt.hash(rawPassword, 10);
 
     const user = await this.prisma.user.create({
@@ -138,7 +151,7 @@ export class UsersService {
       organizationId: orgId,
       userId,
       action: AuditAction.CREATE,
-      entityType: 'User',
+      entityType: "User",
       entityId: user.id,
       after: user,
     });
@@ -146,13 +159,13 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, data: any, orgId: string, currentUserId?: string) {
+  async update(id: string, data: UpdateUserDto, orgId: string, currentUserId?: string) {
     const existing = await this.prisma.user.findFirst({ where: { id, organizationId: orgId } });
-    if (!existing) throw new NotFoundException('Foydalanuvchi topilmadi');
+    if (!existing) throw new NotFoundException("Foydalanuvchi topilmadi");
 
     // Privilege Escalation Protection
     if (data.role === Role.SUPER_ADMIN) {
-      throw new ForbiddenException('SUPER_ADMIN rolini berish taqiqlanadi');
+      throw new ForbiddenException("SUPER_ADMIN rolini berish taqiqlanadi");
     }
 
     if (existing.role === Role.SUPER_ADMIN && currentUserId !== existing.id) {
@@ -169,14 +182,15 @@ export class UsersService {
         where: { id: data.customRoleId, organizationId: orgId, deletedAt: null },
       });
       if (!customRole) {
-        throw new BadRequestException('Tanlangan custom rol topilmadi yoki ushbu tashkilotga tegishli emas');
+        throw new BadRequestException(
+          "Tanlangan custom rol topilmadi yoki ushbu tashkilotga tegishli emas"
+        );
       }
     }
 
     if (data.password) {
       data.password = await bcrypt.hash(data.password, 10);
     }
-    delete data.organizationId; // Prevent tenant mutation
     const updated = await this.prisma.user.update({
       where: { id },
       data,
@@ -199,9 +213,14 @@ export class UsersService {
       organizationId: orgId,
       userId: currentUserId,
       action: AuditAction.UPDATE,
-      entityType: 'User',
+      entityType: "User",
       entityId: id,
-      before: { id: existing.id, firstName: existing.firstName, lastName: existing.lastName, role: existing.role },
+      before: {
+        id: existing.id,
+        firstName: existing.firstName,
+        lastName: existing.lastName,
+        role: existing.role,
+      },
       after: updated,
     });
 
@@ -209,8 +228,10 @@ export class UsersService {
   }
 
   async remove(id: string, orgId: string, currentUserId?: string) {
-    const existing = await this.prisma.user.findFirst({ where: { id, organizationId: orgId, deletedAt: null } });
-    if (!existing) throw new NotFoundException('Foydalanuvchi topilmadi');
+    const existing = await this.prisma.user.findFirst({
+      where: { id, organizationId: orgId, deletedAt: null },
+    });
+    if (!existing) throw new NotFoundException("Foydalanuvchi topilmadi");
 
     if (currentUserId && id === currentUserId) {
       throw new BadRequestException("O'z hisobingizni o'chira olmaysiz");
@@ -236,7 +257,7 @@ export class UsersService {
       organizationId: orgId,
       userId: currentUserId,
       action: AuditAction.DELETE,
-      entityType: 'User',
+      entityType: "User",
       entityId: id,
       before: existing,
       after: deleted,
@@ -247,7 +268,7 @@ export class UsersService {
 
   async restore(id: string, orgId: string, currentUserId?: string) {
     const existing = await this.prisma.user.findFirst({ where: { id, organizationId: orgId } });
-    if (!existing) throw new NotFoundException('Foydalanuvchi topilmadi');
+    if (!existing) throw new NotFoundException("Foydalanuvchi topilmadi");
 
     const restored = await this.prisma.user.update({
       where: { id },
@@ -265,7 +286,7 @@ export class UsersService {
       organizationId: orgId,
       userId: currentUserId,
       action: AuditAction.RESTORE,
-      entityType: 'User',
+      entityType: "User",
       entityId: id,
       before: { id: existing.id, firstName: existing.firstName, lastName: existing.lastName },
       after: restored,

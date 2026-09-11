@@ -1,0 +1,34 @@
+{
+  "name": "eduhub-erp",
+  "version": "1.0.0",
+  "description": "EduHub ERP — Enterprise Education Management System",
+  "private": true,
+  "scripts": {
+    "quality-check": "npm --prefix backend run typecheck && npm --prefix frontend run lint && npm --prefix frontend run architecture-check && npm --prefix frontend run dependency-check && npm --prefix backend run test:cov && npm --prefix frontend run test:e2e && npm --prefix frontend run analyze",
+    "architecture-check": "npm --prefix frontend run architecture-check",
+    "dependency-check": "npm --prefix frontend run dependency-check",
+    "sonar": "sonar-scanner",
+    "lint": "npm --prefix frontend run lint",
+    "lint:report": "npm --prefix frontend run lint:report",
+    "format": "npm --prefix frontend run format",
+    "typecheck": "npm --prefix backend run typecheck && npm --prefix frontend run typecheck",
+    "type-check": "npm run typecheck",
+    "test": "npm --prefix backend test",
+    "test:cov": "npm --prefix backend run test:cov",
+    "test:e2e": "npm --prefix frontend run test:e2e",
+    "analyze": "npm --prefix frontend run analyze",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.9.6",
+    "sonarqube-scanner": "^4.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "EduHub Team",
+  "license": "UNLICENSED"
+}

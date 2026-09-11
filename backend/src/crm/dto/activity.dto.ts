@@ -1,5 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
-import { ActivityType } from '@prisma/client';
+import { IsString, IsNotEmpty, IsOptional, IsEnum } from "class-validator";
+import { ActivityType } from "@prisma/client";
 
 export class CreateActivityDto {
   @IsEnum(ActivityType)
@@ -22,7 +22,7 @@ export class CreateActivityDto {
   customerId?: string;
 
   @IsOptional()
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export class QueryActivityDto {

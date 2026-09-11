@@ -277,41 +277,202 @@ export const WEEKDAYS = [
 
 // Available subjects
 export const SUBJECTS_LIST = [
-  { id: "math", name: "Matematika", color: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800" },
-  { id: "algebra", name: "Algebra", color: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800" },
-  { id: "geometry", name: "Geometriya", color: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800" },
-  { id: "uzbek", name: "Ona tili", color: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800" },
-  { id: "literature", name: "Adabiyot", color: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800" },
-  { id: "english", name: "Ingliz tili", color: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800" },
-  { id: "russian", name: "Rus tili", color: "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800" },
-  { id: "physics", name: "Fizika", color: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800" },
-  { id: "chemistry", name: "Kimyo", color: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800" },
-  { id: "biology", name: "Biologiya", color: "bg-lime-50 text-lime-700 border-lime-200 dark:bg-lime-900/30 dark:text-lime-300 dark:border-lime-800" },
-  { id: "history", name: "O'zbekiston tarixi", color: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800" },
-  { id: "world_history", name: "Jahon tarixi", color: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800" },
-  { id: "geography", name: "Geografiya", color: "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800" },
-  { id: "cs", name: "Informatika (IT)", color: "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/30 dark:text-sky-300 dark:border-sky-800" },
-  { id: "pe", name: "Jismoniy tarbiya", color: "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800" },
-  { id: "art", name: "Tasviriy san'at", color: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 dark:bg-fuchsia-900/30 dark:text-fuchsia-300 dark:border-fuchsia-800" },
-  { id: "drawing", name: "Chizmachilik", color: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800" },
-  { id: "music", name: "Musiqa", color: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800" },
-  { id: "tarbiya", name: "Tarbiya", color: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800" },
+  {
+    id: "math",
+    name: "Matematika",
+    color:
+      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+  },
+  {
+    id: "algebra",
+    name: "Algebra",
+    color:
+      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+  },
+  {
+    id: "geometry",
+    name: "Geometriya",
+    color:
+      "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800",
+  },
+  {
+    id: "uzbek",
+    name: "Ona tili",
+    color:
+      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800",
+  },
+  {
+    id: "literature",
+    name: "Adabiyot",
+    color:
+      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800",
+  },
+  {
+    id: "english",
+    name: "Ingliz tili",
+    color:
+      "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
+  },
+  {
+    id: "russian",
+    name: "Rus tili",
+    color:
+      "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800",
+  },
+  {
+    id: "physics",
+    name: "Fizika",
+    color:
+      "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800",
+  },
+  {
+    id: "chemistry",
+    name: "Kimyo",
+    color:
+      "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800",
+  },
+  {
+    id: "biology",
+    name: "Biologiya",
+    color:
+      "bg-lime-50 text-lime-700 border-lime-200 dark:bg-lime-900/30 dark:text-lime-300 dark:border-lime-800",
+  },
+  {
+    id: "history",
+    name: "O'zbekiston tarixi",
+    color:
+      "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800",
+  },
+  {
+    id: "world_history",
+    name: "Jahon tarixi",
+    color:
+      "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800",
+  },
+  {
+    id: "geography",
+    name: "Geografiya",
+    color:
+      "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
+  },
+  {
+    id: "cs",
+    name: "Informatika (IT)",
+    color:
+      "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/30 dark:text-sky-300 dark:border-sky-800",
+  },
+  {
+    id: "pe",
+    name: "Jismoniy tarbiya",
+    color:
+      "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800",
+  },
+  {
+    id: "art",
+    name: "Tasviriy san'at",
+    color:
+      "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 dark:bg-fuchsia-900/30 dark:text-fuchsia-300 dark:border-fuchsia-800",
+  },
+  {
+    id: "drawing",
+    name: "Chizmachilik",
+    color:
+      "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800",
+  },
+  {
+    id: "music",
+    name: "Musiqa",
+    color:
+      "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800",
+  },
+  {
+    id: "tarbiya",
+    name: "Tarbiya",
+    color:
+      "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800",
+  },
 ];
 
 // Teachers list
 export const TEACHERS_LIST = [
-  { id: "t-normatov", name: "Normatov Jamshid Normatovich", subject: "Chizmachilik", phone: "+998 90 333 44 55", room: "200-xona" },
-  { id: "t-1", name: "Normatova Ruxshona", subject: "Boshlang'ich ta'lim", phone: "+998 90 123 45 67", room: "101" },
-  { id: "t-2", name: "Karimova Zilola", subject: "Matematika", phone: "+998 91 234 56 78", room: "204" },
-  { id: "t-3", name: "Saidov Elyor", subject: "Informatika", phone: "+998 93 345 67 89", room: "IT-Lab 1" },
-  { id: "t-4", name: "Aliyeva Dildora", subject: "Ingliz tili", phone: "+998 94 456 78 90", room: "302" },
-  { id: "t-5", name: "Rustamov Jamshid", subject: "Fizika", phone: "+998 95 567 89 01", room: "Fizika Lab" },
-  { id: "t-6", name: "Usmonova Madina", subject: "Ona tili va Adabiyot", phone: "+998 97 678 90 12", room: "208" },
+  {
+    id: "t-normatov",
+    name: "Normatov Jamshid Normatovich",
+    subject: "Chizmachilik",
+    phone: "+998 90 333 44 55",
+    room: "200-xona",
+  },
+  {
+    id: "t-1",
+    name: "Normatova Ruxshona",
+    subject: "Boshlang'ich ta'lim",
+    phone: "+998 90 123 45 67",
+    room: "101",
+  },
+  {
+    id: "t-2",
+    name: "Karimova Zilola",
+    subject: "Matematika",
+    phone: "+998 91 234 56 78",
+    room: "204",
+  },
+  {
+    id: "t-3",
+    name: "Saidov Elyor",
+    subject: "Informatika",
+    phone: "+998 93 345 67 89",
+    room: "IT-Lab 1",
+  },
+  {
+    id: "t-4",
+    name: "Aliyeva Dildora",
+    subject: "Ingliz tili",
+    phone: "+998 94 456 78 90",
+    room: "302",
+  },
+  {
+    id: "t-5",
+    name: "Rustamov Jamshid",
+    subject: "Fizika",
+    phone: "+998 95 567 89 01",
+    room: "Fizika Lab",
+  },
+  {
+    id: "t-6",
+    name: "Usmonova Madina",
+    subject: "Ona tili va Adabiyot",
+    phone: "+998 97 678 90 12",
+    room: "208",
+  },
   { id: "t-7", name: "Ismoilov Farhod", subject: "Tarix", phone: "+998 98 789 01 23", room: "210" },
-  { id: "t-8", name: "Qodirova Shahnoza", subject: "Biologiya", phone: "+998 99 890 12 34", room: "Biologiya Lab" },
-  { id: "t-9", name: "Sobirova Gulnora", subject: "Kimyo", phone: "+998 90 901 23 45", room: "Kimyo Lab" },
-  { id: "t-10", name: "Mamatov Sherzod", subject: "Jismoniy tarbiya", phone: "+998 91 012 34 56", room: "Sport zal" },
-  { id: "t-11", name: "Xoliqova Nargiza", subject: "Geografiya", phone: "+998 93 123 98 76", room: "215" },
+  {
+    id: "t-8",
+    name: "Qodirova Shahnoza",
+    subject: "Biologiya",
+    phone: "+998 99 890 12 34",
+    room: "Biologiya Lab",
+  },
+  {
+    id: "t-9",
+    name: "Sobirova Gulnora",
+    subject: "Kimyo",
+    phone: "+998 90 901 23 45",
+    room: "Kimyo Lab",
+  },
+  {
+    id: "t-10",
+    name: "Mamatov Sherzod",
+    subject: "Jismoniy tarbiya",
+    phone: "+998 91 012 34 56",
+    room: "Sport zal",
+  },
+  {
+    id: "t-11",
+    name: "Xoliqova Nargiza",
+    subject: "Geografiya",
+    phone: "+998 93 123 98 76",
+    room: "215",
+  },
 ];
 
 // Classrooms list
@@ -339,7 +500,8 @@ export const SCHEDULE_TEMPLATES = [
     tag: "Boshlang'ich",
     tagColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
     icon: "solar:backpack-bold",
-    description: "Savodxonlik, Ona tili, Matematika, Tabiatshunoslik, Tasviriy san'at, Musiqa va Tarbiya fanlariga urg'u berilgan.",
+    description:
+      "Savodxonlik, Ona tili, Matematika, Tabiatshunoslik, Tasviriy san'at, Musiqa va Tarbiya fanlariga urg'u berilgan.",
     daysCount: 5,
     lessonsPerDay: 5,
     hoursPerWeek: 25,
@@ -362,7 +524,8 @@ export const SCHEDULE_TEMPLATES = [
     tag: "O'rta sinf",
     tagColor: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
     icon: "solar:atom-bold",
-    description: "Algebra, Geometriya, Fizika, Kimyo, Biologiya, Ona tili, Adabiyot va Chet tillari integratsiyasi.",
+    description:
+      "Algebra, Geometriya, Fizika, Kimyo, Biologiya, Ona tili, Adabiyot va Chet tillari integratsiyasi.",
     daysCount: 6,
     lessonsPerDay: 6,
     hoursPerWeek: 32,
@@ -388,7 +551,8 @@ export const SCHEDULE_TEMPLATES = [
     tag: "IT & Innovatsiya",
     tagColor: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
     icon: "solar:laptop-minimalistic-bold",
-    description: "Dasturlash (Python), Robototexnika, Chuqurlashtirilgan Matematika, IT-Lab amaliyotlari va Texnik Ingliz tili.",
+    description:
+      "Dasturlash (Python), Robototexnika, Chuqurlashtirilgan Matematika, IT-Lab amaliyotlari va Texnik Ingliz tili.",
     daysCount: 6,
     lessonsPerDay: 6,
     hoursPerWeek: 34,
@@ -410,7 +574,8 @@ export const SCHEDULE_TEMPLATES = [
     tag: "Yuqori sinf / OTM",
     tagColor: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
     icon: "solar:diploma-bold",
-    description: "OTMga kirish imtihonlari yo'nalishidagi blok fanlar, IELTS/Chet tili, Test sinovlari va Murakkab masalalar.",
+    description:
+      "OTMga kirish imtihonlari yo'nalishidagi blok fanlar, IELTS/Chet tili, Test sinovlari va Murakkab masalalar.",
     daysCount: 6,
     lessonsPerDay: 6,
     hoursPerWeek: 36,
@@ -432,7 +597,8 @@ export const SCHEDULE_TEMPLATES = [
     tag: "Xorijiy tillar",
     tagColor: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
     icon: "solar:global-bold",
-    description: "Ingliz tili (Speaking & Debat), Rus tili, Jahon adabiyoti, Jahon tarixi va Notiqlik san'ati.",
+    description:
+      "Ingliz tili (Speaking & Debat), Rus tili, Jahon adabiyoti, Jahon tarixi va Notiqlik san'ati.",
     daysCount: 6,
     lessonsPerDay: 6,
     hoursPerWeek: 34,
@@ -534,7 +700,11 @@ export function saveAllClassSchedules(allSchedules) {
 export function getClassSchedule(classId) {
   const all = loadAllClassSchedules();
   if (!all[classId]) {
-    const cls = SCHEDULE_CLASSES.find((c) => c.id === classId) || { id: classId, parallel: "1", name: classId };
+    const cls = SCHEDULE_CLASSES.find((c) => c.id === classId) || {
+      id: classId,
+      parallel: "1",
+      name: classId,
+    };
     all[classId] = generateSampleScheduleForClass(cls);
     saveAllClassSchedules(all);
   }
@@ -547,7 +717,7 @@ export function saveClassSchedule(classId, scheduleData) {
   saveAllClassSchedules(all);
 }
 
-export function applyTemplateToClass(classId, templateId) {
+export function applyTemplateToClass(classId, _templateId) {
   const cls = SCHEDULE_CLASSES.find((c) => c.id === classId) || { id: classId, parallel: "1" };
   const fresh = generateSampleScheduleForClass(cls);
   saveClassSchedule(classId, fresh);
@@ -599,8 +769,18 @@ export const SCHOOL_QUARTERS = [
 ];
 
 const UZ_MONTH_NAMES = [
-  "yanvar", "fevral", "mart", "aprel", "may", "iyun",
-  "iyul", "avgust", "sentyabr", "oktyabr", "noyabr", "dekabr"
+  "yanvar",
+  "fevral",
+  "mart",
+  "aprel",
+  "may",
+  "iyun",
+  "iyul",
+  "avgust",
+  "sentyabr",
+  "oktyabr",
+  "noyabr",
+  "dekabr",
 ];
 const DAY_NAME_LIST = ["Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba"];
 
@@ -682,7 +862,11 @@ export function generateWeeksForQuarter(startDateStr, endDateStr) {
 
 // Full dated schedule generator across real quarter weeks
 export function applyTemplateToDatedSchedule(classId, templateId, options = {}) {
-  const cls = SCHEDULE_CLASSES.find((c) => c.id === classId) || { id: classId, name: classId, parallel: "1" };
+  const cls = SCHEDULE_CLASSES.find((c) => c.id === classId) || {
+    id: classId,
+    name: classId,
+    parallel: "1",
+  };
   const tpl = SCHEDULE_TEMPLATES.find((t) => t.id === templateId) || SCHEDULE_TEMPLATES[0];
 
   const quarterId = options.quarterId || "1";
@@ -700,7 +884,8 @@ export function applyTemplateToDatedSchedule(classId, templateId, options = {}) 
   const storageKey = `educrm_dated_schedule_${classId}_q${quarterId}`;
   let datedSchedule = {};
   if (!options.overwrite && typeof window !== "undefined") {
-    const existing = localStorage.getItem(storageKey) || localStorage.getItem(`educrm_dated_schedule_${classId}`);
+    const existing =
+      localStorage.getItem(storageKey) || localStorage.getItem(`educrm_dated_schedule_${classId}`);
     if (existing) {
       try {
         datedSchedule = JSON.parse(existing);
@@ -712,13 +897,27 @@ export function applyTemplateToDatedSchedule(classId, templateId, options = {}) 
     let teacher = cls.teacherName || "Normatova Ruxshona";
     let room = "101-xona";
 
-    if (subjName.includes("Matematika") || subjName.includes("Algebra") || subjName.includes("Geometriya")) {
+    if (
+      subjName.includes("Matematika") ||
+      subjName.includes("Algebra") ||
+      subjName.includes("Geometriya")
+    ) {
       teacher = "Karimova Zilola";
       room = "204-xona";
-    } else if (subjName.includes("Dasturlash") || subjName.includes("Informatika") || subjName.includes("Robot") || subjName.includes("Web") || subjName.includes("Kiber")) {
+    } else if (
+      subjName.includes("Dasturlash") ||
+      subjName.includes("Informatika") ||
+      subjName.includes("Robot") ||
+      subjName.includes("Web") ||
+      subjName.includes("Kiber")
+    ) {
       teacher = "Saidov Elyor";
       room = "IT-Lab 1";
-    } else if (subjName.includes("Ingliz") || subjName.includes("Nemis") || subjName.includes("IELTS")) {
+    } else if (
+      subjName.includes("Ingliz") ||
+      subjName.includes("Nemis") ||
+      subjName.includes("IELTS")
+    ) {
       teacher = "Aliyeva Dildora";
       room = "302-xona";
     } else if (subjName.includes("Fizika")) {
@@ -739,7 +938,11 @@ export function applyTemplateToDatedSchedule(classId, templateId, options = {}) 
     } else if (subjName.includes("Jismoniy")) {
       teacher = "Mamatov Sherzod";
       room = "Sport zal";
-    } else if (subjName.includes("Ona tili") || subjName.includes("Adabiyot") || subjName.includes("Rus tili")) {
+    } else if (
+      subjName.includes("Ona tili") ||
+      subjName.includes("Adabiyot") ||
+      subjName.includes("Rus tili")
+    ) {
       teacher = cls.teacherName || "Usmonova Madina";
       room = "208-xona";
     }
@@ -751,7 +954,11 @@ export function applyTemplateToDatedSchedule(classId, templateId, options = {}) 
     week.days.forEach((day, dIdx) => {
       if (day.dateLabel === "—" || !day.inQuarter) return;
       const isSaturday = day.dayName === "Shanba";
-      const maxLessons = isSaturday ? (tpl.daysCount === 5 ? 0 : 4) : Math.min(tpl.lessonsPerDay, 5);
+      const maxLessons = isSaturday
+        ? tpl.daysCount === 5
+          ? 0
+          : 4
+        : Math.min(tpl.lessonsPerDay, 5);
 
       for (let p = 1; p <= maxLessons; p++) {
         const key = `${day.dateKey}_${p}`;
@@ -783,5 +990,3 @@ export function applyTemplateToDatedSchedule(classId, templateId, options = {}) 
 
   return datedSchedule;
 }
-
-

@@ -14,8 +14,12 @@
 
     <!-- 3. Yuklanish holati (Loading State) -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center py-20">
-      <div class="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">To'lovlar statistikasi hisoblanmoqda...</p>
+      <div
+        class="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"
+      ></div>
+      <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+        To'lovlar statistikasi hisoblanmoqda...
+      </p>
     </div>
 
     <!-- 4. Asosiy mazmun (Tablar kesimida) -->
@@ -23,32 +27,27 @@
       <!-- TAB 1: OYLAR BO'YICHA -->
       <div v-if="activeTab === 'months'" class="space-y-5">
         <!-- 10 ta oylik kartochkalar (Responsive moslashuvchan grid) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-          <PaymentMonthCard
-            v-for="m in statsData.months"
-            :key="m.key"
-            :month="m"
-          />
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
+        >
+          <PaymentMonthCard v-for="m in statsData.months" :key="m.key" :month="m" />
         </div>
 
         <!-- Yillik Xulosa Paneli -->
-        <PaymentAnnualSummary
-          :summary="statsData"
-        />
+        <PaymentAnnualSummary :summary="statsData" />
       </div>
 
       <!-- TAB 2: SINFLAR / GURUHLAR BO'YICHA -->
       <div v-else class="space-y-5">
-        <div v-if="!statsData.classes || statsData.classes.length === 0" class="text-center py-16 text-gray-500 dark:text-gray-400">
+        <div
+          v-if="!statsData.classes || statsData.classes.length === 0"
+          class="text-center py-16 text-gray-500 dark:text-gray-400"
+        >
           Ushbu muassasada hozircha faol sinflar yoki guruhlar topilmadi.
         </div>
 
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <PaymentClassCard
-            v-for="cls in statsData.classes"
-            :key="cls.id"
-            :item="cls"
-          />
+          <PaymentClassCard v-for="cls in statsData.classes" :key="cls.id" :item="cls" />
         </div>
       </div>
     </template>
@@ -56,13 +55,13 @@
 </template>
 
 <script>
-import Breadcrumb from "@/components/Breadcrumb.vue";
-import PaymentStatsHeader from "@/components/payment-stats/PaymentStatsHeader.vue";
-import PaymentMonthCard from "@/components/payment-stats/PaymentMonthCard.vue";
-import PaymentClassCard from "@/components/payment-stats/PaymentClassCard.vue";
-import PaymentAnnualSummary from "@/components/payment-stats/PaymentAnnualSummary.vue";
-import { useTenantStore } from "@/store/tenant";
 import { dashboardApi } from "@/api/services";
+import Breadcrumb from "@/components/Breadcrumb.vue";
+import PaymentAnnualSummary from "@/components/payment-stats/PaymentAnnualSummary.vue";
+import PaymentClassCard from "@/components/payment-stats/PaymentClassCard.vue";
+import PaymentMonthCard from "@/components/payment-stats/PaymentMonthCard.vue";
+import PaymentStatsHeader from "@/components/payment-stats/PaymentStatsHeader.vue";
+import { useTenantStore } from "@/store/tenant";
 
 export default {
   name: "PaymentStatsView",

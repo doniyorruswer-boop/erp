@@ -1,18 +1,27 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
-import { AttendanceStatus, AuditAction } from '@prisma/client';
-import { BranchContext, buildBranchWhere } from '../auth/branch-access';
-import { MarkAttendanceDto, SingleAttendanceDto, QueryStudentAttendanceDto } from './dto/attendance.dto';
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditService } from "../audit/audit.service";
+import { AttendanceStatus, AuditAction, Prisma } from "@prisma/client";
+import { BranchContext, buildBranchWhere } from "../auth/branch-access";
+import {
+  MarkAttendanceDto,
+  SingleAttendanceDto,
+  QueryStudentAttendanceDto,
+} from "./dto/attendance.dto";
 
 @Injectable()
 export class AttendanceService {
   constructor(
     private prisma: PrismaService,
-    private auditService: AuditService,
+    private auditService: AuditService
   ) {}
 
-  async getGroupAttendance(groupId: string, dateStr: string, orgId: string, branchCtx?: BranchContext) {
+  async getGroupAttendance(
+    groupId: string,
+    dateStr: string,
+    orgId: string,
+    branchCtx?: BranchContext
+  ) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
     const date = new Date(dateStr);
     date.setUTCHours(0, 0, 0, 0);
@@ -26,7 +35,8 @@ export class AttendanceService {
         },
       },
     });
-    if (!group) throw new NotFoundException('Guruh topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    if (!group)
+      throw new NotFoundException("Guruh topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const attendances = await this.prisma.attendance.findMany({
       where: {
@@ -56,8 +66,13 @@ export class AttendanceService {
     };
   }
 
-  async getMonthlyAttendance(groupId: string, monthStr: string, orgId: string, branchCtx?: BranchContext) {
-    const [year, month] = monthStr.split('-').map(Number);
+  async getMonthlyAttendance(
+    groupId: string,
+    monthStr: string,
+    orgId: string,
+    branchCtx?: BranchContext
+  ) {
+    const [year, month] = monthStr.split("-").map(Number);
     const startDate = new Date(Date.UTC(year, month - 1, 1));
     const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
@@ -71,7 +86,8 @@ export class AttendanceService {
         },
       },
     });
-    if (!group) throw new NotFoundException('Guruh topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    if (!group)
+      throw new NotFoundException("Guruh topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const attendances = await this.prisma.attendance.findMany({
       where: {
@@ -108,12 +124,18 @@ export class AttendanceService {
     };
   }
 
-  async markAttendance(data: MarkAttendanceDto, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async markAttendance(
+    data: MarkAttendanceDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
     const group = await this.prisma.group.findFirst({
       where: { id: data.groupId, organizationId: orgId, deletedAt: null, ...branchWhere },
     });
-    if (!group) throw new NotFoundException('Guruh topilmadi yoki ushbu filialga kirish huquqi yo\'q');
+    if (!group)
+      throw new NotFoundException("Guruh topilmadi yoki ushbu filialga kirish huquqi yo'q");
 
     const targetDate = new Date(data.date);
     targetDate.setUTCHours(0, 0, 0, 0);
@@ -121,21 +143,26 @@ export class AttendanceService {
     // Verify lesson belongs to group and org if provided
     if (data.lessonId) {
       const lesson = await this.prisma.lesson.findFirst({
-        where: { id: data.lessonId, groupId: data.groupId, group: { organizationId: orgId }, deletedAt: null },
+        where: {
+          id: data.lessonId,
+          groupId: data.groupId,
+          group: { organizationId: orgId },
+          deletedAt: null,
+        },
       });
       if (!lesson) {
-        throw new BadRequestException('Dars topilmadi yoki ushbu guruhga tegishli emas');
+        throw new BadRequestException("Dars topilmadi yoki ushbu guruhga tegishli emas");
       }
     }
 
     // Verify all students belong to org
-    const studentIds = data.records.map(r => r.studentId);
+    const studentIds = data.records.map((r) => r.studentId);
     const validStudents = await this.prisma.student.findMany({
       where: { id: { in: studentIds }, organizationId: orgId, deletedAt: null },
       select: { id: true },
     });
     if (validStudents.length !== studentIds.length) {
-      throw new BadRequestException('Ayrim o\'quvchilar ushbu tashkilotga tegishli emas');
+      throw new BadRequestException("Ayrim o'quvchilar ushbu tashkilotga tegishli emas");
     }
 
     const operations = data.records.map((rec) =>
@@ -160,7 +187,7 @@ export class AttendanceService {
           status: rec.status,
           comment: rec.comment,
         },
-      }),
+      })
     );
 
     const results = await this.prisma.$transaction(operations);
@@ -170,7 +197,7 @@ export class AttendanceService {
       branchId: group.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'AttendanceBatch',
+      entityType: "AttendanceBatch",
       entityId: `${data.groupId}_${data.date}`,
       after: { count: results.length, date: data.date },
     });
@@ -178,26 +205,36 @@ export class AttendanceService {
     return { success: true, count: results.length, records: results };
   }
 
-  async markSingleAttendance(data: SingleAttendanceDto, orgId: string, userId?: string, branchCtx?: BranchContext) {
+  async markSingleAttendance(
+    data: SingleAttendanceDto,
+    orgId: string,
+    userId?: string,
+    branchCtx?: BranchContext
+  ) {
     const branchWhere = branchCtx ? buildBranchWhere(branchCtx) : {};
     const group = await this.prisma.group.findFirst({
       where: { id: data.groupId, organizationId: orgId, deletedAt: null, ...branchWhere },
     });
-    if (!group) throw new NotFoundException('Guruh topilmadi');
+    if (!group) throw new NotFoundException("Guruh topilmadi");
 
     const student = await this.prisma.student.findFirst({
       where: { id: data.studentId, organizationId: orgId, deletedAt: null },
     });
     if (!student) {
-      throw new BadRequestException('O\'quvchi topilmadi yoki ushbu tashkilotga tegishli emas');
+      throw new BadRequestException("O'quvchi topilmadi yoki ushbu tashkilotga tegishli emas");
     }
 
     if (data.lessonId) {
       const lesson = await this.prisma.lesson.findFirst({
-        where: { id: data.lessonId, groupId: data.groupId, group: { organizationId: orgId }, deletedAt: null },
+        where: {
+          id: data.lessonId,
+          groupId: data.groupId,
+          group: { organizationId: orgId },
+          deletedAt: null,
+        },
       });
       if (!lesson) {
-        throw new BadRequestException('Dars topilmadi yoki ushbu guruhga tegishli emas');
+        throw new BadRequestException("Dars topilmadi yoki ushbu guruhga tegishli emas");
       }
     }
 
@@ -232,7 +269,7 @@ export class AttendanceService {
       branchId: group.branchId || undefined,
       userId,
       action: AuditAction.UPDATE,
-      entityType: 'Attendance',
+      entityType: "Attendance",
       entityId: record.id,
       after: record,
     });
@@ -244,13 +281,13 @@ export class AttendanceService {
     const student = await this.prisma.student.findFirst({
       where: { id: studentId, organizationId: orgId, deletedAt: null },
     });
-    if (!student) throw new NotFoundException('O\'quvchi topilmadi');
+    if (!student) throw new NotFoundException("O'quvchi topilmadi");
 
     const page = Number(query.page) || 1;
     const limit = Math.min(Number(query.limit) || 20, 100);
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    const where: Prisma.AttendanceWhereInput = {
       studentId,
       groupId: query.groupId,
       status: query.status,
@@ -269,7 +306,7 @@ export class AttendanceService {
           group: { select: { id: true, name: true } },
           lesson: true,
         },
-        orderBy: { date: 'desc' },
+        orderBy: { date: "desc" },
       }),
       this.prisma.attendance.count({ where }),
     ]);

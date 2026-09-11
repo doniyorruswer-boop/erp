@@ -81,139 +81,161 @@ export const rules = {
   /**
    * Majburiy maydon tekshiruvi
    */
-  required: (label = "Ushbu maydon") => (val) => {
-    if (val === null || val === undefined) return `«${label}» to'ldirilishi shart`;
-    if (typeof val === "string" && !val.trim()) return `«${label}» to'ldirilishi shart`;
-    if (Array.isArray(val) && val.length === 0) return `Kamida bitta «${label}» tanlanishi shart`;
-    return null;
-  },
+  required:
+    (label = "Ushbu maydon") =>
+    (val) => {
+      if (val === null || val === undefined) return `«${label}» to'ldirilishi shart`;
+      if (typeof val === "string" && !val.trim()) return `«${label}» to'ldirilishi shart`;
+      if (Array.isArray(val) && val.length === 0) return `Kamida bitta «${label}» tanlanishi shart`;
+      return null;
+    },
 
   /**
    * Minimal uzunlik
    */
-  minLength: (min, label = "Maydon") => (val) => {
-    if (!val) return null;
-    const str = String(val).trim();
-    if (str.length < min) {
-      return `«${label}» kamida ${min} ta belgidan iborat bo'lishi kerak`;
-    }
-    return null;
-  },
+  minLength:
+    (min, label = "Maydon") =>
+    (val) => {
+      if (!val) return null;
+      const str = String(val).trim();
+      if (str.length < min) {
+        return `«${label}» kamida ${min} ta belgidan iborat bo'lishi kerak`;
+      }
+      return null;
+    },
 
   /**
    * Maksimal uzunlik
    */
-  maxLength: (max, label = "Maydon") => (val) => {
-    if (!val) return null;
-    const str = String(val).trim();
-    if (str.length > max) {
-      return `«${label}» ko'pi bilan ${max} ta belgidan oshmasligi kerak`;
-    }
-    return null;
-  },
+  maxLength:
+    (max, label = "Maydon") =>
+    (val) => {
+      if (!val) return null;
+      const str = String(val).trim();
+      if (str.length > max) {
+        return `«${label}» ko'pi bilan ${max} ta belgidan oshmasligi kerak`;
+      }
+      return null;
+    },
 
   /**
    * Ism / F.I.SH tekshiruvi (Kamida 2 ta belgi, raqamsiz)
    */
-  name: (label = "F.I.SH", min = 3) => (val) => {
-    if (!val) return null;
-    const str = String(val).trim();
-    if (str.length < min) {
-      return `«${label}» kamida ${min} ta harfdan iborat bo'lishi kerak`;
-    }
-    if (/\d/.test(str)) {
-      return `«${label}» tarkibida raqamlar bo'lishi mumkin emas`;
-    }
-    return null;
-  },
+  name:
+    (label = "F.I.SH", min = 3) =>
+    (val) => {
+      if (!val) return null;
+      const str = String(val).trim();
+      if (str.length < min) {
+        return `«${label}» kamida ${min} ta harfdan iborat bo'lishi kerak`;
+      }
+      if (/\d/.test(str)) {
+        return `«${label}» tarkibida raqamlar bo'lishi mumkin emas`;
+      }
+      return null;
+    },
 
   /**
    * O'zbekiston telefon raqami formati
    */
-  phone: (label = "Telefon raqami") => (val) => {
-    if (!val) return null;
-    const digits = String(val).replace(/\D/g, "");
-    if (digits.length === 9 || (digits.length === 12 && digits.startsWith("998"))) {
-      return null;
-    }
-    return `«${label}» noto'g'ri kiritilgan (+998 XX XXX-XX-XX formatida bo'lsin)`;
-  },
+  phone:
+    (label = "Telefon raqami") =>
+    (val) => {
+      if (!val) return null;
+      const digits = String(val).replace(/\D/g, "");
+      if (digits.length === 9 || (digits.length === 12 && digits.startsWith("998"))) {
+        return null;
+      }
+      return `«${label}» noto'g'ri kiritilgan (+998 XX XXX-XX-XX formatida bo'lsin)`;
+    },
 
   /**
    * Email tekshiruvi
    */
-  email: (label = "Elektron pochta") => (val) => {
-    if (!val) return null;
-    const str = String(val).trim();
-    if (!REGEX.EMAIL.test(str)) {
-      return `Haqiqiy «${label}» manzilini kiriting (masalan: info@maktab.uz)`;
-    }
-    return null;
-  },
+  email:
+    (label = "Elektron pochta") =>
+    (val) => {
+      if (!val) return null;
+      const str = String(val).trim();
+      if (!REGEX.EMAIL.test(str)) {
+        return `Haqiqiy «${label}» manzilini kiriting (masalan: info@maktab.uz)`;
+      }
+      return null;
+    },
 
   /**
    * Login tekshiruvi (faqat lotin, raqam va . _ -)
    */
-  login: (label = "Login", min = 4) => (val) => {
-    if (!val) return null;
-    const str = String(val).trim();
-    if (str.length < min) {
-      return `«${label}» kamida ${min} ta belgidan iborat bo'lishi kerak`;
-    }
-    if (!REGEX.LOGIN.test(str)) {
-      return `«${label}» faqat lotin harflari, raqamlar va (. - _) belgilaridan iborat bo'lishi mumkin`;
-    }
-    return null;
-  },
+  login:
+    (label = "Login", min = 4) =>
+    (val) => {
+      if (!val) return null;
+      const str = String(val).trim();
+      if (str.length < min) {
+        return `«${label}» kamida ${min} ta belgidan iborat bo'lishi kerak`;
+      }
+      if (!REGEX.LOGIN.test(str)) {
+        return `«${label}» faqat lotin harflari, raqamlar va (. - _) belgilaridan iborat bo'lishi mumkin`;
+      }
+      return null;
+    },
 
   /**
    * Parol mustahkamligi
    */
-  password: (label = "Parol", min = 6) => (val) => {
-    if (!val) return null;
-    const str = String(val);
-    if (str.length < min) {
-      return `«${label}» kamida ${min} ta belgidan iborat bo'lishi kerak`;
-    }
-    return null;
-  },
+  password:
+    (label = "Parol", min = 6) =>
+    (val) => {
+      if (!val) return null;
+      const str = String(val);
+      if (str.length < min) {
+        return `«${label}» kamida ${min} ta belgidan iborat bo'lishi kerak`;
+      }
+      return null;
+    },
 
   /**
    * Musbat son / Narx / To'lov summasi
    */
-  positiveNumber: (label = "Summa", min = 0) => (val) => {
-    if (val === "" || val === null || val === undefined) return null;
-    const num = Number(String(val).replace(/\s/g, ""));
-    if (isNaN(num)) {
-      return `«${label}» faqat raqamlardan iborat bo'lishi kerak`;
-    }
-    if (num < min) {
-      return `«${label}» kamida ${min.toLocaleString("uz-UZ")} bo'lishi kerak`;
-    }
-    return null;
-  },
+  positiveNumber:
+    (label = "Summa", min = 0) =>
+    (val) => {
+      if (val === "" || val === null || val === undefined) return null;
+      const num = Number(String(val).replace(/\s/g, ""));
+      if (isNaN(num)) {
+        return `«${label}» faqat raqamlardan iborat bo'lishi kerak`;
+      }
+      if (num < min) {
+        return `«${label}» kamida ${min.toLocaleString("uz-UZ")} bo'lishi kerak`;
+      }
+      return null;
+    },
 
   /**
    * Telegram username tekshiruvi
    */
-  telegram: (label = "Telegram") => (val) => {
-    if (!val) return null;
-    const str = String(val).trim();
-    if (!REGEX.TELEGRAM.test(str)) {
-      return `«${label}» noto'g'ri (masalan: @foydalanuvchi)`;
-    }
-    return null;
-  },
+  telegram:
+    (label = "Telegram") =>
+    (val) => {
+      if (!val) return null;
+      const str = String(val).trim();
+      if (!REGEX.TELEGRAM.test(str)) {
+        return `«${label}» noto'g'ri (masalan: @foydalanuvchi)`;
+      }
+      return null;
+    },
 
   /**
    * Moslik tekshiruvi (Parolni tasdiqlash uchun)
    */
-  match: (targetVal, targetLabel = "parol", label = "Tasdiqlash") => (val) => {
-    if (val !== targetVal) {
-      return `«${label}» kiritilgan «${targetLabel}» bilan mos kelmadi`;
-    }
-    return null;
-  },
+  match:
+    (targetVal, targetLabel = "parol", label = "Tasdiqlash") =>
+    (val) => {
+      if (val !== targetVal) {
+        return `«${label}» kiritilgan «${targetLabel}» bilan mos kelmadi`;
+      }
+      return null;
+    },
 
   /**
    * Maxsus funksiya orqali tekshirish
@@ -407,7 +429,10 @@ export const employeeValidationRules = {
   lastName: [rules.required("Familiya"), rules.name("Familiya", 2)],
   phone: [rules.required("Telefon raqami"), rules.phone("Telefon raqami")],
   position: [rules.required("Lavozim"), rules.minLength(2, "Lavozim")],
-  baseSalary: [rules.required("Asosiy oylik maosh"), rules.positiveNumber("Asosiy oylik maosh", 100000)],
+  baseSalary: [
+    rules.required("Asosiy oylik maosh"),
+    rules.positiveNumber("Asosiy oylik maosh", 100000),
+  ],
 };
 
 /**
@@ -474,12 +499,14 @@ export const financePaymentValidationRules = {
   method: [rules.required("To'lov usuli")],
 };
 
-
 // ============================================================================
 // 6. YUP SXEMALARI (Yup kutubxonasiga asoslangan komponentlar bilan moslik)
 // ============================================================================
 export const studentSchema = yup.object({
-  fullName: yup.string().required("O'quvchi F.I.Sh ni kiritish shart").min(3, "Kamida 3 ta harf bo'lsin"),
+  fullName: yup
+    .string()
+    .required("O'quvchi F.I.Sh ni kiritish shart")
+    .min(3, "Kamida 3 ta harf bo'lsin"),
   phone: yup
     .string()
     .required("Telefon raqamni kiritish shart")
